@@ -10,7 +10,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [1,33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,9]
+        board = [[],33,0, 0,0,0,5, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -20,7 +20,34 @@ class Player:
         self.DICT = None
         self.opp_Dict = None
         self.can_take_off = False
+        self.dice = None 
+
+    def move_piece(self, FROM, TO):
+        '''
+        Function used for moving one piece and altering the board state
+        '''        
+        starting= self.board[FROM]
+        remaining= int(str(starting)[1:])
+        moved = int(str(starting)[0])
         
+        self.board[FROM]=remaining
+
+        ending = self.board[TO]
+        # For a hit
+        if moved !=self.board[TO]:
+            if self.color =='white':
+                self.board[-1].append(ending)
+                self.board[TO] = moved
+                return  
+            elif self.color =='black':
+                self.board[0].append(ending)
+                self.board[TO]= moved
+                return 
+        # For Stacking pieces
+        if moved == self.board[TO]:
+            curr = str(ending)
+            mov = str(moved)
+            self.board[TO]= curr+mov
 
     def create_color(self):
         rand = random.randint(0,1)
@@ -33,8 +60,7 @@ class Player:
     def roll(self):
         '''
         Rolls, returns rolls
-        '''
-        
+        '''        
         dice = []
         dice2 = []
         for i in range(2):
@@ -44,9 +70,10 @@ class Player:
         if dice[0]==dice[1]:
             for i in range(4):
                 dice2.append(dice[0])
+            self.dice = dice2
             return dice2
            
-                               
+        self.dice = dice                       
         return dice             
 
     def find_positions(self):
@@ -84,12 +111,7 @@ class Player:
     def find_moves(self, DICE=None):
         '''
         Finds moves player rolling can move to on board
-        '''
-        # creates two dictionaries, self and opponent
-        # array of moves
-        
-
-                
+        '''                
         self.find_positions()
         
         Possible_Moves = []
@@ -146,8 +168,12 @@ class Player:
 
         return Move_Dict, Hit_Dict                                   
 
-    def random_comp_move(self):
-        MOVES = self.find_moves()
+    def random_comp_move(self, DICE=None):        
+        
+        if DICE==None:
+            MOVES = self.find_moves()
+        else:
+            MOVES = self.find_moves(DICE)    
         possible_spots = MOVES[0]
         possible_hits = MOVES[1]
         print(possible_spots, possible_hits)
@@ -165,7 +191,17 @@ class Player:
                             FROM = VAL+hit_die
                         elif self.color =='white':
                             FROM = VAL-hit_die    
-                        return hit_die, (FROM, VAL)
+                        self.dice.remove(hit_die)
+                        self.move_piece(FROM, VAL)
+                        # Check to see if all dice are used
+                        if len(self.dice)==0:
+                            return 
+                        # otherwise, continue the move
+                        else:
+                            self.random_comp_move(self.dice)
+
+
+                        
 
 
         # if len(possible_hits)>0:
@@ -182,7 +218,10 @@ a = Player()
 # print(a.find_moves())
 # print(a.DICT, a.opp_Dict)
 # print(a.board)
+
 print(a.random_comp_move())
+print(a.dice)
+print(a.board)
 
 
 

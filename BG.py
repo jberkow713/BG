@@ -1,7 +1,9 @@
+from xml.etree.ElementTree import TreeBuilder
 import numpy as np
 import random 
 import pygame as p
 from pygame.constants import MOUSEBUTTONDOWN
+import sys
 p.init()
 Width, Height = 1024, 1024
 Max_FPS=15
@@ -17,10 +19,12 @@ class Player:
     def __init__(self):
         self.color = self.create_color()
         self.board = Board().board
+        self.done = False
         self.DICT = None
         self.opp_Dict = None
         self.can_take_off = False
-        self.dice = None 
+        self.dice = None
+
 
     def move_piece(self, FROM, TO):
         '''
@@ -129,7 +133,7 @@ class Player:
         # if one die has been used, we want to manually feed in the remaining dice
         else:
             dice=DICE
-
+        
         for die in dice:
             possible_spots = []
             possible_hits = []
@@ -174,21 +178,26 @@ class Player:
 
         return Move_Dict, Hit_Dict                                   
 
-    def random_comp_move(self, DICE=None):        
+    def random_comp_move(self, DICE=None):
         
-        if self.dice !=None:
-            if len(self.dice)==0:
-                print('hi')
-                return 
-        if DICE==None:
-            MOVES = self.find_moves()
+        if self.dice !=None and len(self.dice)==0:
+            return 
+            
+               
         else:
-            MOVES = self.find_moves(DICE)    
+
+            if DICE==None:
+                MOVES = self.find_moves()
+            else:
+                MOVES = self.find_moves(DICE)
+        
         possible_spots = MOVES[0]
         possible_hits = MOVES[1]
         print(possible_spots, possible_hits)
         
         # Example of possible_spots {3, 4, 14, 15, 19, 20, 21, 22}, ex possible_hits {6}
+    
+
         HIT_DICE = []
         for roll, hit_list in possible_hits.items():
             if len(hit_list)>0:
@@ -201,50 +210,49 @@ class Player:
                             FROM = VAL+hit_die
                         elif self.color =='white':
                             FROM = VAL-hit_die    
-                        
+                        print(self.dice)
                         self.dice.remove(hit_die)
                         self.move_piece(FROM, VAL)
                         # Check to see if all dice are used
                         
                         # otherwise, continue the move
                         self.random_comp_move(self.dice)
-        MOVE_DICE = []
         
-        for roll, move_list in possible_spots.items():
-            
-            if len(move_list)>0:
-                MOVE_DICE.append(roll)
-                moved_die = MOVE_DICE[random.randint(0,len(MOVE_DICE)-1)]
-                for roll, move_list in possible_spots.items():
-                    if roll == moved_die:
-                        VAL = move_list[random.randint(0, len(move_list)-1)]
-                        if self.color =='black':
-                            FROM = VAL+moved_die
-                        elif self.color =='white':
-                            FROM = VAL-moved_die  
-
-                        print(self.dice)
-                        self.dice.remove(moved_die)
-                        self.move_piece(FROM, VAL)           
-                        print(self.dice)
-                        # if all dice have been used
-                        self.random_comp_move(self.dice)
-
-            
-# TODO 
-# Hitting is working, now we need to work on recalculating moves, after one die is moved
-
- 
         
+        if len(self.dice)>0:
+            roll = self.dice[random.randint(0, len(self.dice)-1)]
+            print(roll)
+
+            for ROLL, move_list in possible_spots.items():
+                
+                if ROLL==roll:
+                    moved_die= move_list[random.randint(0, len(move_list)-1)]
+                
+            print(moved_die)               
+                            
+            if self.color =='black':
+                FROM = moved_die+roll
+            elif self.color =='white':
+                FROM = moved_die-roll  
+
+            print(self.dice)
+            print(moved_die)
+            self.move_piece(FROM, moved_die)  
+            self.dice.remove(roll)
+                    
+        if len(self.dice)>0:
+            self.random_comp_move(self.dice)
+        else:
+            return   
 
 a = Player()
 # print(a.find_moves())
 # print(a.DICT, a.opp_Dict)
 # print(a.board)
 
-print(a.random_comp_move())
-print(a.dice)
+a.random_comp_move()
 print(a.board)
+
 
 
 

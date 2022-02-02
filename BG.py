@@ -1,4 +1,3 @@
-from xml.etree.ElementTree import TreeBuilder
 import numpy as np
 import random 
 import pygame as p
@@ -182,8 +181,7 @@ class Player:
         
         if self.dice !=None and len(self.dice)==0:
             return 
-            
-               
+                       
         else:
 
             if DICE==None:
@@ -194,9 +192,7 @@ class Player:
         possible_spots = MOVES[0]
         possible_hits = MOVES[1]
         print(possible_spots, possible_hits)
-        
-        # Example of possible_spots {3, 4, 14, 15, 19, 20, 21, 22}, ex possible_hits {6}
-    
+            
 
         HIT_DICE = []
         for roll, hit_list in possible_hits.items():
@@ -221,20 +217,20 @@ class Player:
         
         if len(self.dice)>0:
             roll = self.dice[random.randint(0, len(self.dice)-1)]
-            print(roll)
+            
 
             for ROLL, move_list in possible_spots.items():
                 
                 if ROLL==roll:
                     moved_die= move_list[random.randint(0, len(move_list)-1)]
-                
-            print(moved_die)               
+                                     
                             
             if self.color =='black':
                 FROM = moved_die+roll
             elif self.color =='white':
                 FROM = moved_die-roll  
 
+            print(roll)
             print(self.dice)
             print(moved_die)
             self.move_piece(FROM, moved_die)  

@@ -26,28 +26,35 @@ class Player:
         '''
         Function used for moving one piece and altering the board state
         '''        
+        print(FROM, TO)
         starting= self.board[FROM]
-        remaining= int(str(starting)[1:])
+        if len(str(starting)[1:])>0:
+            
+            remaining= int(str(starting)[1:])
+        else:
+            remaining = 0    
         moved = int(str(starting)[0])
-        
+                
         self.board[FROM]=remaining
 
         ending = self.board[TO]
         # For a hit
-        if moved !=self.board[TO]:
+        if moved !=int(str(self.board[TO])[0]):
             if self.color =='white':
-                self.board[-1].append(ending)
+                if self.board[TO]!=0:
+                    self.board[-1].append(ending)
                 self.board[TO] = moved
                 return  
             elif self.color =='black':
-                self.board[0].append(ending)
+                if self.board[TO]!=0:
+                    self.board[0].append(ending)
                 self.board[TO]= moved
                 return 
         # For Stacking pieces
-        if moved == self.board[TO]:
+        if moved == int(str(self.board[TO])[0]):
             curr = str(ending)
             mov = str(moved)
-            self.board[TO]= curr+mov
+            self.board[TO]= int(curr+mov)
 
     def create_color(self):
         rand = random.randint(0,1)
@@ -90,8 +97,7 @@ class Player:
             if str(3) in str(val):
                 amounts.append(len(str(val)))
                 positions.append(idx)
-        white_dict = dict(zip(positions, amounts))
-                
+        white_dict = dict(zip(positions, amounts))               
                 
         for idx, val in b:
             if str(5) in str(val):
@@ -170,6 +176,10 @@ class Player:
 
     def random_comp_move(self, DICE=None):        
         
+        if self.dice !=None:
+            if len(self.dice)==0:
+                print('hi')
+                return 
         if DICE==None:
             MOVES = self.find_moves()
         else:
@@ -191,22 +201,35 @@ class Player:
                             FROM = VAL+hit_die
                         elif self.color =='white':
                             FROM = VAL-hit_die    
+                        
                         self.dice.remove(hit_die)
                         self.move_piece(FROM, VAL)
                         # Check to see if all dice are used
-                        if len(self.dice)==0:
-                            return 
-                        # otherwise, continue the move
-                        else:
-                            self.random_comp_move(self.dice)
-
-
                         
+                        # otherwise, continue the move
+                        self.random_comp_move(self.dice)
+        MOVE_DICE = []
+        
+        for roll, move_list in possible_spots.items():
+            
+            if len(move_list)>0:
+                MOVE_DICE.append(roll)
+                moved_die = MOVE_DICE[random.randint(0,len(MOVE_DICE)-1)]
+                for roll, move_list in possible_spots.items():
+                    if roll == moved_die:
+                        VAL = move_list[random.randint(0, len(move_list)-1)]
+                        if self.color =='black':
+                            FROM = VAL+moved_die
+                        elif self.color =='white':
+                            FROM = VAL-moved_die  
 
+                        print(self.dice)
+                        self.dice.remove(moved_die)
+                        self.move_piece(FROM, VAL)           
+                        print(self.dice)
+                        # if all dice have been used
+                        self.random_comp_move(self.dice)
 
-        # if len(possible_hits)>0:
-        #     lst = list(possible_hits)
-        #     spot = lst[random.randint(0,len(lst)-1)]
             
 # TODO 
 # Hitting is working, now we need to work on recalculating moves, after one die is moved

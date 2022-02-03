@@ -15,8 +15,11 @@ class Board:
         return board
 
 class Player:
-    def __init__(self):
-        self.color = self.create_color()
+    def __init__(self, color=None):
+        if color==None:
+            self.color = self.create_color()
+        else:
+            self.color=color    
         self.board = Board().board
         self.done = False
         self.DICT = None
@@ -60,8 +63,7 @@ class Player:
             self.board[TO]= int(curr+mov)
 
     def create_color(self):
-        rand = random.randint(0,1)
-        if rand ==0:
+        if random.randint(0,1)==0:
             print('You are white')
             return 'white'
         else:
@@ -71,18 +73,12 @@ class Player:
         '''
         Rolls, returns rolls
         '''        
-        dice = []
-        dice2 = []
-        for i in range(2):
-            a = random.randint(1,6)
-            dice.append(a)
-        
+        dice = [random.randint(1,6) for x in range(2)]
         if dice[0]==dice[1]:
-            for i in range(4):
-                dice2.append(dice[0])
-            self.dice = dice2
-            return dice2
-           
+            doubles = [dice[0]]*4
+            self.dice=doubles
+            return doubles
+                  
         self.dice = dice                       
         return dice             
 
@@ -95,7 +91,7 @@ class Player:
         positions2 = []
         amounts = []
         amounts2 = []
-        
+                
         for idx, val in b:
             if str(3) in str(val):
                 amounts.append(len(str(val)))
@@ -136,39 +132,39 @@ class Player:
         for die in dice:
             possible_spots = []
             possible_hits = []
-            if self.can_take_off ==False:
-                for key in self.DICT.keys():
-                    if self.color == 'white':
-                        spot = key+die
-                        if spot <= 24:
-                            if self.board[spot]==0:
-                                possible_spots.append(spot)
+            
+            for key in self.DICT.keys():
+                if self.color == 'white':
+                    spot = key+die
+                    if spot <= 24:
+                        if self.board[spot]==0:
+                            possible_spots.append(spot)
+                            
+                        if spot in self.DICT:
+                            possible_spots.append(spot)
                                 
-                            if spot in self.DICT:
-                                possible_spots.append(spot)
-                                    
-                            else:
-                                for idx, count in self.opp_Dict.items():
-                                    if spot == idx:
-                                        if count <2:
-                                            possible_hits.append(spot)
-                                            possible_spots.append(spot)
+                        else:
+                            for idx, count in self.opp_Dict.items():
+                                if spot == idx:
+                                    if count <2:
+                                        possible_hits.append(spot)
+                                        possible_spots.append(spot)
                                             
-                    if self.color == 'black':
-                        spot = key-die
-                        if spot >= 1:
-                            if self.board[spot]==0:
-                                possible_spots.append(spot)
-                                
-                            if spot in self.DICT:
-                                possible_spots.append(spot)
-                                     
-                            else:
-                                for idx, count in self.opp_Dict.items():
-                                    if spot == idx:
-                                        if count <2:
-                                            possible_hits.append(spot)
-                                            possible_spots.append(spot)
+                if self.color == 'black':
+                    spot = key-die
+                    if spot >= 1:
+                        if self.board[spot]==0:
+                            possible_spots.append(spot)
+                            
+                        if spot in self.DICT:
+                            possible_spots.append(spot)
+                                    
+                        else:
+                            for idx, count in self.opp_Dict.items():
+                                if spot == idx:
+                                    if count <2:
+                                        possible_hits.append(spot)
+                                        possible_spots.append(spot)
             Possible_Moves.append(possible_spots)                             
             Possible_Hits.append(possible_hits)
         
@@ -182,12 +178,11 @@ class Player:
         if self.dice !=None and len(self.dice)==0:
             return 
                        
+        
+        if DICE==None:
+            MOVES = self.find_moves()
         else:
-
-            if DICE==None:
-                MOVES = self.find_moves()
-            else:
-                MOVES = self.find_moves(DICE)
+            MOVES = self.find_moves(DICE)
         
         possible_spots = MOVES[0]
         possible_hits = MOVES[1]
@@ -209,37 +204,39 @@ class Player:
                         print(self.dice)
                         self.dice.remove(hit_die)
                         self.move_piece(FROM, VAL)
-                        # Check to see if all dice are used
                         
-                        # otherwise, continue the move
+                        # if len(self.dice)>0:
                         self.random_comp_move(self.dice)
+                        # else:
+                        #     print('done')
+                        #     return   
         
         
         if len(self.dice)>0:
             roll = self.dice[random.randint(0, len(self.dice)-1)]
             
-
             for ROLL, move_list in possible_spots.items():
                 
                 if ROLL==roll:
-                    moved_die= move_list[random.randint(0, len(move_list)-1)]
+                    moved_to= move_list[random.randint(0, len(move_list)-1)]
                                      
                             
             if self.color =='black':
-                FROM = moved_die+roll
+                FROM = moved_to+roll
             elif self.color =='white':
-                FROM = moved_die-roll  
+                FROM = moved_to-roll  
 
             print(roll)
             print(self.dice)
-            print(moved_die)
-            self.move_piece(FROM, moved_die)  
+            print(moved_to)
+            self.move_piece(FROM, moved_to)  
             self.dice.remove(roll)
                     
-        if len(self.dice)>0:
+        # if len(self.dice)>0:
             self.random_comp_move(self.dice)
-        else:
-            return   
+        # else:
+        #     print('done')
+        #     return   
 
 a = Player()
 # print(a.find_moves())

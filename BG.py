@@ -11,7 +11,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],33,0, 0,0,0,33333, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[33],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[55]]
         return board
 
 class Player:
@@ -26,7 +26,6 @@ class Player:
         self.opp_Dict = None
         self.can_take_off = False
         self.dice = None
-
 
     def move_piece(self, FROM, TO):
         '''
@@ -66,7 +65,10 @@ class Player:
             curr = str(ending)
             mov = str(moved)
             self.board[TO]= int(curr+mov)
-                
+    def random_list(self, lst):
+        return  lst[random.randint(0,len(lst)-1)]
+    def random_index(self, lst):
+        return random.randint(0, len(lst)-1)               
 
     def create_color(self):
         if random.randint(0,1)==0:
@@ -190,13 +192,9 @@ class Player:
             if self.board[0]!=0:
                 self.board[0]=[(self.board[0])]
             else:
-                self.board[0]=[]
-        
-        print(self.board)
-        print(self.dice)
+                self.board[0]=[]      
 
-        if self.dice !=None and len(self.dice)==0:
-            
+        if self.dice !=None and len(self.dice)==0:            
             return                      
         
         if DICE==None:
@@ -210,8 +208,10 @@ class Player:
         # if on rail
         Rail_Dice = []
         Hits = []
-                   
-        if len(self.dice)>0:
+
+        #Moving Off Rail    
+        if len(self.dice)>0:                
+
             if self.color == 'white':
                 if len(self.board[0])>0:
                     rail = 0
@@ -223,19 +223,19 @@ class Player:
                                     Rail_Dice.append(roll)
                                     Hits.append(val)
 
-                            if len(Rail_Dice)>0:
+                        if len(Rail_Dice)>0:
 
-                                index = random.randint(0, len(Rail_Dice)-1)
-                                die = Rail_Dice[index]
-                                move_to = Hits[index]
-                                FROM = move_to-die
-                                if self.dice == []:
-                                    break
-                                self.dice.remove(die)
-                                self.move_piece(FROM, move_to)
-                                self.random_comp_move(self.dice)      
+                            index = self.random_index(Rail_Dice)
+                            die = Rail_Dice[index]
+                            move_to = Hits[index]
+                            FROM = move_to-die
+                            if self.dice == []:
+                                break
+                            self.dice.remove(die)
+                            self.move_piece(FROM, move_to)
+                            self.random_comp_move(self.dice)      
 
-                        
+                    #For other moves off rail 
                     for roll, hit_list in possible_spots.items():
 
                         if len(hit_list)>0:
@@ -244,18 +244,17 @@ class Player:
                                     Rail_Dice.append(roll)
                                     Hits.append(val)
 
-                            if len(Rail_Dice)>0:
-                                index = random.randint(0, len(Rail_Dice)-1)
-                                die = Rail_Dice[index]
-                                move_to = Hits[index]
-                                FROM = move_to-die
-                                
-                                if self.dice == []:
-                                    break
-                                self.dice.remove(die)
-                                self.move_piece(FROM, move_to)
-                                self.random_comp_move(self.dice) 
-                                    
+                        if len(Rail_Dice)>0:
+                            index = self.random_index(Rail_Dice)
+                            die = Rail_Dice[index]
+                            move_to = Hits[index]
+                            FROM = move_to-die
+                            
+                            if self.dice == []:
+                                break
+                            self.dice.remove(die)
+                            self.move_piece(FROM, move_to)
+                            self.random_comp_move(self.dice)                                    
                     
                     self.dice = []
                     return
@@ -273,7 +272,7 @@ class Player:
 
                             if len(Rail_Dice)>0:
 
-                                index = random.randint(0, len(Rail_Dice)-1)
+                                index = self.random_index(Rail_Dice)
                                 die = Rail_Dice[index]
                                 move_to = Hits[index]
                                 FROM = move_to+die
@@ -281,8 +280,7 @@ class Player:
                                     break
                                 self.dice.remove(die)
                                 self.move_piece(FROM, move_to)
-                                self.random_comp_move(self.dice)      
-
+                                self.random_comp_move(self.dice)
                         
                     for roll, hit_list in possible_spots.items():
 
@@ -293,7 +291,7 @@ class Player:
                                     Hits.append(val)
 
                             if len(Rail_Dice)>0:
-                                index = random.randint(0, len(Rail_Dice)-1)
+                                index = self.random_index(Rail_Dice)
                                 die = Rail_Dice[index]
                                 move_to = Hits[index]
                                 FROM = move_to+die
@@ -302,23 +300,21 @@ class Player:
                                     break
                                 self.dice.remove(die)
                                 self.move_piece(FROM, move_to)
-                                self.random_comp_move(self.dice) 
-                                    
+                                self.random_comp_move(self.dice)                                    
                     
                     self.dice = []
-                    return 
+                    return
 
-
-        
         # if can hit, must hit
         HIT_DICE = []
         for roll, hit_list in possible_hits.items():
             if len(hit_list)>0:
                 HIT_DICE.append(roll)
-                hit_die = HIT_DICE[random.randint(0,len(HIT_DICE)-1)]
+                hit_die = self.random_list(HIT_DICE)
+                # hit_die = HIT_DICE[random.randint(0,len(HIT_DICE)-1)]
                 for roll, hit_list in possible_hits.items():
                     if roll == hit_die:
-                        VAL = hit_list[random.randint(0,len(hit_list)-1)]
+                        VAL = self.random_list(hit_list)
                         if self.color == 'black':
                             FROM = VAL+hit_die
                         elif self.color =='white':
@@ -330,12 +326,12 @@ class Player:
                         self.random_comp_move(self.dice)        
         # otherwise, roll
         if len(self.dice)>0:
-            roll = self.dice[random.randint(0, len(self.dice)-1)]
+            roll = self.random_list(self.dice)
             
             for ROLL, move_list in possible_spots.items():
                 
                 if ROLL==roll:
-                    moved_to= move_list[random.randint(0, len(move_list)-1)]                                     
+                    moved_to= self.random_list(move_list)                                   
                             
             if self.color =='black':
                 FROM = moved_to+roll
@@ -357,6 +353,7 @@ a = Player()
 # print(a.board)
 
 a.random_comp_move()
+print(a.board)
 
 
 

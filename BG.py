@@ -311,7 +311,7 @@ class Player:
             if len(hit_list)>0:
                 HIT_DICE.append(roll)
                 hit_die = self.random_list(HIT_DICE)
-                # hit_die = HIT_DICE[random.randint(0,len(HIT_DICE)-1)]
+                
                 for roll, hit_list in possible_hits.items():
                     if roll == hit_die:
                         VAL = self.random_list(hit_list)
@@ -345,7 +345,13 @@ class Player:
             self.dice.remove(roll)                
         
             self.random_comp_move(self.dice)
-        
+
+# TODO functionality for end of game, taking all pieces off
+
+# TODO If not coming off rail, not taking pieces off at end,
+# not hitting, then make function for prioritizing blocks, 
+# and ultimately blocking on certain spots relative to other color, as well as
+# creating multiple blocks in a row      
 
 a = Player()
 # print(a.find_moves())

@@ -11,7 +11,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],33,0, 0,0,0,5, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[],33,0, 0,0,0,33333, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -34,6 +34,10 @@ class Player:
         '''        
         print(FROM, TO)
         starting= self.board[FROM]
+        
+        if isinstance(starting, list)==True:
+            starting = int(starting[0])
+
         if len(str(starting)[1:])>0:
             
             remaining= int(str(starting)[1:])
@@ -50,6 +54,7 @@ class Player:
                 if self.board[TO]!=0:
                     self.board[-1].append(ending)
                 self.board[TO] = moved
+                
                 return  
             elif self.color =='black':
                 if self.board[TO]!=0:
@@ -61,6 +66,7 @@ class Player:
             curr = str(ending)
             mov = str(moved)
             self.board[TO]= int(curr+mov)
+                
 
     def create_color(self):
         if random.randint(0,1)==0:
@@ -175,9 +181,23 @@ class Player:
 
     def random_comp_move(self, DICE=None):
         
+        if isinstance(self.board[-1], int)==True:
+            if self.board[-1]!=0:
+                self.board[-1]=[(self.board[-1])]
+            else:
+                self.board[-1]=[]    
+        if isinstance(self.board[0], int)==True:
+            if self.board[0]!=0:
+                self.board[0]=[(self.board[0])]
+            else:
+                self.board[0]=[]
+        
+        print(self.board)
+        print(self.dice)
+
         if self.dice !=None and len(self.dice)==0:
-            return 
-                       
+            
+            return                      
         
         if DICE==None:
             MOVES = self.find_moves()
@@ -186,9 +206,111 @@ class Player:
         
         possible_spots = MOVES[0]
         possible_hits = MOVES[1]
-        print(possible_spots, possible_hits)
-            
+        print(possible_spots, possible_hits)            
+        # if on rail
+        Rail_Dice = []
+        Hits = []
+                   
+        if len(self.dice)>0:
+            if self.color == 'white':
+                if len(self.board[0])>0:
+                    rail = 0
+                    # If you can hit coming off rail
+                    for roll, hit_list in possible_hits.items():
+                        if len(hit_list)>0:
+                            for val in hit_list:
+                                if val == rail + roll:
+                                    Rail_Dice.append(roll)
+                                    Hits.append(val)
 
+                            if len(Rail_Dice)>0:
+
+                                index = random.randint(0, len(Rail_Dice)-1)
+                                die = Rail_Dice[index]
+                                move_to = Hits[index]
+                                FROM = move_to-die
+                                if self.dice == []:
+                                    break
+                                self.dice.remove(die)
+                                self.move_piece(FROM, move_to)
+                                self.random_comp_move(self.dice)      
+
+                        
+                    for roll, hit_list in possible_spots.items():
+
+                        if len(hit_list)>0:
+                            for val in hit_list:
+                                if val == rail + roll:
+                                    Rail_Dice.append(roll)
+                                    Hits.append(val)
+
+                            if len(Rail_Dice)>0:
+                                index = random.randint(0, len(Rail_Dice)-1)
+                                die = Rail_Dice[index]
+                                move_to = Hits[index]
+                                FROM = move_to-die
+                                
+                                if self.dice == []:
+                                    break
+                                self.dice.remove(die)
+                                self.move_piece(FROM, move_to)
+                                self.random_comp_move(self.dice) 
+                                    
+                    
+                    self.dice = []
+                    return
+
+            if self.color=='black':
+                if len(self.board[-1])>0:
+                    rail = len(self.board)-1
+                    # If you can hit coming off rail
+                    for roll, hit_list in possible_hits.items():
+                        if len(hit_list)>0:
+                            for val in hit_list:
+                                if val == rail - roll:
+                                    Rail_Dice.append(roll)
+                                    Hits.append(val)
+
+                            if len(Rail_Dice)>0:
+
+                                index = random.randint(0, len(Rail_Dice)-1)
+                                die = Rail_Dice[index]
+                                move_to = Hits[index]
+                                FROM = move_to+die
+                                if self.dice == []:
+                                    break
+                                self.dice.remove(die)
+                                self.move_piece(FROM, move_to)
+                                self.random_comp_move(self.dice)      
+
+                        
+                    for roll, hit_list in possible_spots.items():
+
+                        if len(hit_list)>0:
+                            for val in hit_list:
+                                if val == rail - roll:
+                                    Rail_Dice.append(roll)
+                                    Hits.append(val)
+
+                            if len(Rail_Dice)>0:
+                                index = random.randint(0, len(Rail_Dice)-1)
+                                die = Rail_Dice[index]
+                                move_to = Hits[index]
+                                FROM = move_to+die
+                                
+                                if self.dice == []:
+                                    break
+                                self.dice.remove(die)
+                                self.move_piece(FROM, move_to)
+                                self.random_comp_move(self.dice) 
+                                    
+                    
+                    self.dice = []
+                    return 
+
+
+        
+        # if can hit, must hit
         HIT_DICE = []
         for roll, hit_list in possible_hits.items():
             if len(hit_list)>0:
@@ -204,22 +326,16 @@ class Player:
                         print(self.dice)
                         self.dice.remove(hit_die)
                         self.move_piece(FROM, VAL)
-                        
-                        # if len(self.dice)>0:
-                        self.random_comp_move(self.dice)
-                        # else:
-                        #     print('done')
-                        #     return   
-        
-        
+                                                
+                        self.random_comp_move(self.dice)        
+        # otherwise, roll
         if len(self.dice)>0:
             roll = self.dice[random.randint(0, len(self.dice)-1)]
             
             for ROLL, move_list in possible_spots.items():
                 
                 if ROLL==roll:
-                    moved_to= move_list[random.randint(0, len(move_list)-1)]
-                                     
+                    moved_to= move_list[random.randint(0, len(move_list)-1)]                                     
                             
             if self.color =='black':
                 FROM = moved_to+roll
@@ -230,13 +346,10 @@ class Player:
             print(self.dice)
             print(moved_to)
             self.move_piece(FROM, moved_to)  
-            self.dice.remove(roll)
-                    
-        # if len(self.dice)>0:
+            self.dice.remove(roll)                
+        
             self.random_comp_move(self.dice)
-        # else:
-        #     print('done')
-        #     return   
+        
 
 a = Player()
 # print(a.find_moves())
@@ -244,7 +357,7 @@ a = Player()
 # print(a.board)
 
 a.random_comp_move()
-print(a.board)
+
 
 
 

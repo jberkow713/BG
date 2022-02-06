@@ -11,6 +11,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
+        # board = [[],555,55,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,0,[]]
         board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
@@ -19,18 +20,20 @@ class Player:
         if color==None:
             self.color = self.create_color()
         else:
-            self.color=color    
+            self.color=color
         self.board = Board().board
         self.done = False
         self.DICT = None
         self.opp_Dict = None
-        self.can_remove = False
+        self.can_remove = None
         self.dice = None
+    
     def can_take_off(self):
         if self.color == 'black':
             other = self.board[7:]
             for x in other:
                 if str(5) in str(x):
+                    self.can_remove = False
                     return False
             self.can_remove=True
             return True 
@@ -38,9 +41,14 @@ class Player:
             other = self.board[:19]
             for x in other:
                 if str(3) in str(x):
+                    self.can_remove = False
                     return False
             self.can_remove=True
+            
             return True 
+    # def take_off(self):
+    #     if self.color == 'white':
+
 
     def move_piece(self, FROM, TO):
         '''
@@ -141,6 +149,7 @@ class Player:
         Finds moves player rolling can move to on board
         '''                
         self.find_positions()
+        self.can_take_off()
         
         Possible_Moves = []
         Possible_Hits = []
@@ -155,46 +164,62 @@ class Player:
         for die in dice:
             possible_spots = []
             possible_hits = []
-            
-            for key in self.DICT.keys():
-                if self.color == 'white':
-                    spot = key+die
-                    if spot <= 24:
-                        if self.board[spot]==0:
-                            possible_spots.append(spot)
-                            
-                        if spot in self.DICT:
-                            possible_spots.append(spot)
-                                
-                        else:
-                            for idx, count in self.opp_Dict.items():
-                                if spot == idx:
-                                    if count <2:
-                                        possible_hits.append(spot)
-                                        possible_spots.append(spot)
-                                            
-                if self.color == 'black':
-                    spot = key-die
-                    if spot >= 1:
-                        if self.board[spot]==0:
-                            possible_spots.append(spot)
-                            
-                        if spot in self.DICT:
-                            possible_spots.append(spot)
-                                    
-                        else:
-                            for idx, count in self.opp_Dict.items():
-                                if spot == idx:
-                                    if count <2:
-                                        possible_hits.append(spot)
-                                        possible_spots.append(spot)
-            Possible_Moves.append(possible_spots)                             
-            Possible_Hits.append(possible_hits)
-        
-        Move_Dict = dict(zip(dice, Possible_Moves))
-        Hit_Dict = dict(zip(dice, Possible_Hits))
 
-        return Move_Dict, Hit_Dict                                   
+            if self.can_remove==False:
+
+                for key in self.DICT.keys():
+                    if self.color == 'white':
+                        spot = key+die
+                        if spot <= 24:
+                            if self.board[spot]==0:
+                                possible_spots.append(spot)
+                                
+                            if spot in self.DICT:
+                                possible_spots.append(spot)
+                                    
+                            else:
+                                for idx, count in self.opp_Dict.items():
+                                    if spot == idx:
+                                        if count <2:
+                                            possible_hits.append(spot)
+                                            possible_spots.append(spot)
+                                                
+                    if self.color == 'black':
+                        spot = key-die
+                        if spot >= 1:
+                            if self.board[spot]==0:
+                                possible_spots.append(spot)
+                                
+                            if spot in self.DICT:
+                                possible_spots.append(spot)
+                                        
+                            else:
+                                for idx, count in self.opp_Dict.items():
+                                    if spot == idx:
+                                        if count <2:
+                                            possible_hits.append(spot)
+                                            possible_spots.append(spot)
+            
+            
+                Possible_Moves.append(possible_spots)                             
+                Possible_Hits.append(possible_hits)
+            Move_Dict = dict(zip(dice, Possible_Moves))
+            Hit_Dict = dict(zip(dice, Possible_Hits))
+            
+            
+            if self.can_remove==True:
+                pass
+
+
+
+           
+        
+            return Move_Dict, Hit_Dict                                   
+
+            
+
+
+
 
     def random_comp_move(self, DICE=None):
         
@@ -368,11 +393,15 @@ class Player:
 # and ultimately blocking on certain spots relative to other color, as well as
 # creating multiple blocks in a row      
 
-a = Player()
+a = Player('white')
+# a.find_positions()
+# print(a.DICT)
 # print(a.find_moves())
 # print(a.DICT, a.opp_Dict)
 # print(a.board)
+
 print(a.can_take_off())
+
 a.random_comp_move()
 print(a.board)
 

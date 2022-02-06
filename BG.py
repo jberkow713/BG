@@ -11,8 +11,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        # board = [[],555,55,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,0,[]]
-        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
+        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -54,6 +54,31 @@ class Player:
         '''
         Function used for moving one piece and altering the board state
         '''        
+        
+        if isinstance(self.board[TO], list)==True:
+            print('taking off')
+            if len(self.board[TO])==0:
+                self.board[TO].append(int(str(self.board[FROM])[0]))
+                if len(str(self.board[FROM]))>1:
+                    curr = str(self.board[FROM])[1:]
+                    self.board[FROM]= int(curr)
+                    return
+                else:
+                    self.board[FROM]=0
+                    return      
+            elif len(self.board[TO])>0:
+                first = str(self.board[TO][0])[0]
+                self.board[TO] = int(first + str(self.board[TO][0]))
+
+                if len(str(self.board[FROM]))>1:
+                    curr = str(self.board[FROM])[1:]
+                    self.board[FROM]= int(curr)
+                    return
+                else:
+                    self.board[FROM]=0
+                    return  
+       
+                
         print(FROM, TO)
         starting= self.board[FROM]
         
@@ -160,11 +185,23 @@ class Player:
         # if one die has been used, we want to manually feed in the remaining dice
         else:
             dice=DICE
-        if self.can_remove==False:
+        
+        # # TODO
+        # if self.can_remove==True:
+        #     pass           
+        # # Track furthest back spot, allow that spot to take off if roll +spot>=25 if white
+        # # and <=0 if black
+        # #  Make sure opponent not behind pieces, because if they are, want to force them out
+        # # or continue to take off smartest choices, like keeping blocks, minimizing risk
+               
+        print(self.dice)
+    
 
-            for die in dice:
-                possible_spots = []
-                possible_hits = []           
+        for die in dice:
+            possible_spots = []
+            possible_hits = []
+
+            if self.can_remove==False:           
 
                 for key in self.DICT.keys():
                     if self.color == 'white':
@@ -181,7 +218,7 @@ class Player:
                                     if spot == idx:
                                         if count <2:
                                             possible_hits.append(spot)
-                                            possible_spots.append(spot)
+                                            # possible_spots.append(spot)
                                                 
                     if self.color == 'black':
                         spot = key-die
@@ -197,37 +234,86 @@ class Player:
                                     if spot == idx:
                                         if count <2:
                                             possible_hits.append(spot)
-                                            possible_spots.append(spot)
+                                            # possible_spots.append(spot)
             
             
                 Possible_Moves.append(possible_spots)                             
                 Possible_Hits.append(possible_hits)
-            Move_Dict = dict(zip(dice, Possible_Moves))
-            Hit_Dict = dict(zip(dice, Possible_Hits))
-            
-        # # TODO
         
-        # if self.can_remove==True:
-        #     pass           
-        # # Track furthest back spot, allow that spot to take off if roll +spot>=25 if white
-        # # and <=0 if black
-        # #  Make sure opponent not behind pieces, because if they are, want to force them out
-        # # or continue to take off smartest choices, like keeping blocks, minimizing risk
+    
+            if self.can_remove==True:
+                keys = {x[0] for x in self.DICT.items()}
+                if self.color == 'white':
+                    furthest= min(keys)
+                if self.color == 'black':
+                    furthest= max(keys)
+
+                for key in self.DICT.keys():    
+                    if self.color == 'white':
+                        spot = key+die
+                        Finished= False
+                        if key == furthest:
+                            if spot >=25:
+                                possible_spots.append(25)
+                                Finished=True                       
+                        if Finished==False:
+
+                            if spot <= 25:
+                                if spot ==25:
+                                    possible_spots.append(spot)
+
+                                if self.board[spot]==0:
+                                    possible_spots.append(spot)
+                                        
+                                if spot in self.DICT:
+                                    possible_spots.append(spot)
+                                        
+                                else:
+                                    for idx, count in self.opp_Dict.items():
+                                        if spot == idx:
+                                            if count <2:
+                                                possible_hits.append(spot)
+                                                # possible_spots.append(spot)
+                    
+                    if self.color == 'black':
+                        
+                        spot = key-die
+                        Finished = False
+                        if key == furthest:
+                            if spot <=0:
+                                possible_spots.append(0)
+                                Finished=True                       
+                        if Finished==False:
+
+                            if spot >= 0:
+                                if spot ==0:
+                                    possible_spots.append(spot)
+
+                                if self.board[spot]==0:
+                                    possible_spots.append(spot)
+                                        
+                                if spot in self.DICT:
+                                    possible_spots.append(spot)
+                                        
+                                else:
+                                    for idx, count in self.opp_Dict.items():
+                                        if spot == idx:
+                                            if count <2:
+                                                possible_hits.append(spot)
+                                                    # possible_spots.append(spot)                            
+                Possible_Moves.append(possible_spots)                             
+                Possible_Hits.append(possible_hits)
+                
+        Move_Dict = dict(zip(dice, Possible_Moves))
+        Hit_Dict = dict(zip(dice, Possible_Hits))
+
+
+        
+        
         return Move_Dict, Hit_Dict
 
     def random_comp_move(self, DICE=None):
-        
-        if isinstance(self.board[-1], int)==True:
-            if self.board[-1]!=0:
-                self.board[-1]=[(self.board[-1])]
-            else:
-                self.board[-1]=[]    
-        if isinstance(self.board[0], int)==True:
-            if self.board[0]!=0:
-                self.board[0]=[(self.board[0])]
-            else:
-                self.board[0]=[]      
-
+        print(self.board)
         if self.dice !=None and len(self.dice)==0:            
             return                      
         
@@ -391,6 +477,7 @@ a = Player()
 # a.find_positions()
 # print(a.DICT)
 # print(a.find_moves())
+
 # print(a.DICT, a.opp_Dict)
 # print(a.board)
 

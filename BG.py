@@ -160,12 +160,11 @@ class Player:
         # if one die has been used, we want to manually feed in the remaining dice
         else:
             dice=DICE
-        
-        for die in dice:
-            possible_spots = []
-            possible_hits = []
+        if self.can_remove==False:
 
-            if self.can_remove==False:
+            for die in dice:
+                possible_spots = []
+                possible_hits = []           
 
                 for key in self.DICT.keys():
                     if self.color == 'white':
@@ -206,20 +205,15 @@ class Player:
             Move_Dict = dict(zip(dice, Possible_Moves))
             Hit_Dict = dict(zip(dice, Possible_Hits))
             
-            
-            if self.can_remove==True:
-                pass
-
-
-
-           
+        # # TODO
         
-            return Move_Dict, Hit_Dict                                   
-
-            
-
-
-
+        # if self.can_remove==True:
+        #     pass           
+        # # Track furthest back spot, allow that spot to take off if roll +spot>=25 if white
+        # # and <=0 if black
+        # #  Make sure opponent not behind pieces, because if they are, want to force them out
+        # # or continue to take off smartest choices, like keeping blocks, minimizing risk
+        return Move_Dict, Hit_Dict
 
     def random_comp_move(self, DICE=None):
         
@@ -393,14 +387,14 @@ class Player:
 # and ultimately blocking on certain spots relative to other color, as well as
 # creating multiple blocks in a row      
 
-a = Player('white')
+a = Player()
 # a.find_positions()
 # print(a.DICT)
 # print(a.find_moves())
 # print(a.DICT, a.opp_Dict)
 # print(a.board)
 
-print(a.can_take_off())
+# print(a.can_take_off())
 
 a.random_comp_move()
 print(a.board)

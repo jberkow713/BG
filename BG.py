@@ -11,8 +11,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        # board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
-        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
+        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -58,27 +58,15 @@ class Player:
         print(FROM, TO)
         if isinstance(self.board[TO], list)==True:
             print('taking off')
-            if len(self.board[TO])==0:
-                self.board[TO].append(int(str(self.board[FROM])[0]))
-                if len(str(self.board[FROM]))>1:
-                    curr = str(self.board[FROM])[1:]
-                    self.board[FROM]= int(curr)
-                    return
-                else:
-                    self.board[FROM]=0
-                    return      
-            elif len(self.board[TO])>0:
-                first = str(self.board[TO][0])
-                self.board[TO] = [int(first + first[0])]
-
-                if len(str(self.board[FROM]))>1:
-                    curr = str(self.board[FROM])[1:]
-                    self.board[FROM]= int(curr)
-                    return
-                else:
-                    self.board[FROM]=0
-                    return       
-                
+            
+            if len(str(self.board[FROM]))>1:
+                curr = str(self.board[FROM])[1:]
+                self.board[FROM]= int(curr)
+                return
+            else:
+                self.board[FROM]=0
+                return      
+                            
         print(FROM, TO)
         starting= self.board[FROM]
         

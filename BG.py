@@ -45,11 +45,8 @@ class Player:
                     return False
             self.can_remove=True
             
-            return True 
-    # def take_off(self):
-    #     if self.color == 'white':
-
-
+            return True
+            
     def move_piece(self, FROM, TO):
         '''
         Function used for moving one piece and altering the board state
@@ -76,8 +73,7 @@ class Player:
                     return
                 else:
                     self.board[FROM]=0
-                    return  
-       
+                    return       
                 
         print(FROM, TO)
         starting= self.board[FROM]
@@ -268,8 +264,7 @@ class Player:
                                     for idx, count in self.opp_Dict.items():
                                         if spot == idx:
                                             if count <2:
-                                                possible_hits.append(spot)
-                                                # possible_spots.append(spot)
+                                                possible_hits.append(spot)                                               
                     
                     if self.color == 'black':
                         
@@ -301,10 +296,7 @@ class Player:
                 Possible_Hits.append(possible_hits)
                 
         Move_Dict = dict(zip(dice, Possible_Moves))
-        Hit_Dict = dict(zip(dice, Possible_Hits))
-
-
-        
+        Hit_Dict = dict(zip(dice, Possible_Hits))        
         
         return Move_Dict, Hit_Dict
 
@@ -474,14 +466,7 @@ class Player:
             self.move_piece(FROM, moved_to)  
             self.dice.remove(roll)                
         
-            self.random_comp_move(self.dice)
-
-# TODO functionality for end of game, taking all pieces off
-
-# TODO If not coming off rail, not taking pieces off at end,
-# not hitting, then make function for prioritizing blocks, 
-# and ultimately blocking on certain spots relative to other color, as well as
-# creating multiple blocks in a row      
+            self.random_comp_move(self.dice)  
 
 a = Player('black')
 # a.find_positions()
@@ -495,10 +480,6 @@ a = Player('black')
 
 a.random_comp_move()
 print(a.board)
-
-
-
-
 
 # def main():
 #     screen = p.display.set_mode((Width, Height))

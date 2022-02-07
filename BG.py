@@ -11,17 +11,21 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
-        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        # board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
+        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
-    def __init__(self, color=None):
+    def __init__(self, color=None,board=None):
         if color==None:
             self.color = self.create_color()
         else:
             self.color=color
-        self.board = Board().board
+        if board==None:
+            self.board = Board().board
+        else:
+            self.board=board
+
         self.done = False
         self.DICT = None
         self.opp_Dict = None
@@ -46,7 +50,7 @@ class Player:
             self.can_remove=True
             
             return True
-            
+
     def move_piece(self, FROM, TO):
         '''
         Function used for moving one piece and altering the board state
@@ -437,7 +441,8 @@ class Player:
                                                     
                             self.random_comp_move(self.dice)        
             # otherwise, roll
-            
+            if len(self.dice)==0:
+                return
             roll = self.random_list(self.dice)
             
             for ROLL, move_list in possible_spots.items():
@@ -468,18 +473,23 @@ class Player:
         
             self.random_comp_move(self.dice)  
 
-a = Player('black')
 # a.find_positions()
 # print(a.DICT)
 # print(a.find_moves())
 
 # print(a.DICT, a.opp_Dict)
-# print(a.board)
 
 # print(a.can_take_off())
 
+# looping, using same board
+a = Player('black')
 a.random_comp_move()
-print(a.board)
+BRD = a.board
+b = Player('white', BRD)
+b.random_comp_move()
+print(b.board)
+
+
 
 # def main():
 #     screen = p.display.set_mode((Width, Height))

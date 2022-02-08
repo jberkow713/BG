@@ -50,7 +50,29 @@ class Player:
             self.can_remove=True
             
             return True
+    def pip_count(self):
+        self.find_positions()
+        # {1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1} {19: 2, 20: 3, 21: 3, 22: 2, 23: 2,  24:2}
+        if self.color=='white':
+            WHITE = self.DICT
+            BLACK = self.opp_Dict
+        else:
+            BLACK=self.DICT
+            WHITE=self.opp_Dict
+        white_pip = [0, 'white_count']
+        for k,v in WHITE.items():
+            diff = 25-k
+            white_pip[0] +=diff*v
+        black_pip = [0, 'black_count']
+        for k,v in BLACK.items():
+            diff = 0+k
+            black_pip[0] +=diff*v
+        return white_pip, black_pip
 
+
+
+
+        return
     def move_piece(self, FROM, TO):
         '''
         Function used for moving one piece and altering the board state
@@ -172,16 +194,7 @@ class Player:
             dice =self.roll()
         # if one die has been used, we want to manually feed in the remaining dice
         else:
-            dice=DICE
-        
-        # # TODO
-        # if self.can_remove==True:
-        #     pass           
-        # # Track furthest back spot, allow that spot to take off if roll +spot>=25 if white
-        # # and <=0 if black
-        # #  Make sure opponent not behind pieces, because if they are, want to force them out
-        # # or continue to take off smartest choices, like keeping blocks, minimizing risk
-                  
+            dice=DICE                         
 
         for die in dice:
             possible_spots = []
@@ -461,21 +474,31 @@ class Player:
         
             self.random_comp_move(self.dice)  
 
+# TODO add pip_count component for each color
+# improve brain, make computer look for specific blocks to make,
+# make computer look for consecutive blocks, and blocks certain distance from opponent 
+# prioritize blocks in its own space, etc...
+# learning how to switch gears, based on pip count vs opponent pip count, whether to be 
+# aggressive or not
+# end game, intelligent taking off of pieces, depending on where opponent is
+
+
+
+
 # a.find_positions()
 # print(a.DICT)
 # print(a.find_moves())
-
 # print(a.DICT, a.opp_Dict)
-
 # print(a.can_take_off())
 
 # looping, using same board
 a = Player('black')
-a.random_comp_move()
-BRD = a.board
-b = Player('white', BRD)
-b.random_comp_move()
-print(b.board)
+# a.random_comp_move()
+# BRD = a.board
+# b = Player('white', BRD)
+# b.random_comp_move()
+# print(b.board)
+print(a.pip_count())
 
 
 

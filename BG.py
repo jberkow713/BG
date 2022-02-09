@@ -7,11 +7,47 @@ p.init()
 Width, Height = 1024, 1024
 Max_FPS=15
 
+def consec_pairs(DICT):
+    blocks = []
+    for k,v in DICT.items():
+        if v>=2:
+            blocks.append(k)
+    length = len(blocks)-1
+    idx = 0
+
+    consec = []
+
+    while length>0:
+        consecutive = []
+        CONSEC = True
+        while CONSEC==True:
+            prv = blocks[idx-1]
+            curr = blocks[idx]
+            next = blocks[idx+1]
+            if next == curr+1:
+                consecutive.append(curr)                    
+            else:                    
+                CONSEC = False
+                if curr == prv +1:
+                    consecutive.append(curr)
+
+            idx+=1
+            length-=1
+            if idx == len(blocks)-1:
+                if blocks[idx]==blocks[idx-1]+1:
+                    consecutive.append(blocks[idx])
+                CONSEC=False
+        consec.append(consecutive)
+        
+    consecs = [x for x in consec if len(x)>0]
+    
+    return consecs
+
 class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,33,333,333,33,33,33,[]]
+        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
         # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
@@ -50,29 +86,43 @@ class Player:
             self.can_remove=True
             
             return True
-    def pip_count(self):
+    def consec_blocks(self, colors=None):
+        
         self.find_positions()
-        # {1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1} {19: 2, 20: 3, 21: 3, 22: 2, 23: 2,  24:2}
+        
         if self.color=='white':
             WHITE = self.DICT
             BLACK = self.opp_Dict
         else:
             BLACK=self.DICT
             WHITE=self.opp_Dict
-        white_pip = [0, 'white_count']
+        if colors==None:
+            return consec_pairs(WHITE), consec_pairs(BLACK)   
+        else:
+            if colors=='white':
+                return consec_pairs(WHITE)
+            elif colors=='black':
+                return consec_pairs(BLACK)         
+    
+    def pip_count(self):
+        self.find_positions()
+        # {1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1} {19: 2, 20: 3, 21: 3, 22: 2, 23: 2, 24:2}
+        if self.color=='white':
+            WHITE = self.DICT
+            BLACK = self.opp_Dict
+        else:
+            BLACK=self.DICT
+            WHITE=self.opp_Dict
+        white_pip = [0, 'white_pips']
         for k,v in WHITE.items():
             diff = 25-k
             white_pip[0] +=diff*v
-        black_pip = [0, 'black_count']
+        black_pip = [0, 'black_pips']
         for k,v in BLACK.items():
             diff = 0+k
             black_pip[0] +=diff*v
         return white_pip, black_pip
-
-
-
-
-        return
+        
     def move_piece(self, FROM, TO):
         '''
         Function used for moving one piece and altering the board state
@@ -499,6 +549,7 @@ a = Player('black')
 # b.random_comp_move()
 # print(b.board)
 print(a.pip_count())
+print(a.consec_blocks())
 
 
 

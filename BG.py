@@ -47,7 +47,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],555,555,555,555,55,5,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
+        board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
         # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
@@ -104,6 +104,32 @@ class Player:
             elif colors=='black':
                 return consec_pairs(BLACK)         
     
+    def find_single_blocks(self):
+        multiple = self.consec_blocks()
+        multiple_white = multiple[0]
+        multiple_black = multiple[1]
+        if self.color == 'white':
+            WHITE = self.DICT
+            BLACK = self.opp_Dict
+        else:
+            BLACK=self.DICT
+            WHITE = self.opp_Dict
+
+        single_white = []
+        single_black = []
+        for k,v in WHITE.items():
+            if v >1:
+                for x in multiple_white:
+                    if k not in x:
+                        single_white.append(k)
+        for k,v in BLACK.items():
+            if v >1:
+                for x in multiple_black:
+                    if k not in x:
+                        single_black.append(k)
+
+        return single_white, single_black
+
     def pip_count(self):
         self.find_positions()
         # {1: 3, 2: 3, 3: 3, 4: 3, 5: 2, 6: 1} {19: 2, 20: 3, 21: 3, 22: 2, 23: 2, 24:2}
@@ -550,6 +576,7 @@ a = Player('black')
 # print(b.board)
 print(a.pip_count())
 print(a.consec_blocks())
+print(a.find_single_blocks())
 
 
 

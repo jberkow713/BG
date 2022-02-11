@@ -148,7 +148,23 @@ class Player:
             diff = 0+k
             black_pip[0] +=diff*v
         return white_pip, black_pip
-        
+    def find_furthest_back(self):
+        if self.color == 'white':
+            curr = 0
+            for spot in self.opp_Dict.keys():
+                if spot >curr:
+                    curr = spot
+            return curr
+
+        if self.color == 'black':
+            curr = 25
+            for spot in self.opp_Dict.keys():
+                if spot <curr:
+                    curr = spot
+            return curr                       
+
+
+
     def move_piece(self, FROM, TO):
         '''
         Function used for moving one piece and altering the board state
@@ -568,7 +584,7 @@ class Player:
 # print(a.can_take_off())
 
 # looping, using same board
-a = Player('black')
+a = Player('white')
 # a.random_comp_move()
 # BRD = a.board
 # b = Player('white', BRD)
@@ -577,6 +593,7 @@ a = Player('black')
 print(a.pip_count())
 print(a.consec_blocks())
 print(a.find_single_blocks())
+print(a.find_furthest_back())
 
 
 

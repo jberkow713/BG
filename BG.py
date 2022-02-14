@@ -312,18 +312,32 @@ class Player:
                     key = keys[idx]
 
                     if self.can_remove == False:
-                        if key + roll >0 and key +roll <25:
+                        if self.color == 'white':
 
-                            if key+roll not in opp_keys:
-                                CAN_MOVE = True
-                            elif key+roll in opp_keys:
-                                
-                                if self.opp_Dict[key+roll]==1:
+                            if key + roll >0 and key +roll <25:
+
+                                if key+roll not in opp_keys:
                                     CAN_MOVE = True
+                                elif key+roll in opp_keys:
+                                    
+                                    if self.opp_Dict[key+roll]==1:
+                                        CAN_MOVE = True
+                        if self.color =='black':
+                            if key - roll >0 and key -roll <25:
+
+                                if key-roll not in opp_keys:
+                                    CAN_MOVE = True
+                                elif key-roll in opp_keys:
+                                    
+                                    if self.opp_Dict[key-roll]==1:
+                                        CAN_MOVE = True
 
                     if CAN_MOVE == True:
-                        
-                        self.move_piece(key, key+roll)
+                        if self.color =='white':
+                            
+                            self.move_piece(key, key+roll)
+                        if self.color =='black':
+                            self.move_piece(key, key-roll)    
                         # recalculate positions based on moved piece
                         self.find_positions()
                         
@@ -350,18 +364,35 @@ class Player:
 
                             if self.can_remove == False:
 
-                                if key2 + remaining >0 and key2 + remaining <25:                     
-                        
-                                    if key2+remaining not in opp_keys2:
-                                        CAN_MOVE_2 = True
-                                    elif key2+remaining in opp_keys2:
-                                        
-                                        if self.opp_Dict[key2+remaining]==1:
+                                if self.color =='white':
+
+
+                                    if key2 + remaining >0 and key2 + remaining <25:                     
+                            
+                                        if key2+remaining not in opp_keys2:
                                             CAN_MOVE_2 = True
+                                        elif key2+remaining in opp_keys2:
+                                            
+                                            if self.opp_Dict[key2+remaining]==1:
+                                                CAN_MOVE_2 = True
+                                if self.color =='black':
+                                    if key2 - remaining >0 and key2 - remaining <25:                     
+                            
+                                        if key2-remaining not in opp_keys2:
+                                            CAN_MOVE_2 = True
+                                        elif key2-remaining in opp_keys2:
+                                            
+                                            if self.opp_Dict[key2-remaining]==1:
+                                                CAN_MOVE_2 = True
 
                             if CAN_MOVE_2 == True:
-                        
-                                self.move_piece(key2, key2+remaining)
+                                if self.color =='white':
+
+                                    self.move_piece(key2, key2+remaining)
+
+                                if self.color =='black':
+                                    self.move_piece(key2, key2-remaining)
+
                                 if self.board not in board_states:
                                     board_states.append(self.board)
                                     # print(self.board)
@@ -701,7 +732,7 @@ class Player:
 # aggressive or not
 # end game, intelligent taking off of pieces, depending on where opponent is
 
-a = Player('white')
+a = Player()
 
 a.update_reality()
 

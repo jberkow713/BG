@@ -172,7 +172,7 @@ class Player:
         '''
         Function used for moving one piece and altering the board state
         '''        
-        print(FROM, TO)
+        # print(FROM, TO)
         if isinstance(self.board[TO], list)==True:
             print('taking off')
             
@@ -284,57 +284,103 @@ class Player:
         self.find_positions()
         self.can_take_off()
         self.roll()
-        print(self.dice)               
-        
-        keys = [x for x in self.DICT.keys()]
-        opp_keys = [x for x in self.opp_Dict.keys()]       
-        
-        
-                
-        LEN = len(self.dice)    
-        IDX = 0
+        print(self.dice)
         board_states = []
-
-        while LEN>0:
+        
+        # This is working for all possible board states for White on a non double roll
+        
+        if len(self.dice)==2:                            
             
-            roll = self.dice[IDX]
+            keys = [x for x in self.DICT.keys()]
+            opp_keys = [x for x in self.opp_Dict.keys()]            
+                    
+            LEN = len(self.dice)    
+            IDX = 0
+            
 
-            LENGTH = len(keys)
-            idx = 0                
+            while LEN>0:                
+                
+                roll = self.dice[IDX]
+
+                LENGTH = len(keys)
+                idx = 0                               
+
+                while LENGTH >0:
+                    # each key seeing if it can move using each roll
+                    CAN_MOVE = False
+                    
+                    key = keys[idx]
+
+                    if self.can_remove == False:
+                        if key + roll >0 and key +roll <25:
+
+                            if key+roll not in opp_keys:
+                                CAN_MOVE = True
+                            elif key+roll in opp_keys:
+                                
+                                if self.opp_Dict[key+roll]==1:
+                                    CAN_MOVE = True
+
+                    if CAN_MOVE == True:
+                        
+                        self.move_piece(key, key+roll)
+                        # recalculate positions based on moved piece
+                        self.find_positions()
+                        
+                        # Save board state here
+                        current_board = copy.deepcopy(self.board) 
+
+
+                        keys2 = [x for x in self.DICT.keys()]
+                        print(keys2)
+                        opp_keys2 = [x for x in self.opp_Dict.keys()]
+
+                        for x in self.dice:
+                            if x != roll:
+                                remaining = x
+                                
+                        LENGTH_2 = len(keys2)
+                        idx2 = 0                                          
+
+                        while LENGTH_2 >0:
+                            # each key seeing if it can move using remaining roll
+                            CAN_MOVE_2 = False
                             
+                            key2 = keys2[idx2]
 
-            while LENGTH >0:
-                # each key seeing if it can move using each roll
-                CAN_MOVE = False
+                            if self.can_remove == False:
+
+                                if key2 + remaining >0 and key2 + remaining <25:                     
+                        
+                                    if key2+remaining not in opp_keys2:
+                                        CAN_MOVE_2 = True
+                                    elif key2+remaining in opp_keys2:
+                                        
+                                        if self.opp_Dict[key2+remaining]==1:
+                                            CAN_MOVE_2 = True
+
+                            if CAN_MOVE_2 == True:
+                        
+                                self.move_piece(key2, key2+remaining)
+                                if self.board not in board_states:
+                                    board_states.append(self.board)
+                                    # print(self.board)
+
+                            idx2 +=1
+                            LENGTH_2 -=1
+                            self.board = copy.deepcopy(current_board)                           
+
+
+                    self.board = copy.deepcopy(self.saved_board)    
+
+                    idx +=1
+                    LENGTH -=1
                 
-                key = keys[idx]
-            
-                if key+roll not in opp_keys:
-                    CAN_MOVE = True
-                elif key+roll in opp_keys:
-                    
-                    if self.opp_Dict[key+roll]==1:
-                        CAN_MOVE = True
-
-                if CAN_MOVE == True:
-                    
-                    self.move_piece(key, key+roll)
-                    if self.board not in board_states:
-                        board_states.append(self.board)
-
-
-                    
-                self.board = copy.deepcopy(self.saved_board)
-                
-                idx +=1
-                LENGTH -=1
-            
-            IDX+=1
-            LEN -=1
-
+                IDX+=1
+                LEN -=1
         print(board_states)
         
-                          
+             
                 
           
          

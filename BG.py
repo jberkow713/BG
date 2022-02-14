@@ -3,6 +3,9 @@ import random
 import pygame as p
 from pygame.constants import MOUSEBUTTONDOWN
 import sys
+import itertools
+import copy
+
 p.init()
 Width, Height = 1024, 1024
 Max_FPS=15
@@ -47,8 +50,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
-        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        # board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
+        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -61,12 +64,13 @@ class Player:
             self.board = Board().board
         else:
             self.board=board
-
+        self.saved_board = None 
         self.done = False
         self.DICT = None
         self.opp_Dict = None
         self.can_remove = None
         self.dice = None
+        self.moves = None
     
     def can_take_off(self):
         if self.color == 'black':
@@ -148,6 +152,7 @@ class Player:
             diff = 0+k
             black_pip[0] +=diff*v
         return white_pip, black_pip
+    
     def find_furthest_back(self):
         if self.color == 'white':
             curr = 0
@@ -161,9 +166,7 @@ class Player:
             for spot in self.opp_Dict.keys():
                 if spot <curr:
                     curr = spot
-            return curr                       
-
-
+            return curr           
 
     def move_piece(self, FROM, TO):
         '''
@@ -181,7 +184,7 @@ class Player:
                 self.board[FROM]=0
                 return      
                             
-        print(FROM, TO)
+        
         starting= self.board[FROM]
         
         if isinstance(starting, list)==True:
@@ -270,7 +273,84 @@ class Player:
             self.DICT = black_dict
             self.opp_Dict = white_dict         
             return            
-    
+    def update_reality(self):
+        #TODO 
+        # Going to find all possible moves using this function, and store it in self.moves
+        # {1: 2, 12: 5, 17: 3, 19: 5} {6: 5, 8: 3, 13: 5, 24: 2} [6, 3]
+        
+        # copy board to reference back to 
+        self.saved_board = copy.deepcopy(self.board)
+                       
+        self.find_positions()
+        self.can_take_off()
+        self.roll()
+        print(self.dice)               
+        
+        keys = [x for x in self.DICT.keys()]
+        opp_keys = [x for x in self.opp_Dict.keys()]       
+        
+        
+                
+        LEN = len(self.dice)    
+        IDX = 0
+        board_states = []
+
+        while LEN>0:
+            
+            roll = self.dice[IDX]
+
+            LENGTH = len(keys)
+            idx = 0                
+                            
+
+            while LENGTH >0:
+                # each key seeing if it can move using each roll
+                CAN_MOVE = False
+                
+                key = keys[idx]
+            
+                if key+roll not in opp_keys:
+                    CAN_MOVE = True
+                elif key+roll in opp_keys:
+                    
+                    if self.opp_Dict[key+roll]==1:
+                        CAN_MOVE = True
+
+                if CAN_MOVE == True:
+                    
+                    self.move_piece(key, key+roll)
+                    if self.board not in board_states:
+                        board_states.append(self.board)
+
+
+                    
+                self.board = copy.deepcopy(self.saved_board)
+                
+                idx +=1
+                LENGTH -=1
+            
+            IDX+=1
+            LEN -=1
+
+        print(board_states)
+        
+                          
+                
+          
+         
+
+        # The function will operate on all of these possible_Rolls
+        # 
+        # So to make the computer able to evaluate the board states, we need to give it all possible 
+        # board states, ending board states for a given roll
+
+        # so if you roll 35, we want to give it all possible board states for 35 and 53
+        # then have it somehow assess the board states in terms of value , and choose the highest long term
+        # value based board state
+
+        # create board states, have it choose, based on starting board state, then needs to move the pieces
+        # to get to the ending board state    
+
     def find_moves(self, DICE=None):
         '''
         Finds moves player rolling can move to on board
@@ -396,7 +476,8 @@ class Player:
         Hit_Dict = dict(zip(dice, Possible_Hits))        
         
         return Move_Dict, Hit_Dict
-
+    def Terminator_Move(self):
+        pass
     def random_comp_move(self, DICE=None):
         
         print(self.board)
@@ -574,26 +655,20 @@ class Player:
 # aggressive or not
 # end game, intelligent taking off of pieces, depending on where opponent is
 
-
-
-
-# a.find_positions()
-# print(a.DICT)
-# print(a.find_moves())
-# print(a.DICT, a.opp_Dict)
-# print(a.can_take_off())
-
-# looping, using same board
 a = Player('white')
-# a.random_comp_move()
-# BRD = a.board
+
+a.update_reality()
+
 # b = Player('white', BRD)
 # b.random_comp_move()
 # print(b.board)
-print(a.pip_count())
-print(a.consec_blocks())
-print(a.find_single_blocks())
-print(a.find_furthest_back())
+
+# print(a.pip_count())
+# print(a.consec_blocks())
+# print(a.find_single_blocks())
+# print(a.find_furthest_back())
+
+# print(a.find_all_moves())
 
 
 

@@ -287,7 +287,12 @@ class Player:
         print(self.dice)
         board_states = []
         
-        # This is working for all possible board states for White on a non double roll
+        # This is working for all possible board states for White and black on a non double roll
+        # On a board where you are not taking pieces off 
+
+
+        # TODO Make this work for doubles 
+        # Make this work on boards where you can take off
         
         if len(self.dice)==2:                            
             
@@ -313,37 +318,27 @@ class Player:
 
                     if self.can_remove == False:
                         if self.color == 'white':
+                            spot = key + roll
+                        if self.color == 'black':
+                            spot = key-roll      
 
-                            if key + roll >0 and key +roll <25:
+                        if spot >0 and spot <25:
 
-                                if key+roll not in opp_keys:
+                            if spot not in opp_keys:
+                                CAN_MOVE = True
+                            elif spot in opp_keys:
+                                
+                                if self.opp_Dict[spot]==1:
                                     CAN_MOVE = True
-                                elif key+roll in opp_keys:
-                                    
-                                    if self.opp_Dict[key+roll]==1:
-                                        CAN_MOVE = True
-                        if self.color =='black':
-                            if key - roll >0 and key -roll <25:
-
-                                if key-roll not in opp_keys:
-                                    CAN_MOVE = True
-                                elif key-roll in opp_keys:
-                                    
-                                    if self.opp_Dict[key-roll]==1:
-                                        CAN_MOVE = True
-
-                    if CAN_MOVE == True:
-                        if self.color =='white':
+                        
+                    if CAN_MOVE == True:                        
                             
-                            self.move_piece(key, key+roll)
-                        if self.color =='black':
-                            self.move_piece(key, key-roll)    
+                        self.move_piece(key, spot)                          
                         # recalculate positions based on moved piece
                         self.find_positions()
                         
                         # Save board state here
-                        current_board = copy.deepcopy(self.board) 
-
+                        current_board = copy.deepcopy(self.board)
 
                         keys2 = [x for x in self.DICT.keys()]
                         print(keys2)
@@ -365,33 +360,22 @@ class Player:
                             if self.can_remove == False:
 
                                 if self.color =='white':
-
-
-                                    if key2 + remaining >0 and key2 + remaining <25:                     
-                            
-                                        if key2+remaining not in opp_keys2:
-                                            CAN_MOVE_2 = True
-                                        elif key2+remaining in opp_keys2:
-                                            
-                                            if self.opp_Dict[key2+remaining]==1:
-                                                CAN_MOVE_2 = True
+                                    spot2 = key2+remaining
                                 if self.color =='black':
-                                    if key2 - remaining >0 and key2 - remaining <25:                     
-                            
-                                        if key2-remaining not in opp_keys2:
-                                            CAN_MOVE_2 = True
-                                        elif key2-remaining in opp_keys2:
-                                            
-                                            if self.opp_Dict[key2-remaining]==1:
-                                                CAN_MOVE_2 = True
+                                    spot2 = key2-remaining
 
-                            if CAN_MOVE_2 == True:
-                                if self.color =='white':
+                                if spot2 >0 and spot2 <25:                     
+                        
+                                    if spot2 not in opp_keys2:
+                                        CAN_MOVE_2 = True
+                                    elif spot2 in opp_keys2:
+                                        
+                                        if self.opp_Dict[spot2]==1:
+                                            CAN_MOVE_2 = True                                
 
-                                    self.move_piece(key2, key2+remaining)
+                            if CAN_MOVE_2 == True:                                
 
-                                if self.color =='black':
-                                    self.move_piece(key2, key2-remaining)
+                                self.move_piece(key2, spot2)                                
 
                                 if self.board not in board_states:
                                     board_states.append(self.board)
@@ -399,8 +383,7 @@ class Player:
 
                             idx2 +=1
                             LENGTH_2 -=1
-                            self.board = copy.deepcopy(current_board)                           
-
+                            self.board = copy.deepcopy(current_board)
 
                     self.board = copy.deepcopy(self.saved_board)    
 
@@ -409,24 +392,7 @@ class Player:
                 
                 IDX+=1
                 LEN -=1
-        print(board_states)
-        
-             
-                
-          
-         
-
-        # The function will operate on all of these possible_Rolls
-        # 
-        # So to make the computer able to evaluate the board states, we need to give it all possible 
-        # board states, ending board states for a given roll
-
-        # so if you roll 35, we want to give it all possible board states for 35 and 53
-        # then have it somehow assess the board states in terms of value , and choose the highest long term
-        # value based board state
-
-        # create board states, have it choose, based on starting board state, then needs to move the pieces
-        # to get to the ending board state    
+        return board_states   
 
     def find_moves(self, DICE=None):
         '''
@@ -734,7 +700,7 @@ class Player:
 
 a = Player()
 
-a.update_reality()
+print(a.update_reality())
 
 # b = Player('white', BRD)
 # b.random_comp_move()

@@ -50,8 +50,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        # board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
-        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
+        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -330,7 +330,35 @@ class Player:
                                 
                                 if self.opp_Dict[spot]==1:
                                     CAN_MOVE = True
+                    
+                    if self.can_remove==True:
+                        KEYS = {x[0] for x in self.DICT.items()}
+                        if self.color == 'white':
+                            furthest= min(KEYS)
+                        if self.color == 'black':
+                            furthest= max(KEYS)
                         
+                        if key == furthest:
+
+                            if self.color == 'white':
+                                spot = min(key+roll, 25)
+                            if self.color == 'black':
+                                spot = max(key-roll, 0)
+
+                        elif key !=furthest:
+                            if self.color == 'white':
+                                spot = key+roll
+                            elif self.color == 'black':
+                                spot = key -roll
+
+                        if spot >=0 and spot <=25:
+                            if spot not in opp_keys:
+                                CAN_MOVE = True
+                            elif spot in opp_keys:
+                                
+                                if self.opp_Dict[spot]==1:
+                                    CAN_MOVE = True                           
+
                     if CAN_MOVE == True:                        
                             
                         self.move_piece(key, spot)                          
@@ -372,7 +400,34 @@ class Player:
                                         
                                         if self.opp_Dict[spot2]==1:
                                             CAN_MOVE_2 = True                                
+                            
+                            if self.can_remove==True:
+                                KEYS = {x[0] for x in self.DICT.items()}
+                                if self.color == 'white':
+                                    furthest= min(KEYS)
+                                if self.color == 'black':
+                                    furthest= max(KEYS)
+                                
+                                if key == furthest:
 
+                                    if self.color == 'white':
+                                        spot2 = min(key+roll, 25)
+                                    if self.color == 'black':
+                                        spot2 = max(key-roll, 0)
+
+                                elif key !=furthest:
+                                    if self.color == 'white':
+                                        spot2 = key+roll
+                                    elif self.color == 'black':
+                                        spot2 = key -roll
+
+                                if spot2 >=0 and spot2 <=25:
+                                    if spot2 not in opp_keys:
+                                        CAN_MOVE_2 = True
+                                    elif spot2 in opp_keys:
+                                        
+                                        if self.opp_Dict[spot2]==1:
+                                            CAN_MOVE_2 = True   
                             if CAN_MOVE_2 == True:                                
 
                                 self.move_piece(key2, spot2)                                
@@ -700,7 +755,9 @@ class Player:
 
 a = Player()
 
-print(a.update_reality())
+spots = a.update_reality()
+
+print(spots)
 
 # b = Player('white', BRD)
 # b.random_comp_move()

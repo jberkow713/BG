@@ -50,7 +50,7 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],55555,0,5555,555,0,555,0,0,0,0,0,0,0,0,0,0,0,0,3333,0,333333,0,33,33,[]]
+        board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
         # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
@@ -287,12 +287,10 @@ class Player:
         print(self.dice)
         board_states = []
         
-        # This is working for all possible board states for White and black on a non double roll
-        # On a board where you are not taking pieces off 
-
-
+        
         # TODO Make this work for doubles 
-        # Make this work on boards where you can take off
+        # ------------------------------------------------------------
+        print(self.board)
         
         if len(self.dice)==2:                            
             
@@ -332,20 +330,28 @@ class Player:
                                     CAN_MOVE = True
                     
                     if self.can_remove==True:
+                        
                         KEYS = {x[0] for x in self.DICT.items()}
                         if self.color == 'white':
                             furthest= min(KEYS)
                         if self.color == 'black':
-                            furthest= max(KEYS)
+                            furthest= max(KEYS)                          
                         
                         if key == furthest:
 
                             if self.color == 'white':
-                                spot = min(key+roll, 25)
+                                if key+roll >25:
+                                    spot = min(key+roll, 25)
+                                else:
+                                    spot = key+roll     
                             if self.color == 'black':
-                                spot = max(key-roll, 0)
+                                if key-roll <0:
+                                    spot = max(key-roll, 0)
+                                else:
+                                    spot = key-roll     
 
-                        elif key !=furthest:
+                            
+                        elif key!=furthest:
                             if self.color == 'white':
                                 spot = key+roll
                             elif self.color == 'black':
@@ -358,7 +364,8 @@ class Player:
                                 
                                 if self.opp_Dict[spot]==1:
                                     CAN_MOVE = True                           
-
+                            
+                        print(key,spot)
                     if CAN_MOVE == True:                        
                             
                         self.move_piece(key, spot)                          
@@ -367,9 +374,10 @@ class Player:
                         
                         # Save board state here
                         current_board = copy.deepcopy(self.board)
+                        
 
                         keys2 = [x for x in self.DICT.keys()]
-                        print(keys2)
+                        
                         opp_keys2 = [x for x in self.opp_Dict.keys()]
 
                         for x in self.dice:
@@ -408,18 +416,25 @@ class Player:
                                 if self.color == 'black':
                                     furthest= max(KEYS)
                                 
-                                if key == furthest:
+                                if key2 == furthest:
 
                                     if self.color == 'white':
-                                        spot2 = min(key+roll, 25)
+                                        if key2+remaining >25:
+                                            spot2 = min(key2+remaining, 25)
+                                        else:
+                                            spot2 = key2+remaining
+
                                     if self.color == 'black':
-                                        spot2 = max(key-roll, 0)
+                                        if key2-roll <0:
+                                            spot2 = max(key2-remaining, 0)
+                                        else:
+                                            spot2 = key2 - remaining            
 
-                                elif key !=furthest:
+                                elif key2 !=furthest:
                                     if self.color == 'white':
-                                        spot2 = key+roll
+                                        spot2 = key2+remaining 
                                     elif self.color == 'black':
-                                        spot2 = key -roll
+                                        spot2 = key2 -remaining 
 
                                 if spot2 >=0 and spot2 <=25:
                                     if spot2 not in opp_keys:

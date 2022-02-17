@@ -420,58 +420,11 @@ class Player:
                     CAN_MOVE = False
                     
                     key = keys[idx]
-
-                    if self.can_remove == False:
-                        if self.color == 'white':
-                            spot = key + roll
-                        if self.color == 'black':
-                            spot = key-roll      
-
-                        if spot >0 and spot <25:
-
-                            if spot not in opp_keys:
-                                CAN_MOVE = True
-                            elif spot in opp_keys:
-                                
-                                if self.opp_Dict[spot]==1:
-                                    CAN_MOVE = True
+                    evaluate = self.branch_out(key, roll, opp_keys)
+                    if evaluate != None:                
+                        CAN_MOVE=True
+                        spot = evaluate[0] 
                     
-                    if self.can_remove==True:
-                        
-                        KEYS = {x[0] for x in self.DICT.items()}
-                        if self.color == 'white':
-                            furthest= min(KEYS)
-                        if self.color == 'black':
-                            furthest= max(KEYS)                          
-                        
-                        if key == furthest:
-
-                            if self.color == 'white':
-                                if key+roll >25:
-                                    spot = min(key+roll, 25)
-                                else:
-                                    spot = key+roll     
-                            if self.color == 'black':
-                                if key-roll <0:
-                                    spot = max(key-roll, 0)
-                                else:
-                                    spot = key-roll     
-
-                            
-                        elif key!=furthest:
-                            if self.color == 'white':
-                                spot = key+roll
-                            elif self.color == 'black':
-                                spot = key -roll
-
-                        if spot >=0 and spot <=25:
-                            if spot not in opp_keys:
-                                CAN_MOVE = True
-                            elif spot in opp_keys:
-                                
-                                if self.opp_Dict[spot]==1:
-                                    CAN_MOVE = True                           
-                            
                         print(key,spot)
                     if CAN_MOVE == True:                        
                             
@@ -499,57 +452,11 @@ class Player:
                             CAN_MOVE_2 = False
                             
                             key2 = keys2[idx2]
-
-                            if self.can_remove == False:
-
-                                if self.color =='white':
-                                    spot2 = key2+remaining
-                                if self.color =='black':
-                                    spot2 = key2-remaining
-
-                                if spot2 >0 and spot2 <25:                     
-                        
-                                    if spot2 not in opp_keys2:
-                                        CAN_MOVE_2 = True
-                                    elif spot2 in opp_keys2:
-                                        
-                                        if self.opp_Dict[spot2]==1:
-                                            CAN_MOVE_2 = True                                
+                            evaluate = self.branch_out(key2, remaining, opp_keys2)
+                            if evaluate != None:                
+                                CAN_MOVE_2=True
+                                spot2 = evaluate[0] 
                             
-                            if self.can_remove==True:
-                                KEYS = {x[0] for x in self.DICT.items()}
-                                if self.color == 'white':
-                                    furthest= min(KEYS)
-                                if self.color == 'black':
-                                    furthest= max(KEYS)
-                                
-                                if key2 == furthest:
-
-                                    if self.color == 'white':
-                                        if key2+remaining >25:
-                                            spot2 = min(key2+remaining, 25)
-                                        else:
-                                            spot2 = key2+remaining
-
-                                    if self.color == 'black':
-                                        if key2-roll <0:
-                                            spot2 = max(key2-remaining, 0)
-                                        else:
-                                            spot2 = key2 - remaining            
-
-                                elif key2 !=furthest:
-                                    if self.color == 'white':
-                                        spot2 = key2+remaining 
-                                    elif self.color == 'black':
-                                        spot2 = key2 -remaining 
-
-                                if spot2 >=0 and spot2 <=25:
-                                    if spot2 not in opp_keys:
-                                        CAN_MOVE_2 = True
-                                    elif spot2 in opp_keys:
-                                        
-                                        if self.opp_Dict[spot2]==1:
-                                            CAN_MOVE_2 = True   
                             if CAN_MOVE_2 == True:                                
 
                                 self.move_piece(key2, spot2)                                

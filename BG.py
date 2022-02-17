@@ -243,11 +243,15 @@ class Player:
         self.dice = dice                       
         return dice             
 
-    def find_positions(self):
+    def find_positions(self, board=None):
         '''
         Creates player dictionaries of moves and counts
         '''
-        b = list(enumerate(self.board))
+        if board == None:
+            board = self.board
+        else:
+            board = board    
+        b = list(enumerate(board))
         positions = []
         positions2 = []
         amounts = []
@@ -325,8 +329,6 @@ class Player:
                     
                     if self.opp_Dict[spot]==1:
                         return spot, True
-        
-                                               
                 
     
     
@@ -362,8 +364,7 @@ class Player:
             
             roll = self.dice[0]
             LENGTH = len(keys)
-            idx = 0
-                            
+            idx = 0                            
 
             while LENGTH >0:
                 CAN_MOVE = False
@@ -372,65 +373,13 @@ class Player:
                 evaluate = self.branch_out(key, roll, opp_keys)
                 if evaluate != None:                
                     CAN_MOVE=True
-                    spot = evaluate[0]
-                # if self.can_remove == False:
-                #     if self.color == 'white':
-                #         spot = key + roll
-                #     if self.color == 'black':
-                #         spot = key-roll      
-
-                #     if spot >0 and spot <25:
-
-                #         if spot not in opp_keys:
-                #             CAN_MOVE = True
-                #         elif spot in opp_keys:
-                            
-                #             if self.opp_Dict[spot]==1:
-                #                 CAN_MOVE = True
-                
-                # if self.can_remove==True:
-                    
-                #     KEYS = {x[0] for x in self.DICT.items()}
-                #     if self.color == 'white':
-                #         furthest= min(KEYS)
-                #     if self.color == 'black':
-                #         furthest= max(KEYS)                          
-                    
-                #     if key == furthest:
-
-                #         if self.color == 'white':
-                #             if key+roll >25:
-                #                 spot = min(key+roll, 25)
-                #             else:
-                #                 spot = key+roll     
-                #         if self.color == 'black':
-                #             if key-roll <0:
-                #                 spot = max(key-roll, 0)
-                #             else:
-                #                 spot = key-roll     
-
-                        
-                #     elif key!=furthest:
-                #         if self.color == 'white':
-                #             spot = key+roll
-                #         elif self.color == 'black':
-                #             spot = key -roll
-
-                #     if spot >=0 and spot <=25:
-                #         if spot not in opp_keys:
-                #             CAN_MOVE = True
-                #         elif spot in opp_keys:
-                            
-                #             if self.opp_Dict[spot]==1:
-                #                 CAN_MOVE = True                           
-                
-                    
+                    spot = evaluate[0]                   
                 
                 if CAN_MOVE == True:                        
                             
                     self.move_piece(key, spot)                          
                     # recalculate positions based on moved piece
-                    self.find_positions()
+                    # self.find_positions()
                     
                     # Save board state here
                     current_board = copy.deepcopy(self.board)
@@ -442,18 +391,14 @@ class Player:
                 idx +=1
                 LENGTH -=1
 
-            print(Current_Boards)       
+            print(Current_Boards)   
+                # TODO
+                # Current Boards represents every key moving from the original board with the first die
+                # Want to run this again for the second die, on all of these current boards
+                # Want to save those boards, run this again for the third die on all of those boards
+                # Want to save those, run this again for the 4th die on all of those boards and return that list of 
+                # board states
         
-                    
-
-
-
-            
-
-
-
-
-
         if len(self.dice)==2:                            
             
             keys = [x for x in self.DICT.keys()]

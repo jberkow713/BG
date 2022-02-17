@@ -50,8 +50,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        # board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
+        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -273,6 +273,63 @@ class Player:
             self.DICT = black_dict
             self.opp_Dict = white_dict         
             return            
+    def branch_out(self, key, roll, opp_keys):
+        
+        if self.can_remove == False:
+            if self.color == 'white':
+                spot = key + roll
+            if self.color == 'black':
+                spot = key-roll      
+
+            if spot >0 and spot <25:
+
+                if spot not in opp_keys:
+                    return spot, True
+                elif spot in opp_keys:
+                    
+                    if self.opp_Dict[spot]==1:
+                        return spot, True
+        
+        if self.can_remove==True:
+            
+            KEYS = {x[0] for x in self.DICT.items()}
+            if self.color == 'white':
+                furthest= min(KEYS)
+            if self.color == 'black':
+                furthest= max(KEYS)                          
+            
+            if key == furthest:
+
+                if self.color == 'white':
+                    if key+roll >25:
+                        spot = min(key+roll, 25)
+                    else:
+                        spot = key+roll     
+                if self.color == 'black':
+                    if key-roll <0:
+                        spot = max(key-roll, 0)
+                    else:
+                        spot = key-roll     
+
+                
+            elif key!=furthest:
+                if self.color == 'white':
+                    spot = key+roll
+                elif self.color == 'black':
+                    spot = key -roll
+
+            if spot >=0 and spot <=25:
+                if spot not in opp_keys:
+                    return spot, True
+                elif spot in opp_keys:
+                    
+                    if self.opp_Dict[spot]==1:
+                        return spot, True
+        
+                                               
+                
+    
+    
     def update_reality(self):
         #TODO 
         # Going to find all possible moves using this function, and store it in self.moves
@@ -292,6 +349,111 @@ class Player:
         # ------------------------------------------------------------
         print(self.board)
         
+        if len(self.dice)==4:            
+            
+            # LEN = len(self.dice)
+            
+            # while LEN >0:
+            Current_Boards = []
+            keys = [x for x in self.DICT.keys()]
+            opp_keys = [x for x in self.opp_Dict.keys()]
+            
+            # [[],3 , 0 ,0 , 0,0 , 55555, 0, 555, 0, 0, 0, 33333, 55555, , 0, 0, 333, 0, 33333, 0, 0, 0, 0, 55, []]
+            
+            roll = self.dice[0]
+            LENGTH = len(keys)
+            idx = 0
+                            
+
+            while LENGTH >0:
+                CAN_MOVE = False
+
+                key = keys[idx]
+                evaluate = self.branch_out(key, roll, opp_keys)
+                if evaluate != None:                
+                    CAN_MOVE=True
+                    spot = evaluate[0]
+                # if self.can_remove == False:
+                #     if self.color == 'white':
+                #         spot = key + roll
+                #     if self.color == 'black':
+                #         spot = key-roll      
+
+                #     if spot >0 and spot <25:
+
+                #         if spot not in opp_keys:
+                #             CAN_MOVE = True
+                #         elif spot in opp_keys:
+                            
+                #             if self.opp_Dict[spot]==1:
+                #                 CAN_MOVE = True
+                
+                # if self.can_remove==True:
+                    
+                #     KEYS = {x[0] for x in self.DICT.items()}
+                #     if self.color == 'white':
+                #         furthest= min(KEYS)
+                #     if self.color == 'black':
+                #         furthest= max(KEYS)                          
+                    
+                #     if key == furthest:
+
+                #         if self.color == 'white':
+                #             if key+roll >25:
+                #                 spot = min(key+roll, 25)
+                #             else:
+                #                 spot = key+roll     
+                #         if self.color == 'black':
+                #             if key-roll <0:
+                #                 spot = max(key-roll, 0)
+                #             else:
+                #                 spot = key-roll     
+
+                        
+                #     elif key!=furthest:
+                #         if self.color == 'white':
+                #             spot = key+roll
+                #         elif self.color == 'black':
+                #             spot = key -roll
+
+                #     if spot >=0 and spot <=25:
+                #         if spot not in opp_keys:
+                #             CAN_MOVE = True
+                #         elif spot in opp_keys:
+                            
+                #             if self.opp_Dict[spot]==1:
+                #                 CAN_MOVE = True                           
+                
+                    
+                
+                if CAN_MOVE == True:                        
+                            
+                    self.move_piece(key, spot)                          
+                    # recalculate positions based on moved piece
+                    self.find_positions()
+                    
+                    # Save board state here
+                    current_board = copy.deepcopy(self.board)
+                    Current_Boards.append(current_board)
+                    self.board = copy.deepcopy(self.saved_board) 
+                    
+
+
+                idx +=1
+                LENGTH -=1
+
+            print(Current_Boards)       
+        
+                    
+
+
+
+            
+
+
+
+
+
         if len(self.dice)==2:                            
             
             keys = [x for x in self.DICT.keys()]

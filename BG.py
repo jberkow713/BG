@@ -348,8 +348,7 @@ class Player:
         self.can_take_off()
         self.roll()
         print(self.dice)
-        board_states = []
-        
+        board_states = []        
         
         # TODO Make this work for doubles 
         # ------------------------------------------------------------
@@ -584,7 +583,12 @@ class Player:
                 IDX+=1
                 LEN -=1
         self.board_states = board_states        
-        return 
+        return
+    def find_optimal_board(self):
+        self.update_reality()
+        Possible_Boards = self.board_states
+        return Possible_Boards
+
 
     def find_moves(self, DICE=None):
         '''
@@ -892,8 +896,8 @@ class Player:
 
 a = Player()
 
-a.update_reality()
-print(a.board_states)
+print(a.find_optimal_board())
+
 
 
 

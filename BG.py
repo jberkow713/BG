@@ -178,25 +178,23 @@ class Player:
             board = self.board
         
         if isinstance(board[TO], list)==True:
-            print('taking off')
-            
+                        
             if len(str(board[FROM]))>1:
                 curr = str(board[FROM])[1:]
                 board[FROM]= int(curr)
                 return
             else:
                 board[FROM]=0
-                return      
-                            
+                return                             
         
         starting= board[FROM]
         
         if isinstance(starting, list)==True:
             starting = int(starting[0])
 
-        if len(str(starting)[1:])>0:
-            
+        if len(str(starting)[1:])>0:            
             remaining= int(str(starting)[1:])
+        
         else:
             remaining = 0    
         moved = int(str(starting)[0])
@@ -222,8 +220,10 @@ class Player:
             curr = str(ending)
             mov = str(moved)
             board[TO]= int(curr+mov)
+    
     def random_list(self, lst):
         return  lst[random.randint(0,len(lst)-1)]
+    
     def random_index(self, lst):
         return random.randint(0, len(lst)-1)               
 
@@ -234,6 +234,7 @@ class Player:
         else:
             print('You are black')
             return 'black'        
+    
     def roll(self):
         '''
         Rolls, returns rolls
@@ -281,8 +282,10 @@ class Player:
             self.DICT = black_dict
             self.opp_Dict = white_dict         
             return            
+    
     def branch_out(self, key, roll, opp_keys):
-        
+        ''' Determines if piece can be moved with a given roll'''
+
         if self.can_remove == False:
             if self.color == 'white':
                 spot = key + roll
@@ -317,9 +320,8 @@ class Player:
                     if key-roll <0:
                         spot = max(key-roll, 0)
                     else:
-                        spot = key-roll     
+                        spot = key-roll
 
-                
             elif key!=furthest:
                 if self.color == 'white':
                     spot = key+roll
@@ -332,26 +334,18 @@ class Player:
                 elif spot in opp_keys:
                     
                     if self.opp_Dict[spot]==1:
-                        return spot, True
-                
-    
+                        return spot, True   
     
     def update_reality(self):
-        #TODO 
-        # Going to find all possible moves using this function, and store it in self.moves
-        # {1: 2, 12: 5, 17: 3, 19: 5} {6: 5, 8: 3, 13: 5, 24: 2} [6, 3]
-        
-        # copy board to reference back to 
-        self.saved_board = copy.deepcopy(self.board)
-                       
+        '''
+        Finds all possible board states for a given roll, stores them in self.board_states
+        '''
+        self.saved_board = copy.deepcopy(self.board)                       
         self.find_positions()
         self.can_take_off()
         self.roll()
-        print(self.dice)
-        
-        board_states = []        
-        
-        # Trying to get this into one 
+        print(self.dice)        
+        board_states = []              
         
         if len(self.dice)==4: 
             Length = len(self.dice)
@@ -385,13 +379,11 @@ class Player:
                         current_board = copy.deepcopy(board)
                         
                         if CAN_MOVE == True:                        
-                            
-                            self.move_piece(key, spot, board)                          
-                            # recalculate positions based on moved piece
+                            # recalculate positions based on moved piece for given board
+                            self.move_piece(key, spot, board)                            
                                             
-                            # Save board state here
+                            # Save board 
                             New_Boards.append(board)
-
 
                         board = current_board    
 
@@ -412,8 +404,7 @@ class Player:
             opp_keys = [x for x in self.opp_Dict.keys()]            
                     
             LEN = len(self.dice)    
-            IDX = 0
-            
+            IDX = 0            
 
             while LEN>0:                
                 
@@ -430,18 +421,16 @@ class Player:
                     evaluate = self.branch_out(key, roll, opp_keys)
                     if evaluate != None:                
                         CAN_MOVE=True
-                        spot = evaluate[0] 
-                    
-                        print(key,spot)
+                        spot = evaluate[0]                   
+                        
                     if CAN_MOVE == True:                        
-                            
+                           
                         self.move_piece(key, spot)                          
-                        # recalculate positions based on moved piece
+                        # recalculate positions based on moved piece 
                         self.find_positions()
                         
                         # Save board state here
-                        current_board = copy.deepcopy(self.board)
-                        
+                        current_board = copy.deepcopy(self.board)                        
 
                         keys2 = [x for x in self.DICT.keys()]
                         
@@ -469,8 +458,7 @@ class Player:
                                 self.move_piece(key2, spot2)                                
 
                                 if self.board not in board_states:
-                                    board_states.append(self.board)
-                                    # print(self.board)
+                                    board_states.append(self.board)                                    
 
                             idx2 +=1
                             LENGTH_2 -=1
@@ -492,7 +480,6 @@ class Player:
         # TODO evaluating all possible board states for optimal value
         # want to return that board as output
         return Possible_Boards
-
 
     def find_moves(self, DICE=None):
         '''
@@ -789,31 +776,9 @@ class Player:
         
             self.random_comp_move(self.dice)  
 
-# TODO add pip_count component for each color
-# improve brain, make computer look for specific blocks to make,
-# make computer look for consecutive blocks, and blocks certain distance from opponent 
-# prioritize blocks in its own space, etc...
-# learning how to switch gears, based on pip count vs opponent pip count, whether to be 
-# aggressive or not
-# end game, intelligent taking off of pieces, depending on where opponent is
-
 a = Player()
 
 print(a.find_optimal_board())
-
-
-
-
-# b = Player('white', BRD)
-# b.random_comp_move()
-# print(b.board)
-
-# print(a.pip_count())
-# print(a.consec_blocks())
-# print(a.find_single_blocks())
-# print(a.find_furthest_back())
-
-# print(a.find_all_moves())
 
 
 

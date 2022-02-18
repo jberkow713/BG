@@ -71,6 +71,7 @@ class Player:
         self.can_remove = None
         self.dice = None
         self.moves = None
+        self.board_states = None
     
     def can_take_off(self):
         if self.color == 'black':
@@ -391,7 +392,7 @@ class Player:
                 idx +=1
                 LENGTH -=1
 
-            print(Current_Boards)
+            
             Roll_2_Boards = []
 
             for board in Current_Boards:
@@ -428,8 +429,83 @@ class Player:
 
                     idx +=1
                     LENGTH -=1
-            print(Roll_2_Boards)    
-        
+            Roll_3_Boards = []
+
+            for board in Roll_2_Boards:
+                self.find_positions(board)
+
+                keys = [x for x in self.DICT.keys()]
+                opp_keys = [x for x in self.opp_Dict.keys()]               
+               
+                roll = self.dice[0]
+                LENGTH = len(keys)
+                idx = 0                            
+
+                while LENGTH >0:
+                    CAN_MOVE = False
+
+                    key = keys[idx]
+                    evaluate = self.branch_out(key, roll, opp_keys)
+                    if evaluate != None:                
+                        CAN_MOVE=True
+                        spot = evaluate[0]                   
+                    
+                    current_board = copy.deepcopy(board)
+                    
+                    if CAN_MOVE == True:                        
+                        
+                        self.move_piece(key, spot, board)                          
+                        # recalculate positions based on moved piece
+                                        
+                        # Save board state here
+                        Roll_3_Boards.append(board)
+
+
+                    board = current_board    
+
+                    idx +=1
+                    LENGTH -=1
+            Roll_4_Boards = []
+
+            for board in Roll_3_Boards:
+                self.find_positions(board)
+
+                keys = [x for x in self.DICT.keys()]
+                opp_keys = [x for x in self.opp_Dict.keys()]               
+               
+                roll = self.dice[0]
+                LENGTH = len(keys)
+                idx = 0                            
+
+                while LENGTH >0:
+                    CAN_MOVE = False
+
+                    key = keys[idx]
+                    evaluate = self.branch_out(key, roll, opp_keys)
+                    if evaluate != None:                
+                        CAN_MOVE=True
+                        spot = evaluate[0]                   
+                    
+                    current_board = copy.deepcopy(board)
+                    
+                    if CAN_MOVE == True:                        
+                        
+                        self.move_piece(key, spot, board)                          
+                        # recalculate positions based on moved piece
+                                        
+                        # Save board state here
+                        Roll_4_Boards.append(board)
+
+
+                    board = current_board    
+
+                    idx +=1
+                    LENGTH -=1
+            print(len(Roll_4_Boards))
+            self.board_states= Roll_4_Boards
+            return           
+                
+        # TODO finish for rolls 3 and 4, and rolls 4 is ALL board states for doubles!
         if len(self.dice)==2:                            
             
             keys = [x for x in self.DICT.keys()]
@@ -507,7 +583,8 @@ class Player:
                 
                 IDX+=1
                 LEN -=1
-        return board_states   
+        self.board_states = board_states        
+        return 
 
     def find_moves(self, DICE=None):
         '''
@@ -815,9 +892,10 @@ class Player:
 
 a = Player()
 
-spots = a.update_reality()
+a.update_reality()
+print(a.board_states)
 
-print(spots)
+
 
 # b = Player('white', BRD)
 # b.random_comp_move()

@@ -348,161 +348,62 @@ class Player:
         self.can_take_off()
         self.roll()
         print(self.dice)
+        
         board_states = []        
         
-        # TODO Make this work for doubles 
-        # ------------------------------------------------------------
-        print(self.board)
+        # Trying to get this into one 
         
-        if len(self.dice)==4:            
-            
-            # LEN = len(self.dice)
-            
-            # while LEN >0:
-            Current_Boards = []
-            keys = [x for x in self.DICT.keys()]
-            opp_keys = [x for x in self.opp_Dict.keys()]
-            
-            # [[],3 , 0 ,0 , 0,0 , 55555, 0, 555, 0, 0, 0, 33333, 55555, , 0, 0, 333, 0, 33333, 0, 0, 0, 0, 55, []]
-            
-            roll = self.dice[0]
-            LENGTH = len(keys)
-            idx = 0                            
-
-            while LENGTH >0:
-                CAN_MOVE = False
-
-                key = keys[idx]
-                evaluate = self.branch_out(key, roll, opp_keys)
-                if evaluate != None:                
-                    CAN_MOVE=True
-                    spot = evaluate[0]                   
+        if len(self.dice)==4: 
+            Length = len(self.dice)
+            while Length >0:           
                 
-                if CAN_MOVE == True:                        
+                New_Boards = []
+
+                if Length == len(self.dice):
+                    board_states = [self.board]
+
+                for board in board_states:
+
+                    self.find_positions(board)
+
+                    keys = [x for x in self.DICT.keys()]
+                    opp_keys = [x for x in self.opp_Dict.keys()]               
+                    
+                    roll = self.dice[0]
+                    LENGTH = len(keys)
+                    idx = 0                            
+
+                    while LENGTH >0:
+                        CAN_MOVE = False
+
+                        key = keys[idx]
+                        evaluate = self.branch_out(key, roll, opp_keys)
+                        if evaluate != None:                
+                            CAN_MOVE=True
+                            spot = evaluate[0]                   
+                        
+                        current_board = copy.deepcopy(board)
+                        
+                        if CAN_MOVE == True:                        
                             
-                    self.move_piece(key, spot)                          
-                    # recalculate positions based on moved piece
-                                       
-                    # Save board state here
-                    current_board = copy.deepcopy(self.board)
-                    Current_Boards.append(current_board)
-                    self.board = copy.deepcopy(self.saved_board) 
-                    
-                idx +=1
-                LENGTH -=1
-
-            
-            Roll_2_Boards = []
-
-            for board in Current_Boards:
-                self.find_positions(board)
-
-                keys = [x for x in self.DICT.keys()]
-                opp_keys = [x for x in self.opp_Dict.keys()]               
-               
-                roll = self.dice[0]
-                LENGTH = len(keys)
-                idx = 0                            
-
-                while LENGTH >0:
-                    CAN_MOVE = False
-
-                    key = keys[idx]
-                    evaluate = self.branch_out(key, roll, opp_keys)
-                    if evaluate != None:                
-                        CAN_MOVE=True
-                        spot = evaluate[0]                   
-                    
-                    current_board = copy.deepcopy(board)
-                    
-                    if CAN_MOVE == True:                        
-                        
-                        self.move_piece(key, spot, board)                          
-                        # recalculate positions based on moved piece
-                                        
-                        # Save board state here
-                        Roll_2_Boards.append(board)
+                            self.move_piece(key, spot, board)                          
+                            # recalculate positions based on moved piece
+                                            
+                            # Save board state here
+                            New_Boards.append(board)
 
 
-                    board = current_board    
+                        board = current_board    
 
-                    idx +=1
-                    LENGTH -=1
-            Roll_3_Boards = []
+                        idx +=1
+                        LENGTH -=1
 
-            for board in Roll_2_Boards:
-                self.find_positions(board)
-
-                keys = [x for x in self.DICT.keys()]
-                opp_keys = [x for x in self.opp_Dict.keys()]               
-               
-                roll = self.dice[0]
-                LENGTH = len(keys)
-                idx = 0                            
-
-                while LENGTH >0:
-                    CAN_MOVE = False
-
-                    key = keys[idx]
-                    evaluate = self.branch_out(key, roll, opp_keys)
-                    if evaluate != None:                
-                        CAN_MOVE=True
-                        spot = evaluate[0]                   
-                    
-                    current_board = copy.deepcopy(board)
-                    
-                    if CAN_MOVE == True:                        
-                        
-                        self.move_piece(key, spot, board)                          
-                        # recalculate positions based on moved piece
-                                        
-                        # Save board state here
-                        Roll_3_Boards.append(board)
-
-
-                    board = current_board    
-
-                    idx +=1
-                    LENGTH -=1
-            Roll_4_Boards = []
-
-            for board in Roll_3_Boards:
-                self.find_positions(board)
-
-                keys = [x for x in self.DICT.keys()]
-                opp_keys = [x for x in self.opp_Dict.keys()]               
-               
-                roll = self.dice[0]
-                LENGTH = len(keys)
-                idx = 0                            
-
-                while LENGTH >0:
-                    CAN_MOVE = False
-
-                    key = keys[idx]
-                    evaluate = self.branch_out(key, roll, opp_keys)
-                    if evaluate != None:                
-                        CAN_MOVE=True
-                        spot = evaluate[0]                   
-                    
-                    current_board = copy.deepcopy(board)
-                    
-                    if CAN_MOVE == True:                        
-                        
-                        self.move_piece(key, spot, board)                          
-                        # recalculate positions based on moved piece
-                                        
-                        # Save board state here
-                        Roll_4_Boards.append(board)
-
-
-                    board = current_board    
-
-                    idx +=1
-                    LENGTH -=1
-            print(len(Roll_4_Boards))
-            self.board_states= Roll_4_Boards
-            return           
+                board_states = New_Boards
+                Length -=1 
+        
+            self.board_states= board_states
+            print(len(self.board_states))
+            return               
                 
         # TODO finish for rolls 3 and 4, and rolls 4 is ALL board states for doubles!
         if len(self.dice)==2:                            
@@ -585,8 +486,11 @@ class Player:
         self.board_states = board_states        
         return
     def find_optimal_board(self):
+        # Finding all possible moves
         self.update_reality()
         Possible_Boards = self.board_states
+        # TODO evaluating all possible board states for optimal value
+        # want to return that board as output
         return Possible_Boards
 
 
@@ -715,8 +619,7 @@ class Player:
         Hit_Dict = dict(zip(dice, Possible_Hits))        
         
         return Move_Dict, Hit_Dict
-    def Terminator_Move(self):
-        pass
+    
     def random_comp_move(self, DICE=None):
         
         print(self.board)

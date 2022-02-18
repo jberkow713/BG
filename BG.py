@@ -347,6 +347,7 @@ class Player:
         print(self.dice)        
         board_states = []              
         
+        # for doubles
         if len(self.dice)==4: 
             Length = len(self.dice)
             while Length >0:           
@@ -397,7 +398,7 @@ class Player:
             print(len(self.board_states))
             return               
                 
-        # TODO finish for rolls 3 and 4, and rolls 4 is ALL board states for doubles!
+        # For a non double roll
         if len(self.dice)==2:                            
             
             keys = [x for x in self.DICT.keys()]
@@ -473,6 +474,7 @@ class Player:
                 LEN -=1
         self.board_states = board_states        
         return
+        
     def find_optimal_board(self):
         # Finding all possible moves
         self.update_reality()

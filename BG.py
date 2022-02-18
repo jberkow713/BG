@@ -483,8 +483,7 @@ class Player:
     
     def random_comp_move(self):
         self.update_reality()
-        random_board = self.board_states[random.randint(0,len(self.board_states)-1)]
-        self.board = random_board
+        self.board = self.random_list(self.board_states)
         return
 
 A = Player()

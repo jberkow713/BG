@@ -168,24 +168,27 @@ class Player:
                     curr = spot
             return curr           
 
-    def move_piece(self, FROM, TO):
+    def move_piece(self, FROM, TO, board=None):
         '''
         Function used for moving one piece and altering the board state
         '''        
         # print(FROM, TO)
-        if isinstance(self.board[TO], list)==True:
+        if board==None:
+            board = self.board
+        
+        if isinstance(board[TO], list)==True:
             print('taking off')
             
-            if len(str(self.board[FROM]))>1:
-                curr = str(self.board[FROM])[1:]
-                self.board[FROM]= int(curr)
+            if len(str(board[FROM]))>1:
+                curr = str(board[FROM])[1:]
+                board[FROM]= int(curr)
                 return
             else:
-                self.board[FROM]=0
+                board[FROM]=0
                 return      
                             
         
-        starting= self.board[FROM]
+        starting= board[FROM]
         
         if isinstance(starting, list)==True:
             starting = int(starting[0])
@@ -197,27 +200,27 @@ class Player:
             remaining = 0    
         moved = int(str(starting)[0])
                 
-        self.board[FROM]=remaining
+        board[FROM]=remaining
 
-        ending = self.board[TO]
+        ending = board[TO]
         # For a hit
-        if moved !=int(str(self.board[TO])[0]):
+        if moved !=int(str(board[TO])[0]):
             if self.color =='white':
-                if self.board[TO]!=0:
-                    self.board[-1].append(ending)
-                self.board[TO] = moved
+                if board[TO]!=0:
+                    board[-1].append(ending)
+                board[TO] = moved
                 
                 return  
             elif self.color =='black':
-                if self.board[TO]!=0:
-                    self.board[0].append(ending)
-                self.board[TO]= moved
+                if board[TO]!=0:
+                    board[0].append(ending)
+                board[TO]= moved
                 return 
         # For Stacking pieces
-        if moved == int(str(self.board[TO])[0]):
+        if moved == int(str(board[TO])[0]):
             curr = str(ending)
             mov = str(moved)
-            self.board[TO]= int(curr+mov)
+            board[TO]= int(curr+mov)
     def random_list(self, lst):
         return  lst[random.randint(0,len(lst)-1)]
     def random_index(self, lst):
@@ -379,25 +382,53 @@ class Player:
                             
                     self.move_piece(key, spot)                          
                     # recalculate positions based on moved piece
-                    # self.find_positions()
-                    
+                                       
                     # Save board state here
                     current_board = copy.deepcopy(self.board)
                     Current_Boards.append(current_board)
                     self.board = copy.deepcopy(self.saved_board) 
                     
-
-
                 idx +=1
                 LENGTH -=1
 
-            print(Current_Boards)   
-                # TODO
-                # Current Boards represents every key moving from the original board with the first die
-                # Want to run this again for the second die, on all of these current boards
-                # Want to save those boards, run this again for the third die on all of those boards
-                # Want to save those, run this again for the 4th die on all of those boards and return that list of 
-                # board states
+            print(Current_Boards)
+            Roll_2_Boards = []
+
+            for board in Current_Boards:
+                self.find_positions(board)
+
+                keys = [x for x in self.DICT.keys()]
+                opp_keys = [x for x in self.opp_Dict.keys()]               
+               
+                roll = self.dice[0]
+                LENGTH = len(keys)
+                idx = 0                            
+
+                while LENGTH >0:
+                    CAN_MOVE = False
+
+                    key = keys[idx]
+                    evaluate = self.branch_out(key, roll, opp_keys)
+                    if evaluate != None:                
+                        CAN_MOVE=True
+                        spot = evaluate[0]                   
+                    
+                    current_board = copy.deepcopy(board)
+                    
+                    if CAN_MOVE == True:                        
+                        
+                        self.move_piece(key, spot, board)                          
+                        # recalculate positions based on moved piece
+                                        
+                        # Save board state here
+                        Roll_2_Boards.append(board)
+
+
+                    board = current_board    
+
+                    idx +=1
+                    LENGTH -=1
+            print(Roll_2_Boards)    
         
         if len(self.dice)==2:                            
             

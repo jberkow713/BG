@@ -50,8 +50,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        # board = [[33],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[55]]
+        # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
+        board = [[3],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[5]]
         return board
 
 class Player:
@@ -552,7 +552,7 @@ class Player:
             # Smallest possible rail count not knowing the dice, after moving
             best_rail_count = max(0,starting_count - len(self.dice))
             # Best possible rail count after assessing all boards
-            current_best = 15
+            current_best = starting_count
             for lst in list:
                 if current_best == best_rail_count:
                     return [x for x in list if self.rail_count(x)==best_rail_count]

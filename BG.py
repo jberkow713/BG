@@ -177,25 +177,18 @@ class Player:
         if board==None:
             board = self.board
         
-        # For removing pieces in the end game
-        if self.can_remove == True:
-            # TODO
-            # Need to add hitting to the removal part, stacking as well, and moving to empty spots
-            # 
-            # 
-            #  
-            if isinstance(board[TO], list)==True:
-                #33333 
-                if len(str(board[FROM]))>1:
-                    curr = str(board[FROM])[1:]
-                    board[FROM]= int(curr)
-                    return
-                else:
-                    board[FROM]=0
-                    return                             
-        
-        #Moving from spots when you can not remove pieces
-        
+        #Can only move to the end rail if you're moving off, will not affect other stuck colors in end zone    
+        if isinstance(board[TO], list)==True:
+            #33333 
+            if len(str(board[FROM]))>1:
+                curr = str(board[FROM])[1:]
+                board[FROM]= int(curr)
+                return
+            else:
+                board[FROM]=0
+                return                             
+
+        # All other movement       
         starting= board[FROM]
         
         if isinstance(starting, list)==True:
@@ -208,16 +201,16 @@ class Player:
         # setting remaining values for later when moving
         if len(starting_val)>1:
 
-            if isinstance(starting, list)==True:
-                            
+            if isinstance(starting, list)==True:                            
                 remaining = [int(starting_val[1:])]
+            
             else:
                 remaining = int(starting_val[1:])    
         
         elif len(starting_val)==1:
-            if isinstance(starting, list)==True:
-                          
+            if isinstance(starting, list)==True:                          
                 remaining = []
+            
             else:
                 remaining = 0
 
@@ -532,6 +525,12 @@ class Player:
         return Possible_Boards
     
     def random_comp_move(self):
+        #TODO Need to make sure that if there are pieces on the rail to start, that the move
+        # which is made, removes pieces from the rail, and if no such move in the possible moves can be made,
+        # then return some kind of can not move statement 
+
+
+
         original_board = copy.deepcopy(self.board)
 
         self.update_reality()

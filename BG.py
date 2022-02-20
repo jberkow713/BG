@@ -179,6 +179,7 @@ class Player:
         
         # For removing pieces in the end game
         if self.can_remove == True:
+            # TODO
             # Need to add hitting to the removal part, stacking as well, and moving to empty spots
             # 
             # 
@@ -252,38 +253,7 @@ class Player:
             board[TO] = int(moving)
             board[FROM] = remaining
 
-        return     
-                  
-            
-
-        # if len(str(starting)[1:])>0:            
-        #     remaining= int(str(starting)[1:])
-        
-        # else:
-        #     remaining = 0    
-        #     moved = int(str(starting)[0])
-                    
-        #     board[FROM]=remaining
-
-        #     ending = board[TO]
-        #     # For a hit
-        #     if moved !=int(str(board[TO])[0]):
-        #         if self.color =='white':
-        #             if board[TO]!=0:
-        #                 board[-1].append(ending)
-        #             board[TO] = moved
-                    
-        #             return  
-        #         elif self.color =='black':
-        #             if board[TO]!=0:
-        #                 board[0].append(ending)
-        #             board[TO]= moved
-        #             return 
-        #     # For Stacking pieces
-        #     if moved == int(str(board[TO])[0]):
-        #         curr = str(ending)
-        #         mov = str(moved)
-        #         board[TO]= int(curr+mov)
+        return                        
     
     def random_list(self, lst):
         return  lst[random.randint(0,len(lst)-1)]

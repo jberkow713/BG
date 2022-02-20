@@ -50,8 +50,8 @@ class Board:
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):
-        # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[33],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[55]]
+        board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
+        # board = [[33],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[55]]
         return board
 
 class Player:
@@ -543,6 +543,8 @@ class Player:
     def find_move_off_rail_list(self, list):
         # gets you count of pieces you have on rail, if you have any of your current board
         starting_count = self.rail_count(self.board)
+        if starting_count == 0:
+            return list
         
         # If nothing is on the rail, you can choose from entire list
         if starting_count == 0:

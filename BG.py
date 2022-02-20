@@ -484,10 +484,10 @@ class Player:
         return Possible_Boards
     
     def random_comp_move(self):
-        
+        original_board = copy.deepcopy(self.board)
+
         self.update_reality()
-        
-        original_board = self.board
+                
         self.board = self.random_list(self.board_states)
                 
         return original_board, self.board
@@ -535,7 +535,7 @@ class Player:
 
 A = Player()
 boards = A.random_comp_move()
-print(boards)
+# print(boards)
 print(A.find_moved_pieces(boards[0], boards[1]))
 
 

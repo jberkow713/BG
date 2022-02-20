@@ -436,7 +436,7 @@ class Player:
                 Length -=1 
         
             self.board_states= board_states
-            print(len(self.board_states))
+            
             return               
                 
         # For a non double roll
@@ -524,20 +524,70 @@ class Player:
         # want to return that board as output
         return Possible_Boards
     
-    def random_comp_move(self):
-        #TODO Need to make sure that if there are pieces on the rail to start, that the move
-        # which is made, removes pieces from the rail, and if no such move in the possible moves can be made,
-        # then return some kind of can not move statement 
-
-
-
-        original_board = copy.deepcopy(self.board)
-
-        self.update_reality()
-                        
-        self.board = self.random_list(self.board_states)
+    def rail_count(self, board):
+        self.find_positions(board)
+        # {0: 2, 1: 1, 12: 5, 17: 3, 19: 5}
+        
+        if self.color == 'white':
+            rail = 0
+        if self.color =='black':
+            rail = 25    
                 
-        return original_board, self.board
+        if rail in self.DICT.keys():
+            count = self.DICT[rail]
+        else:
+            count = 0
+
+        return count
+
+    def find_move_off_rail_list(self, list):
+        # gets you count of pieces you have on rail, if you have any of your current board
+        starting_count = self.rail_count(self.board)
+        
+        # If nothing is on the rail, you can choose from entire list
+        if starting_count == 0:
+            return list 
+        
+        else:            
+            # Smallest possible rail count not knowing the dice, after moving
+            best_rail_count = max(0,starting_count - len(self.dice))
+            print(best_rail_count)
+            # Best possible rail count after assessing all boards
+            current_best = 15
+            for lst in list:
+                if current_best == best_rail_count:
+                    return [x for x in list if self.rail_count(x)==best_rail_count]
+
+                COUNT = self.rail_count(lst)
+                if current_best > COUNT:
+                    current_best = COUNT      
+            # if ending best count off rail = starting count on rail, you can not move
+            print(current_best)
+            if current_best == starting_count:
+                
+                return []
+            else:               
+
+                return [x for x in list if self.rail_count(x)==current_best]
+
+
+    def random_comp_move(self):
+               
+        # get all possible board states for given roll
+        print(self.board)
+        
+        self.update_reality()
+        # In the case of pieces stuck on rail, want to find usable board states
+        usable_boards = self.find_move_off_rail_list(self.board_states)
+        # If this is empty, this means we can not move even one piece from off of the rail
+        
+        if usable_boards == []:
+            print('Stuck on rail, can not move')
+        # Otherwise, return possible move from possible list
+        else:
+            board = self.random_list(usable_boards)
+            print(board)
+            return board
 
     def find_moved_pieces(self, starting_board, ending_board):
         '''
@@ -581,7 +631,8 @@ class Player:
 
 
 A = Player()
-print(A.random_comp_move())
+# print(A.rail_count())
+A.random_comp_move()
 # print(boards)
 # print(A.find_moved_pieces(boards[0], boards[1]))
 

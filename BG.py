@@ -484,14 +484,61 @@ class Player:
         return Possible_Boards
     
     def random_comp_move(self):
+        
         self.update_reality()
+        
+        original_board = self.board
         self.board = self.random_list(self.board_states)
-        return
+                
+        return original_board, self.board
+
+    def find_moved_pieces(self, starting_board, ending_board):
+        '''
+        Finds moved piece based on starting and ending locations, for purposes of the visual game
+        '''
+        # {1: 2, 12: 5, 17: 3, 19: 5}, {1: 2, 12: 5, 17: 1, 19: 6, 20: 1}
+        # starting and ending_dictionaries
+        self.board = starting_board
+        self.find_positions()
+        starting_dict = self.DICT
+
+        self.board = ending_board 
+        self.find_positions()
+        ending_dict = self.DICT 
+
+        changed_keys = []
+        changed_Vals =[]
+        new_keys = []
+        new_vals = []
+
+        for key, val in starting_dict.items():
+            for key_2, val_2 in ending_dict.items():
+                if key == key_2:
+                    if val != val_2:
+                        changed_keys.append(key)
+                        changed_Vals.append(val - val_2)
+
+        for key, val in ending_dict.items():
+            if key not in starting_dict.keys():
+                new_keys.append(key)
+                new_vals.append(val)
+
+        #Use this information to calculate which pieces moved to where from starting to end dict 
+
+
+        return starting_dict, ending_dict, changed_keys, changed_Vals, new_keys, new_vals
+
+
+
+
+
 
 A = Player()
+boards = A.random_comp_move()
+print(boards)
+print(A.find_moved_pieces(boards[0], boards[1]))
 
-A.random_comp_move()
-print(A.board)
+
 
 
 

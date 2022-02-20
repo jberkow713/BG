@@ -551,7 +551,6 @@ class Player:
         else:            
             # Smallest possible rail count not knowing the dice, after moving
             best_rail_count = max(0,starting_count - len(self.dice))
-            print(best_rail_count)
             # Best possible rail count after assessing all boards
             current_best = 15
             for lst in list:
@@ -562,7 +561,6 @@ class Player:
                 if current_best > COUNT:
                     current_best = COUNT      
             # if ending best count off rail = starting count on rail, you can not move
-            print(current_best)
             if current_best == starting_count:
                 
                 return []
@@ -570,12 +568,10 @@ class Player:
 
                 return [x for x in list if self.rail_count(x)==current_best]
 
-
     def random_comp_move(self):
                
         # get all possible board states for given roll
-        print(self.board)
-        
+                
         self.update_reality()
         # In the case of pieces stuck on rail, want to find usable board states
         usable_boards = self.find_move_off_rail_list(self.board_states)

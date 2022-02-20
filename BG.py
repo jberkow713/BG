@@ -543,9 +543,7 @@ class Player:
     def find_move_off_rail_list(self, list):
         # gets you count of pieces you have on rail, if you have any of your current board
         starting_count = self.rail_count(self.board)
-        if starting_count == 0:
-            return list
-        
+                
         # If nothing is on the rail, you can choose from entire list
         if starting_count == 0:
             return list 

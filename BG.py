@@ -51,7 +51,7 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[33],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[55]]
         return board
 
 class Player:
@@ -177,49 +177,113 @@ class Player:
         if board==None:
             board = self.board
         
-        if isinstance(board[TO], list)==True:
-                        
-            if len(str(board[FROM]))>1:
-                curr = str(board[FROM])[1:]
-                board[FROM]= int(curr)
-                return
-            else:
-                board[FROM]=0
-                return                             
+        # For removing pieces in the end game
+        if self.can_remove == True:
+            # Need to add hitting to the removal part, stacking as well, and moving to empty spots
+            # 
+            # 
+            #  
+            if isinstance(board[TO], list)==True:
+                #33333 
+                if len(str(board[FROM]))>1:
+                    curr = str(board[FROM])[1:]
+                    board[FROM]= int(curr)
+                    return
+                else:
+                    board[FROM]=0
+                    return                             
+        
+        #Moving from spots when you can not remove pieces
         
         starting= board[FROM]
         
         if isinstance(starting, list)==True:
-            starting = int(starting[0])
-
-        if len(str(starting)[1:])>0:            
-            remaining= int(str(starting)[1:])
-        
+            starting_val = str(starting[0])
         else:
-            remaining = 0    
-        moved = int(str(starting)[0])
-                
-        board[FROM]=remaining
+            starting_val = str(starting)    
+        
+        # the piece being moved
+        moving= starting_val[0]
+        # setting remaining values for later when moving
+        if len(starting_val)>1:
 
-        ending = board[TO]
-        # For a hit
-        if moved !=int(str(board[TO])[0]):
-            if self.color =='white':
-                if board[TO]!=0:
-                    board[-1].append(ending)
-                board[TO] = moved
-                
-                return  
-            elif self.color =='black':
-                if board[TO]!=0:
-                    board[0].append(ending)
-                board[TO]= moved
-                return 
-        # For Stacking pieces
-        if moved == int(str(board[TO])[0]):
-            curr = str(ending)
-            mov = str(moved)
-            board[TO]= int(curr+mov)
+            if isinstance(starting, list)==True:
+                            
+                remaining = [int(starting_val[1:])]
+            else:
+                remaining = int(starting_val[1:])    
+        
+        elif len(starting_val)==1:
+            if isinstance(starting, list)==True:
+                          
+                remaining = []
+            else:
+                remaining = 0
+
+        # if moving to an empty spot
+        if board[TO]==0:
+            
+            board[TO]= int(moving)
+            board[FROM] = remaining
+        
+        # For stacking pieces of same color
+        elif moving in str(board[TO]):
+            board[TO] = int(moving+str(board[TO]))
+            board[FROM] = remaining
+
+        # For hitting
+        else:
+            # send hit piece to corresponding rail
+            if self.color == 'white':
+                if board[-1] == []:
+                    board[-1] = [5]
+                else:
+                    current_rail = str(board[-1][0])
+                    board[-1] = [int(current_rail+str(5))]
+            if self.color == 'black':
+                if board[0] == []:
+                    board[0] = [3]
+                else:
+                    current_rail = str(board[0][0])
+                    board[0] = [int(current_rail+str(3))]
+                            
+            # set value at end after moving hit piece
+        
+            board[TO] = int(moving)
+            board[FROM] = remaining
+
+        return     
+                  
+            
+
+        # if len(str(starting)[1:])>0:            
+        #     remaining= int(str(starting)[1:])
+        
+        # else:
+        #     remaining = 0    
+        #     moved = int(str(starting)[0])
+                    
+        #     board[FROM]=remaining
+
+        #     ending = board[TO]
+        #     # For a hit
+        #     if moved !=int(str(board[TO])[0]):
+        #         if self.color =='white':
+        #             if board[TO]!=0:
+        #                 board[-1].append(ending)
+        #             board[TO] = moved
+                    
+        #             return  
+        #         elif self.color =='black':
+        #             if board[TO]!=0:
+        #                 board[0].append(ending)
+        #             board[TO]= moved
+        #             return 
+        #     # For Stacking pieces
+        #     if moved == int(str(board[TO])[0]):
+        #         curr = str(ending)
+        #         mov = str(moved)
+        #         board[TO]= int(curr+mov)
     
     def random_list(self, lst):
         return  lst[random.randint(0,len(lst)-1)]
@@ -261,17 +325,30 @@ class Player:
         positions2 = []
         amounts = []
         amounts2 = []
-                
+        
         for idx, val in b:
-            if str(3) in str(val):
-                amounts.append(len(str(val)))
-                positions.append(idx)
-        white_dict = dict(zip(positions, amounts))               
-                
-        for idx, val in b:
-            if str(5) in str(val):
-                amounts2.append(len(str(val)))
-                positions2.append(idx)
+            if isinstance(val, list)==True and val!=[]:
+
+                VAL = str(val[0])
+                amount = len(VAL)
+                if str(3) in str(val):
+                    amounts.append(amount)
+                    positions.append(idx)
+                if str(5) in str(val):
+                    amounts2.append(amount)
+                    positions2.append(idx)                              
+            
+            else:
+
+                if str(3) in str(val):
+                    amounts.append(len(str(val)))
+                    positions.append(idx)            
+        
+                if str(5) in str(val):
+                    amounts2.append(len(str(val)))
+                    positions2.append(idx)
+
+        white_dict = dict(zip(positions, amounts))  
         black_dict = dict(zip(positions2, amounts2))          
                 
         if self.color == 'white':
@@ -342,6 +419,7 @@ class Player:
         '''
         self.saved_board = copy.deepcopy(self.board)                       
         self.find_positions()
+        print(self.DICT)
         self.can_take_off()
         self.roll()
         print(self.dice)        
@@ -487,7 +565,7 @@ class Player:
         original_board = copy.deepcopy(self.board)
 
         self.update_reality()
-                
+                        
         self.board = self.random_list(self.board_states)
                 
         return original_board, self.board
@@ -534,9 +612,9 @@ class Player:
 
 
 A = Player()
-boards = A.random_comp_move()
+print(A.random_comp_move())
 # print(boards)
-print(A.find_moved_pieces(boards[0], boards[1]))
+# print(A.find_moved_pieces(boards[0], boards[1]))
 
 
 

@@ -51,7 +51,7 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[3],3,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,5,[5]]
+        board = [[333],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[555]]
         return board
 
 class Player:
@@ -72,6 +72,7 @@ class Player:
         self.dice = None
         self.moves = None
         self.board_states = None
+        self.forced_move = None
     
     def can_take_off(self):
         if self.color == 'black':
@@ -385,7 +386,8 @@ class Player:
         print(self.DICT)
         self.can_take_off()
         self.roll()
-        print(self.dice)        
+        print(self.dice)
+        Rail_Count = self.rail_count(self.board)        
         board_states = []              
         
         # for doubles
@@ -436,7 +438,7 @@ class Player:
                 Length -=1 
         
             self.board_states= board_states
-            
+            self.board = copy.deepcopy(self.saved_board)   
             return               
                 
         # For a non double roll
@@ -444,7 +446,35 @@ class Player:
             
             keys = [x for x in self.DICT.keys()]
             opp_keys = [x for x in self.opp_Dict.keys()]            
+
+            # Check to see if 2 or more on rail
+            if Rail_Count >=2:
+                # [[33], 33, 0, 0, 0, 0, 55555, 0, 555, 0, 0, 0, 33333, 55555, 0, 0, 0, 333, 0, 33333, 0, 0, 0, 0, 55, [55]]
+                # {0: 2, 1: 2, 12: 5, 17: 3, 19: 5}  opp {6: 5, 8: 3, 13: 5, 24: 2, 25: 2}
+                if self.color == 'white':
+                    rail = 0
+                if self.color == 'black':
+                    rail = 25               
+                
+                die_1_check = self.branch_out(rail, self.dice[0], opp_keys)
+                if die_1_check != None:
+                    spot = die_1_check[0]
+                    self.move_piece(rail, spot)
+                    self.find_positions()
+                    opp_keys = [x for x in self.opp_Dict.keys()]
                     
+                    # self.board is updated , or not, here  
+
+                die_2_check = self.branch_out(rail, self.dice[1], opp_keys)
+                if die_2_check != None:
+                    spot = die_2_check[0]
+                    self.move_piece(rail, spot)
+                    
+                # Save the board after possible moves
+                self.board_states = [self.board]
+                self.forced_move = True
+                return 
+
             LEN = len(self.dice)    
             IDX = 0            
 
@@ -543,7 +573,7 @@ class Player:
     def find_move_off_rail_list(self, list):
         # gets you count of pieces you have on rail, if you have any of your current board
         starting_count = self.rail_count(self.board)
-                
+                                
         # If nothing is on the rail, you can choose from entire list
         if starting_count == 0:
             return list 
@@ -571,15 +601,22 @@ class Player:
     def random_comp_move(self):
                
         # get all possible board states for given roll
-                
-        self.update_reality()
+                 
+                    
+        self.update_reality()                       
+         
         # In the case of pieces stuck on rail, want to find usable board states
+        if self.forced_move == True:
+            usable_boards = self.board_states[0]
+            print(usable_boards)
+            return usable_boards
         usable_boards = self.find_move_off_rail_list(self.board_states)
-        # If this is empty, this means we can not move even one piece from off of the rail
-        
+        # working here
+                
         if usable_boards == []:
             print('Stuck on rail, can not move')
         # Otherwise, return possible move from possible list
+        
         else:
             board = self.random_list(usable_boards)
             print(board)
@@ -626,7 +663,7 @@ class Player:
 
 
 
-A = Player()
+A = Player('white')
 # print(A.rail_count())
 A.random_comp_move()
 # print(boards)

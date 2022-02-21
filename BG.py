@@ -51,7 +51,7 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[333],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[555]]
+        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         return board
 
 class Player:
@@ -610,6 +610,7 @@ class Player:
             usable_boards = self.board_states[0]
             print(usable_boards)
             return usable_boards
+        
         usable_boards = self.find_move_off_rail_list(self.board_states)
         # working here
                 
@@ -622,42 +623,60 @@ class Player:
             print(board)
             return board
 
-    def find_moved_pieces(self, starting_board, ending_board):
+    def find_moved_pieces(self):
         '''
         Finds moved piece based on starting and ending locations, for purposes of the visual game
         '''
-        # {1: 2, 12: 5, 17: 3, 19: 5}, {1: 2, 12: 5, 17: 1, 19: 6, 20: 1}
-        # starting and ending_dictionaries
-        self.board = starting_board
+        # TODO work on finding which piece moved where, based on the move        
+        
         self.find_positions()
         starting_dict = self.DICT
+        starting_keys = [x for x in self.DICT.keys()]
 
-        self.board = ending_board 
-        self.find_positions()
-        ending_dict = self.DICT 
+        moved_board = self.random_comp_move()
+        self.find_positions(moved_board)
+        ending_dict = self.DICT
+        ending_keys = [x for x in self.DICT.keys()]
 
-        changed_keys = []
-        changed_Vals =[]
-        new_keys = []
-        new_vals = []
+        Dice = sorted(self.dice)
+        Dice_Sums = []
+        if len(Dice)==2:
+            Dice_Sums.append(Dice[0])
+            Dice_Sums.append(Dice[1])
+            Dice_Sums.append(Dice[0]+Dice[1])
+        if len(Dice)==4:
+            for i in range(1,5):
+                Dice_Sums.append(i*Dice[0])        
+        
+        length = len(starting_dict)
+        index = 0
+        key_vals = []
 
-        for key, val in starting_dict.items():
-            for key_2, val_2 in ending_dict.items():
-                if key == key_2:
-                    if val != val_2:
-                        changed_keys.append(key)
-                        changed_Vals.append(val - val_2)
+        while length >0:
+            possible_spots = []
+            
+            key = starting_keys[index]
+            count = key
 
-        for key, val in ending_dict.items():
-            if key not in starting_dict.keys():
-                new_keys.append(key)
-                new_vals.append(val)
+            if self.color == 'white':
+                for val in Dice_Sums:
+                    count +=val
+                    possible_spots.append(count)
+                    count = key
+            if self.color == 'black':
+                for val in Dice_Sums:
+                    count -=val
+                    possible_spots.append(count)
+                    count = key          
+            key_vals.append(possible_spots)
+            index +=1
+            length -=1
 
-        #Use this information to calculate which pieces moved to where from starting to end dict 
+        Key_Dict = dict(zip(starting_keys, key_vals))
+        # ({1: 2, 12: 5, 17: 3, 19: 5}, {1: 1, 7: 1, 12: 4, 17: 4, 19: 5})      
 
 
-        return starting_dict, ending_dict, changed_keys, changed_Vals, new_keys, new_vals
-
+        return starting_dict, ending_dict, Dice, Key_Dict
 
 
 
@@ -665,7 +684,7 @@ class Player:
 
 A = Player('white')
 # print(A.rail_count())
-A.random_comp_move()
+print(A.find_moved_pieces())
 # print(boards)
 # print(A.find_moved_pieces(boards[0], boards[1]))
 

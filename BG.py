@@ -632,12 +632,12 @@ class Player:
         self.find_positions()
         starting_dict = self.DICT
         starting_keys = [x for x in self.DICT.keys()]
-
+        # for now random comp move moves piece, in future we select piece, need to change this
         moved_board = self.random_comp_move()
         self.find_positions(moved_board)
         ending_dict = self.DICT
         ending_keys = [x for x in self.DICT.keys()]
-
+        
         Dice = sorted(self.dice)
         Dice_Sums = []
         if len(Dice)==2:
@@ -673,10 +673,48 @@ class Player:
             length -=1
 
         Key_Dict = dict(zip(starting_keys, key_vals))
-        # ({1: 2, 12: 5, 17: 3, 19: 5}, {1: 1, 7: 1, 12: 4, 17: 4, 19: 5})      
+
+        Decreased_Keys = []
+        for key, val in starting_dict.items():
+            for k2, val2 in ending_dict.items():
+                if key == k2:
+                    if val > val2:
+                        for i in range(val-val2):
+                            Decreased_Keys.append(key)
+
+        for key in starting_keys:
+            if key not in ending_keys:
+                for k,v in starting_dict.items():
+                    if key == k:
+                        for i in range(v):
+                            Decreased_Keys.append(k)            
+        
+        moved_spots = []
+        for k,v in starting_dict.items():
+            for i,j in ending_dict.items():
+                if k == i:
+                    if j >v:
+                        for i in range(j-v):
+                            moved_spots.append(k)
+        for key in ending_keys:
+            if key not in starting_keys:
+                for k,v in ending_dict.items():
+                    if k == key:
+                        for i in range(v):
+                            moved_spots.append(key)
+        moved_spots = sorted(moved_spots)
+        Moved_List = []
+        
+        length = len(Decreased_Keys)
+        idx = 0
+        while length >0:
+            info = (Decreased_Keys[idx],moved_spots[idx])
+            Moved_List.append(info)
+            length -=1
+            idx+=1             
 
 
-        return starting_dict, ending_dict, Dice, Key_Dict
+        return Moved_List
 
 
 

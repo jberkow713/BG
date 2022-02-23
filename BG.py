@@ -627,13 +627,16 @@ class Player:
         '''
         Finds moved piece based on starting and ending locations, for purposes of the visual game
         '''
-        # TODO work on finding which piece moved where, based on the move        
-        
+             
+        # starting positions
         self.find_positions()
         starting_dict = self.DICT
         starting_keys = [x for x in self.DICT.keys()]
+        
         # for now random comp move moves piece, in future we select piece, need to change this
         moved_board = self.random_comp_move()
+
+        # ending position using the random selection board
         self.find_positions(moved_board)
         ending_dict = self.DICT
         ending_keys = [x for x in self.DICT.keys()]
@@ -702,20 +705,33 @@ class Player:
                     if k == key:
                         for i in range(v):
                             moved_spots.append(key)
-        moved_spots = sorted(moved_spots)
+        Decreased_Keys = sorted(Decreased_Keys)
+             
+        # moved_spots = sorted(moved_spots)
         Moved_List = []
         
         length = len(Decreased_Keys)
         idx = 0
         while length >0:
-            info = (Decreased_Keys[idx],moved_spots[idx])
+            curr_key = Decreased_Keys[idx]
+            for val in moved_spots:
+                for k,v in Key_Dict.items():
+                    if curr_key == k:
+                        if val in v:
+                            moved_spots.remove(val)
+
+
+                            info = (curr_key,val)
+                            break 
             Moved_List.append(info)
             length -=1
-            idx+=1             
+            idx+=1            
 
 
         return Moved_List
 
+# TODO Make comp select from possible 'random moves' and select based on criteria, 
+# Make it Smarter
 
 
 

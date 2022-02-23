@@ -81,6 +81,7 @@ class Player:
                 if str(5) in str(x):
                     self.can_remove = False
                     return False
+
             self.can_remove=True
             return True 
         if self.color == 'white':
@@ -92,6 +93,7 @@ class Player:
             self.can_remove=True
             
             return True
+
     def consec_blocks(self, colors=None):
         
         self.find_positions()
@@ -99,11 +101,14 @@ class Player:
         if self.color=='white':
             WHITE = self.DICT
             BLACK = self.opp_Dict
+        
         else:
             BLACK=self.DICT
             WHITE=self.opp_Dict
+        
         if colors==None:
             return consec_pairs(WHITE), consec_pairs(BLACK)   
+        
         else:
             if colors=='white':
                 return consec_pairs(WHITE)
@@ -114,9 +119,11 @@ class Player:
         multiple = self.consec_blocks()
         multiple_white = multiple[0]
         multiple_black = multiple[1]
+        
         if self.color == 'white':
             WHITE = self.DICT
             BLACK = self.opp_Dict
+        
         else:
             BLACK=self.DICT
             WHITE = self.opp_Dict
@@ -128,6 +135,7 @@ class Player:
                 for x in multiple_white:
                     if k not in x:
                         single_white.append(k)
+        
         for k,v in BLACK.items():
             if v >1:
                 for x in multiple_black:
@@ -142,17 +150,21 @@ class Player:
         if self.color=='white':
             WHITE = self.DICT
             BLACK = self.opp_Dict
+        
         else:
             BLACK=self.DICT
             WHITE=self.opp_Dict
         white_pip = [0, 'white_pips']
+        
         for k,v in WHITE.items():
             diff = 25-k
             white_pip[0] +=diff*v
         black_pip = [0, 'black_pips']
+        
         for k,v in BLACK.items():
             diff = 0+k
             black_pip[0] +=diff*v
+        
         return white_pip, black_pip
     
     def find_furthest_back(self):
@@ -185,6 +197,7 @@ class Player:
                 curr = str(board[FROM])[1:]
                 board[FROM]= int(curr)
                 return
+            
             else:
                 board[FROM]=0
                 return                             
@@ -194,6 +207,7 @@ class Player:
         
         if isinstance(starting, list)==True:
             starting_val = str(starting[0])
+        
         else:
             starting_val = str(starting)    
         
@@ -232,12 +246,14 @@ class Player:
             if self.color == 'white':
                 if board[-1] == []:
                     board[-1] = [5]
+                
                 else:
                     current_rail = str(board[-1][0])
                     board[-1] = [int(current_rail+str(5))]
             if self.color == 'black':
                 if board[0] == []:
                     board[0] = [3]
+                
                 else:
                     current_rail = str(board[0][0])
                     board[0] = [int(current_rail+str(3))]
@@ -282,6 +298,7 @@ class Player:
         '''
         if board == None:
             board = self.board
+        
         else:
             board = board    
         b = list(enumerate(board))
@@ -303,7 +320,6 @@ class Player:
                     positions2.append(idx)                              
             
             else:
-
                 if str(3) in str(val):
                     amounts.append(len(str(val)))
                     positions.append(idx)            
@@ -449,8 +465,7 @@ class Player:
 
             # Check to see if 2 or more on rail
             if Rail_Count >=2:
-                # [[33], 33, 0, 0, 0, 0, 55555, 0, 555, 0, 0, 0, 33333, 55555, 0, 0, 0, 333, 0, 33333, 0, 0, 0, 0, 55, [55]]
-                # {0: 2, 1: 2, 12: 5, 17: 3, 19: 5}  opp {6: 5, 8: 3, 13: 5, 24: 2, 25: 2}
+               
                 if self.color == 'white':
                     rail = 0
                 if self.color == 'black':
@@ -552,6 +567,7 @@ class Player:
         Possible_Boards = self.board_states
         # TODO evaluating all possible board states for optimal value
         # want to return that board as output
+        
         return Possible_Boards
     
     def rail_count(self, board):
@@ -565,6 +581,7 @@ class Player:
                 
         if rail in self.DICT.keys():
             count = self.DICT[rail]
+        
         else:
             count = 0
 
@@ -599,10 +616,11 @@ class Player:
                 return [x for x in list if self.rail_count(x)==current_best]
 
     def random_comp_move(self):
-               
-        # get all possible board states for given roll
-                 
-                    
+        '''
+        Based on a starting board state, finds all usable board states given all boards, for a given roll
+        Returns a random board
+        '''       
+        # get all possible board states for given roll                  
         self.update_reality()                       
          
         # In the case of pieces stuck on rail, want to find usable board states
@@ -647,6 +665,7 @@ class Player:
             Dice_Sums.append(Dice[0])
             Dice_Sums.append(Dice[1])
             Dice_Sums.append(Dice[0]+Dice[1])
+        
         if len(Dice)==4:
             for i in range(1,5):
                 Dice_Sums.append(i*Dice[0])        
@@ -719,10 +738,9 @@ class Player:
                     if curr_key == k:
                         if val in v:
                             moved_spots.remove(val)
-
-
                             info = (curr_key,val)
                             break 
+
             Moved_List.append(info)
             length -=1
             idx+=1            

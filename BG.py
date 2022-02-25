@@ -51,7 +51,7 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[],3,0, 3,0,0,55555, 5,55,0,5,0,33333,55555,3,3,0,33, 33333, 0,0,0,0,55,[]]
+        board = [[3],3,0, 3,0,0,55555, 5,55,0,5,0,33333,55555,3,3,0,33,0, 33333, 0,0,0,0,55,[55]]
         # board = [[],3,0, 55,5,0,555, 0,555,0,3,0,3333,5555,0,3,0,33,0, 333, 5,0,33,0,5,[]]
         return board
 
@@ -318,14 +318,16 @@ class Player:
         amounts2 = []
         
         for idx, val in b:
+
             if isinstance(val, list)==True and val!=[]:
 
                 VAL = str(val[0])
                 amount = len(VAL)
-                if str(3) in str(val):
+                if str(3) in VAL:
                     amounts.append(amount)
                     positions.append(idx)
-                if str(5) in str(val):
+                if str(5) in VAL:
+                    
                     amounts2.append(amount)
                     positions2.append(idx)                              
             
@@ -645,11 +647,33 @@ class Player:
             return board
     def choose_optimal_board(self):
         
+        self.find_positions()
+        starting_dict = self.DICT
+        starting_opp_dict = self.opp_Dict
+       
+        print(starting_dict)
+        print(starting_opp_dict)
+        # get rail count for opponent
+        if self.color == 'white':
+            opp_rail_count = 0
+            for k,v in starting_opp_dict.items():
+                if k == 25:
+                    opp_rail_count +=v
+        if self.color == 'black':
+            opp_rail_count = 0
+            for k,v in starting_opp_dict.items():
+                if k == 0:
+                    opp_rail_count +=v
+
+        print(opp_rail_count)                          
+
         self.update_reality()
-        print(self.DICT)
-        print(self.opp_Dict)
+
         self.pip_count()
-        print(self.pips, self.opp_pips)
+        pip_ratio = self.pips / self.opp_pips
+        pip_differential = self.opp_pips - self.pips
+        print(pip_ratio, pip_differential)
+
 
         if self.forced_move == True:
             usable_boards = self.board_states[0]
@@ -657,6 +681,25 @@ class Player:
         usable_boards = self.find_move_off_rail_list(self.board_states)
         if usable_boards == []:
             print('Stuck on rail, can not move')
+
+
+
+        #TODO ideas for assessment
+        # hit if you can, when the board states are relatively close in the early and mid game
+        # build on existing blocks
+        # make blocks on the 7,6,5 spots as black, 18,19,20 as white
+        # look to make consecutive blocks
+
+
+        # Order: 1) Make the 5,6,7 or 18,19,20 blocks 
+        # These are somewhat interchangeable
+        # 2) Hit
+        # 2) Build on blocks
+        #    make new blocks as close to the old blocks as possible
+        #    assess where the opponents furthest back pieces are when deciding on blocks
+        # 
+        # Have to decide when hitting 2 , versus making a block in home territory and hitting 1 is a better option
+
         
 
 

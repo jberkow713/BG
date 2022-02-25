@@ -51,7 +51,8 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
+        board = [[],3,0, 3,0,0,55555, 5,55,0,5,0,33333,55555,3,3,0,33, 33333, 0,0,0,0,55,[]]
+        # board = [[],3,0, 55,5,0,555, 0,555,0,3,0,3333,5555,0,3,0,33,0, 333, 5,0,33,0,5,[]]
         return board
 
 class Player:
@@ -73,6 +74,8 @@ class Player:
         self.moves = None
         self.board_states = None
         self.forced_move = None
+        self.pips = None
+        self.opp_pips = None  
     
     def can_take_off(self):
         if self.color == 'black':
@@ -143,6 +146,8 @@ class Player:
                         single_black.append(k)
 
         return single_white, single_black
+    # def find_hit_count(self):
+
 
     def pip_count(self):
         self.find_positions()
@@ -154,18 +159,23 @@ class Player:
         else:
             BLACK=self.DICT
             WHITE=self.opp_Dict
-        white_pip = [0, 'white_pips']
+        white_pip = 0
         
         for k,v in WHITE.items():
             diff = 25-k
-            white_pip[0] +=diff*v
-        black_pip = [0, 'black_pips']
+            white_pip +=diff*v
+        black_pip = 0
         
         for k,v in BLACK.items():
             diff = 0+k
-            black_pip[0] +=diff*v
+            black_pip +=diff*v
         
-        return white_pip, black_pip
+        if self.color == 'white':
+            self.pips = white_pip
+            self.opp_pips = black_pip
+        if self.color == 'black':
+            self.pips = black_pip
+            self.opp_pips = white_pip    
     
     def find_furthest_back(self):
         if self.color == 'white':
@@ -399,7 +409,8 @@ class Player:
         '''
         self.saved_board = copy.deepcopy(self.board)                       
         self.find_positions()
-        print(self.DICT)
+        # print(self.DICT)
+        # print(self.opp_Dict)
         self.can_take_off()
         self.roll()
         print(self.dice)
@@ -560,15 +571,7 @@ class Player:
                 LEN -=1
         self.board_states = board_states        
         return
-        
-    def find_optimal_board(self):
-        # Finding all possible moves
-        self.update_reality()
-        Possible_Boards = self.board_states
-        # TODO evaluating all possible board states for optimal value
-        # want to return that board as output
-        
-        return Possible_Boards
+    
     
     def rail_count(self, board):
         self.find_positions(board)
@@ -640,6 +643,26 @@ class Player:
             board = self.random_list(usable_boards)
             print(board)
             return board
+    def choose_optimal_board(self):
+        
+        self.update_reality()
+        print(self.DICT)
+        print(self.opp_Dict)
+        self.pip_count()
+        print(self.pips, self.opp_pips)
+
+        if self.forced_move == True:
+            usable_boards = self.board_states[0]
+        
+        usable_boards = self.find_move_off_rail_list(self.board_states)
+        if usable_boards == []:
+            print('Stuck on rail, can not move')
+        
+
+
+
+        print(len(usable_boards))
+        return usable_boards         
 
     def find_moved_pieces(self):
         '''
@@ -754,9 +777,10 @@ class Player:
 
 
 
-A = Player('white')
+A = Player()
 # print(A.rail_count())
-print(A.find_moved_pieces())
+print(A.choose_optimal_board())
+# print(A.find_moved_pieces())
 # print(boards)
 # print(A.find_moved_pieces(boards[0], boards[1]))
 

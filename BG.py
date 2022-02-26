@@ -51,7 +51,7 @@ class Board:
         self.board = self.create_board()
     def create_board(self):
         # board = [[],0,555,55,55,555,55555,0,0,0,0,0,0,0,0,0,0,0,0,33333,333,33,333,33,0,[]]
-        board = [[3],3,0, 3,0,0,55555, 5,55,0,5,0,33333,55555,3,3,0,33,0, 33333, 0,0,0,0,55,[55]]
+        board = [[],33,0, 0,0,0,55555, 0,555,0,0,0,33333,55555,0,0,0,333,0, 33333, 0,0,0,0,55,[]]
         # board = [[],3,0, 55,5,0,555, 0,555,0,3,0,3333,5555,0,3,0,33,0, 333, 5,0,33,0,5,[]]
         return board
 
@@ -97,10 +97,13 @@ class Player:
             
             return True
 
-    def consec_blocks(self, colors=None):
+    def consec_blocks(self, colors=None, board=None):
+        if board==None:
+            self.find_positions()
         
-        self.find_positions()
-        
+        else:
+            self.find_positions(board)
+
         if self.color=='white':
             WHITE = self.DICT
             BLACK = self.opp_Dict
@@ -118,8 +121,15 @@ class Player:
             elif colors=='black':
                 return consec_pairs(BLACK)         
     
-    def find_single_blocks(self):
-        multiple = self.consec_blocks()
+    def find_single_blocks(self,colors=None, board=None):
+        
+        colors = self.color 
+        if board == None:
+            board = self.board
+        else:
+            board = board    
+
+        multiple = self.consec_blocks(colors, board)
         multiple_white = multiple[0]
         multiple_black = multiple[1]
         
@@ -645,15 +655,10 @@ class Player:
             board = self.random_list(usable_boards)
             print(board)
             return board
-    def choose_optimal_board(self):
+    def opp_rail_count(self):
         
-        self.find_positions()
-        starting_dict = self.DICT
         starting_opp_dict = self.opp_Dict
-       
-        print(starting_dict)
-        print(starting_opp_dict)
-        # get rail count for opponent
+        
         if self.color == 'white':
             opp_rail_count = 0
             for k,v in starting_opp_dict.items():
@@ -664,14 +669,21 @@ class Player:
             for k,v in starting_opp_dict.items():
                 if k == 0:
                     opp_rail_count +=v
-
-        print(opp_rail_count)                          
+        return opp_rail_count            
+    
+    def choose_optimal_board(self):
+        
+        self.find_positions()
+               
+        print(self.DICT)
+        print(self.opp_Dict)
+        print(self.opp_rail_count())                               
 
         self.update_reality()
 
         self.pip_count()
         pip_ratio = self.pips / self.opp_pips
-        pip_differential = self.opp_pips - self.pips
+        pip_differential = self.pips - self.opp_pips
         print(pip_ratio, pip_differential)
 
 
@@ -682,6 +694,13 @@ class Player:
         if usable_boards == []:
             print('Stuck on rail, can not move')
 
+        # Need to look for board conditions
+        for board in usable_boards:
+            
+            consec_blocks = self.consec_blocks(self.color, board)
+            # So this is finding the consecutive blocks on all of the usable boards, for a given roll
+            print(consec_blocks)
+            
 
 
         #TODO ideas for assessment

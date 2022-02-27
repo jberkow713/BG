@@ -682,10 +682,10 @@ class Player:
         self.update_reality()
 
         self.pip_count()
-        pip_ratio = self.pips / self.opp_pips
+        pip_ratio = (self.pips-self.dice[0]-self.dice[1]) / self.opp_pips
         pip_differential = self.pips - self.opp_pips
         print(pip_ratio, pip_differential)
-
+        print(self.find_furthest_back())
 
         if self.forced_move == True:
             usable_boards = self.board_states[0]
@@ -718,6 +718,26 @@ class Player:
         #    assess where the opponents furthest back pieces are when deciding on blocks
         # 
         # Have to decide when hitting 2 , versus making a block in home territory and hitting 1 is a better option
+        
+        # Need to give some kind of exponentially growing weight to the value of adding to the blocks, so like 3 blocks in a row
+        # worth a lot more than 2, etc
+        # This also will depend on the pip count ratio, where the opponent piece is,
+        # Want to give weight to making a block 6 spots away from furthest opponent piece
+        # 
+        # Being able to put 2 or more pieces on the rail, has a lot more value than having 1 piece on the rail
+        # So this needs to affect the decision making process, when deciding to make a block and hitting
+
+        # Also needs to be some consideration for having stacks of 3, especially stacks of 3 or more close to each other
+        # So this kind of assessment needs to be coded into a function
+
+        # Also consider simply trying to make the blocks in the 7,6,5, spots, 19,20,21 spots, even leaving a piece open 
+        # to be of value above others
+
+        # So priority doesn't need to come only from making the blocks, but from attempting to make the blocks,
+        # So from all this, need to create rules, rules of when to try to make blocks, when to stack towers of 3, 
+        # When to add to consecutive blocks, when to hit, how to value the hit versus the other choices
+
+        
 
         
 

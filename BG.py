@@ -737,7 +737,18 @@ class Player:
         # So from all this, need to create rules, rules of when to try to make blocks, when to stack towers of 3, 
         # When to add to consecutive blocks, when to hit, how to value the hit versus the other choices
 
+        # When assessing boards, we want to possibly eliminate certain boards based on the options of other current boards
+        # So for example, if we can make the block on the 7 spot, we can basically evaluate boards that give this option,
+        # For sub options within this board if possible, such as hitting while making the block, maybe stacking options,
         
+        # Pip count matters, if we're down by 100 pips, then blocking opponents last remaining piece, 6 from where it is, outweighs
+        # making the 7 block, hitting an empty piece gains value,
+        # our block position has to be factored in relative to pip count, such as if our block position is strong, pip count is
+        # mostly irrelevant, as long as we can trap 1 or more pieces
+        # 
+        # So more to come, all these ideas need to be implemented into board evaluation function, and run on all possible boards
+        # for a given roll, and best board is then chosen, board is thrown into the piece moving function, and pieces are moved 
+
 
         
 

@@ -97,65 +97,29 @@ class Player:
             
             return True
 
-    def consec_blocks(self, colors=None, board=None):
+    def consec_blocks(self, board=None):
+        if board==None:
+            self.find_positions()
+        
+        else:
+            self.find_positions(board)       
+        
+        return consec_pairs(self.DICT)   
+      
+    
+    def find_single_blocks(self, board=None):
+        
         if board==None:
             self.find_positions()
         
         else:
             self.find_positions(board)
 
-        if self.color=='white':
-            WHITE = self.DICT
-            BLACK = self.opp_Dict
-        
-        else:
-            BLACK=self.DICT
-            WHITE=self.opp_Dict
-        
-        if colors==None:
-            return consec_pairs(WHITE), consec_pairs(BLACK)   
-        
-        else:
-            if colors=='white':
-                return consec_pairs(WHITE)
-            elif colors=='black':
-                return consec_pairs(BLACK)         
-    
-    def find_single_blocks(self,colors=None, board=None):
-        
-        colors = self.color 
-        if board == None:
-            board = self.board
-        else:
-            board = board    
-
-        multiple = self.consec_blocks(colors, board)
-        multiple_white = multiple[0]
-        multiple_black = multiple[1]
-        
-        if self.color == 'white':
-            WHITE = self.DICT
-            BLACK = self.opp_Dict
-        
-        else:
-            BLACK=self.DICT
-            WHITE = self.opp_Dict
-
-        single_white = []
-        single_black = []
-        for k,v in WHITE.items():
-            if v >1:
-                for x in multiple_white:
-                    if k not in x:
-                        single_white.append(k)
-        
-        for k,v in BLACK.items():
-            if v >1:
-                for x in multiple_black:
-                    if k not in x:
-                        single_black.append(k)
-
-        return single_white, single_black
+        blocks = []
+        for k,v in self.DICT.items():
+            if v >=2:
+                blocks.append(k)
+        return blocks         
     # def find_hit_count(self):
 
 
@@ -697,9 +661,15 @@ class Player:
         # Need to look for board conditions
         for board in usable_boards:
             
-            consec_blocks = self.consec_blocks(self.color, board)
-            # So this is finding the consecutive blocks on all of the usable boards, for a given roll
-            print(consec_blocks)
+            consec_blocks = self.consec_blocks(board)
+            all_consecs = [item for sublist in consec_blocks for item in sublist]
+            
+            all_blocks = self.find_single_blocks(board)
+            single_blocks = [x for x in all_blocks if x not in all_consecs]            
+
+            #find consecutive blocks, and single blocks for a given possible board state 
+            print(consec_blocks, single_blocks)
+            
             
 
 
@@ -746,6 +716,9 @@ class Player:
         # our block position has to be factored in relative to pip count, such as if our block position is strong, pip count is
         # mostly irrelevant, as long as we can trap 1 or more pieces
         # 
+        # Create a relative positional measurement between black and white, similar to what pip count does, 
+        # but for position of blocks
+        
         # So more to come, all these ideas need to be implemented into board evaluation function, and run on all possible boards
         # for a given roll, and best board is then chosen, board is thrown into the piece moving function, and pieces are moved 
 

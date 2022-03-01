@@ -724,7 +724,29 @@ class Player:
 
 
         
+        # Ideas:
+        # Different ideas can create different decisions
+        # blocking objectives can exist as the main priority, with secondary as hitting, and third as creating multiple 
+        # stacks of 3, setting up for future blocks, positioning pieces even within opp hitting range, 
+        # to set up for future blocks
 
+        #Within this strategy, want to value blocks based on their board position, such as from rail, assuming youll knock
+        # out opponents pieces at some point, to maximize chance they don't escape
+        # Then increased value for building on blocks, from 2-3-4-5-6, while keeping in mind the necessity to hit
+        # 
+        # So you are kind of juggling two-three main ideas
+        # 1) Set up blocks, consecutive blocks, in specific areas of the board
+        # 2) Set up the potential to make these blocks, by either putting pieces in position to do so, or stacking nearby
+        # towers, for ammo to make these blocks
+        # 3) Hitting the opponent and keeping them relatively pinned, or in position where it's almost impossible to run,
+        #  is necessary. 
+        # 
+        # In some cases, it means getting your own pieces trapped, having them stall in opponent's space,
+        # while simultaneously setting up objectives 1,2, and 3 
+
+        # Opponent will understand he is being trapped, and will position pieces to move out, so you need to either hit open
+        # fleeing pieces, and then try and make consecutive blocks
+        # Or rearrange the end slot from where they move their piece
 
 
         print(len(usable_boards))

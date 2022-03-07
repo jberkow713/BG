@@ -647,7 +647,7 @@ class Player:
 
         self.pip_count()
         pip_ratio = (self.pips-self.dice[0]-self.dice[1]) / self.opp_pips
-        pip_differential = self.pips - self.opp_pips
+        pip_differential = self.pips-self.dice[0]-self.dice[1] - self.opp_pips
         print(pip_ratio, pip_differential)
         print(self.find_furthest_back())
 

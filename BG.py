@@ -60,6 +60,10 @@ def consec_pairs(DICT):
     return consecs
 
 class Board:
+    '''
+    3s represent white pieces, 5s represent black pieces
+    Sets the board, once game runs, class is not used as board will be updated in the Player Class
+    '''
     def __init__(self):
         self.board = self.create_board()
     def create_board(self):

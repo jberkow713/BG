@@ -5,7 +5,20 @@ from pygame.constants import MOUSEBUTTONDOWN
 import sys
 import itertools
 import copy
+'''
+The purpose of this notebook is to train a computer to play exceptionally advanced Backgammon
+This notebook is broken down into 2 classes, one of them 'Board' simply sets the board, 
+The other class 'Player', does all of the work. 
+The Player class uses the board, and currently is responsible for finding all possible moves which can be made
+for a given roll. Each move is linked to an individual board. 
+From there, I am currently in the process of working on a brain function that will decide which move to choose
+based on a value system I am in the process of creating, for a given roll.
 
+Ultimately, this notebook will also be used for reinforced learning, connected to AWS, or some other cloud, 
+and games will be simulated and information stored.
+
+Enjoy!
+'''
 p.init()
 Width, Height = 1024, 1024
 Max_FPS=15
@@ -748,6 +761,16 @@ class Player:
         # fleeing pieces, and then try and make consecutive blocks
         # Or rearrange the end slot from where they move their piece
 
+        
+        
+        # TODO Main Idea:
+        
+        # Create tasks , based on board states
+        # board states can be based on pip count differential
+        # Initially, little difference, incentives blocks, evening towers, hitting
+        # Far behind, incentivizes creating full block, turtling guys in opponent's space
+        # far ahead, incentivizes running and stack on your towers, and minimizing risk for what rolls could hit you
+        
 
         print(len(usable_boards))
         return usable_boards         

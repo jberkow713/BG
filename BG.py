@@ -663,8 +663,9 @@ class Player:
         self.update_reality()
 
         self.pip_count()
-        pip_ratio = (self.pips-self.dice[0]-self.dice[1]) / self.opp_pips
-        pip_differential = self.pips-self.dice[0]-self.dice[1] - self.opp_pips
+
+        pip_ratio = (self.pips-sum(self.dice)) / self.opp_pips
+        pip_differential = self.pips-sum(self.dice) - self.opp_pips
         print(pip_ratio, pip_differential)
         print(self.find_furthest_back())
 

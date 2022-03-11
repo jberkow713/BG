@@ -691,90 +691,10 @@ class Player:
             #find consecutive blocks, and single blocks for a given possible board state 
             print(consec_blocks, single_blocks)
             
-            
-
-
-        #TODO ideas for assessment
-        # hit if you can, when the board states are relatively close in the early and mid game
-        # build on existing blocks
-        # make blocks on the 7,6,5 spots as black, 18,19,20 as white
-        # look to make consecutive blocks
-
-
-        # Order: 1) Make the 5,6,7 or 18,19,20 blocks 
-        # These are somewhat interchangeable
-        # 2) Hit
-        # 2) Build on blocks
-        #    make new blocks as close to the old blocks as possible
-        #    assess where the opponents furthest back pieces are when deciding on blocks
-        # 
-        # Have to decide when hitting 2 , versus making a block in home territory and hitting 1 is a better option
-        
-        # Need to give some kind of exponentially growing weight to the value of adding to the blocks, so like 3 blocks in a row
-        # worth a lot more than 2, etc
-        # This also will depend on the pip count ratio, where the opponent piece is,
-        # Want to give weight to making a block 6 spots away from furthest opponent piece
-        # 
-        # Being able to put 2 or more pieces on the rail, has a lot more value than having 1 piece on the rail
-        # So this needs to affect the decision making process, when deciding to make a block and hitting
-
-        # Also needs to be some consideration for having stacks of 3, especially stacks of 3 or more close to each other
-        # So this kind of assessment needs to be coded into a function
-
-        # Also consider simply trying to make the blocks in the 7,6,5, spots, 19,20,21 spots, even leaving a piece open 
-        # to be of value above others
-
-        # So priority doesn't need to come only from making the blocks, but from attempting to make the blocks,
-        # So from all this, need to create rules, rules of when to try to make blocks, when to stack towers of 3, 
-        # When to add to consecutive blocks, when to hit, how to value the hit versus the other choices
-
-        # When assessing boards, we want to possibly eliminate certain boards based on the options of other current boards
-        # So for example, if we can make the block on the 7 spot, we can basically evaluate boards that give this option,
-        # For sub options within this board if possible, such as hitting while making the block, maybe stacking options,
-        
-        # Pip count matters, if we're down by 100 pips, then blocking opponents last remaining piece, 6 from where it is, outweighs
-        # making the 7 block, hitting an empty piece gains value,
-        # our block position has to be factored in relative to pip count, such as if our block position is strong, pip count is
-        # mostly irrelevant, as long as we can trap 1 or more pieces
-        # 
-        # Create a relative positional measurement between black and white, similar to what pip count does, 
-        # but for position of blocks
-        
-        # So more to come, all these ideas need to be implemented into board evaluation function, and run on all possible boards
-        # for a given roll, and best board is then chosen, board is thrown into the piece moving function, and pieces are moved 
-
-
-        
-        # Ideas:
-        # Different ideas can create different decisions
-        # blocking objectives can exist as the main priority, with secondary as hitting, and third as creating multiple 
-        # stacks of 3, setting up for future blocks, positioning pieces even within opp hitting range, 
-        # to set up for future blocks
-
-        #Within this strategy, want to value blocks based on their board position, such as from rail, assuming youll knock
-        # out opponents pieces at some point, to maximize chance they don't escape
-        # Then increased value for building on blocks, from 2-3-4-5-6, while keeping in mind the necessity to hit
-        # 
-        # So you are kind of juggling two-three main ideas
-        # 1) Set up blocks, consecutive blocks, in specific areas of the board
-        # 2) Set up the potential to make these blocks, by either putting pieces in position to do so, or stacking nearby
-        # towers, for ammo to make these blocks
-        # 3) Hitting the opponent and keeping them relatively pinned, or in position where it's almost impossible to run,
-        #  is necessary. 
-        # 
-        # In some cases, it means getting your own pieces trapped, having them stall in opponent's space,
-        # while simultaneously setting up objectives 1,2, and 3 
-
-        # Opponent will understand he is being trapped, and will position pieces to move out, so you need to either hit open
-        # fleeing pieces, and then try and make consecutive blocks
-        # Or rearrange the end slot from where they move their piece
-
-        
-        
         # TODO Main Idea:
         
         # Create tasks , based on board states
-        # board states can be based on pip count differential
+        # board states can be based on pip count differential, blocks, board position, etc...
         # Initially, little difference, incentives blocks, evening towers, hitting
         # Far behind, incentivizes creating full block, turtling guys in opponent's space
         # far ahead, incentivizes running and stack on your towers, and minimizing risk for what rolls could hit you

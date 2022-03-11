@@ -396,7 +396,7 @@ class Player:
                     if self.opp_Dict[spot]==1:
                         return spot, True   
     
-    def update_reality(self):
+    def update_reality(self, DICE=None):
         '''
         Finds all possible board states for a given roll, stores them in self.board_states
         '''
@@ -405,8 +405,11 @@ class Player:
         # print(self.DICT)
         # print(self.opp_Dict)
         self.can_take_off()
-        self.roll()
-        print(self.dice)
+        if DICE==None:
+            self.roll()
+            print(self.dice)
+        else:
+            self.dice = DICE    
         Rail_Count = self.rail_count(self.board)        
         board_states = []              
         
@@ -776,6 +779,9 @@ class Player:
         # Far behind, incentivizes creating full block, turtling guys in opponent's space
         # far ahead, incentivizes running and stack on your towers, and minimizing risk for what rolls could hit you
         
+        # Set up Value system based on type of board state
+        # Check which possible move maximizes objective of current value state by checking next moves and finding
+        # which percentage of those moves achieve objective
 
         print(len(usable_boards))
         return usable_boards         

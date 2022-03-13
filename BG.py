@@ -703,10 +703,31 @@ class Player:
         # Check which possible move maximizes objective of current value state by checking next moves and finding
         # which percentage of those moves achieve objective
 
+        # Early Game Condition Preferences:
+        '''
+        White:
+        1)Hit and make 18 block
+        2)Hit Opponent from 0-12 / 18 block
+        3)Hit + 20 block, 21 block, 22 block
+        4)20 block, 21 block, 22 block
+        5)Hit + Set up 18 block
+        6)Set up 18 block
+        7)Hit + Set up 16, 15, 14 blocks
+        8)Set up 16, 15, 14 blocks
+        9)7 block with escaping pieces
+        '''
+        # Create function that evaluates Stage of Game
+
+        # Create function that takes this Stage input, takes current board pre-roll, post roll boards
+        # Evaluates each one based on a structure such as the one above, returns the board with the lowest
+        # value. Can make each value relate to an option, better options have lower vals, like a val_dictionary
+
+        # Then the idea is just throw that chosen board into below function to find out which pieces moved where
+
         print(len(usable_boards))
         return usable_boards         
 
-    def find_moved_pieces(self):
+    def find_moved_pieces(self, board=None):
         '''
         Finds moved piece based on starting and ending locations, for purposes of the visual game
         '''
@@ -716,8 +737,11 @@ class Player:
         starting_dict = self.DICT
         starting_keys = [x for x in self.DICT.keys()]
         
-        # for now random comp move moves piece, in future we select piece, need to change this
-        moved_board = self.random_comp_move()
+        # for now random comp move moves piece, if board is given, we use that selected board
+        if board == None:
+            moved_board = self.random_comp_move()
+        else:
+            moved_board = board    
 
         # ending position using the random selection board
         self.find_positions(moved_board)

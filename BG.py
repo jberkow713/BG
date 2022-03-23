@@ -637,8 +637,9 @@ class Player:
         
         else:
             board = self.random_list(usable_boards)
-            print(board)
+           
             return board
+
     def opp_rail_count(self):
         
         starting_opp_dict = self.opp_Dict
@@ -844,11 +845,11 @@ class Player:
 
 
 A = Player()
-# print(A.rail_count())
-print(A.choose_optimal_board())
-# print(A.find_moved_pieces())
-# print(boards)
-# print(A.find_moved_pieces(boards[0], boards[1]))
+# making a random possible move and finding pieces that moved
+# by feeding in the new board to the find_moved_pieces function
+moved_to = A.random_comp_move()
+print(moved_to)
+print(A.find_moved_pieces(moved_to))
 
 
 

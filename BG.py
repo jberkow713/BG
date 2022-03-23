@@ -847,9 +847,18 @@ class Player:
 A = Player()
 # making a random possible move and finding pieces that moved
 # by feeding in the new board to the find_moved_pieces function
+# saving position as new board, running again, to simulate game
+print(A.board)
 moved_to = A.random_comp_move()
 print(moved_to)
 print(A.find_moved_pieces(moved_to))
+
+A.board = moved_to
+
+moved_to = A.random_comp_move()
+print(moved_to)
+print(A.find_moved_pieces(moved_to))
+
 
 
 

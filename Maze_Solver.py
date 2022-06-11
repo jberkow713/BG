@@ -24,6 +24,9 @@ class Navigator:
         self.col = self.generate_starting_column()
         self.position = self.MAP[self.col][self.row]
         self.direction = None
+        self.zero_dict = {}
+        self.moves = 0
+        self.actual_moves = 0
     
     def prevent_nonsense(self):
         self.MAP[self.columns-1][self.rows-1] = 1
@@ -36,25 +39,26 @@ class Navigator:
             starting_col +=1 
         return starting_col 
 
-    def board_check(self,col,row):
-        
+    def board_check(self,col,row):        
         if col>=0 and col<=self.columns-1:
             if row>=0 and row<=self.rows-1:
+                if self.MAP[col][row] == 0:
+                    self.zero_dict[(col,row)]=0
                 if self.MAP[col][row] !=0:
                     self.directions = copy.deepcopy(self.all_p_directions)
-                    return True                    
-        
+                    return True          
+                  
     def Move(self):
         
         if self.direction == None:
             random_dir = self.directions[random.randint(0,len(self.directions)-1)]
             dir, self.direction = random_dir, random_dir
 
-        randomized = random.randint(0,4)
-        if randomized>=1:
+        randomized = random.randint(0,25)
+        if randomized>=4:
             dir = self.direction
-        elif randomized==0:
-            dir = random_dir = self.directions[random.randint(0,len(self.directions)-1)]
+        elif randomized<4:
+            dir = self.directions[random.randint(0,len(self.directions)-1)]
         
         row = self.row
         col = self.col
@@ -68,13 +72,21 @@ class Navigator:
         elif dir == 'W':
             col -=1
 
+        if (col,row) in self.zero_dict.keys():
+            self.directions.remove(dir)
+            if len(self.directions)==0:
+                self.directions = copy.deepcopy(self.all_p_directions)
+            self.direction = None
+            return            
+
         if self.board_check(col,row)==True:
             self.col = col
             self.row = row
-            self.position == self.MAP[self.col][self.row]            
+            self.position == self.MAP[self.col][self.row]
+            self.actual_moves +=1            
             return
         
-        self.directions.remove(self.direction)
+        self.directions.remove(self.direction)        
         if len(self.directions)==0:
             self.directions = copy.deepcopy(self.all_p_directions)    
         self.direction = None
@@ -85,20 +97,23 @@ class Navigator:
         MOVES = 0
         end = self.rows-1, self.rows-1
         while (self.row, self.col)!=end :
-            if MOVES >75000:
-                print("You are too dumb")
-                
+            if MOVES >50000:
+                print("You are too dumb")                
                 break
+
             self.Move()
-            MOVES +=1
+            MOVES +=1            
             Path.append((self.row, self.col))
+        
         self.moves = MOVES
         self.path = Path
+
 
 N = Navigator(20,20)
 N.Navigate()
 
-print(N.moves)
-if N.moves > 75000:
+
+if N.moves > 50000:
   print(N.path[-20:-1])
+print(N.actual_moves) 
 print(N.MAP)    

@@ -27,11 +27,26 @@ screen.fill(TAN)
 
 class Board:
     def __init__(self):
-        self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
-            [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2],[2]]
+        self.board = [[1],[1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+            [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
+        
+class Player:
+    # Players will use the same starting board, and as moves are made, the board will be adjusted
+    def __init__(self, color,Comp=False):
+        self.color = color
+        self.board = Board().board
+        self.on_rail = False
+        self.can_remove = False
+        self.dice = None
+        self.Comp = Comp
+        self.White_Pieces = {}
+        self.Black_Pieces = {}
+        self.populate_Dict()
+        self.moves = []
         self.buffer = 50
         self.draw_board()
-        self.draw_pieces()    
+        self.draw_pieces() 
+    
     def draw_board(self):
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
@@ -69,7 +84,6 @@ class Board:
                 current_y = start_y+ c_size
                 for _ in range(len(val)):
                     y_coord = current_y
-                    print(y_coord,c_size)
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     current_y+=c_size*2 -2
         for i in range(len(bottom_half)):
@@ -87,21 +101,6 @@ class Board:
                     y_coord = current_y                    
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     current_y-=c_size*2 -2    
-
-class Player:
-    # Players will use the same starting board, and as moves are made, the board will be adjusted
-    def __init__(self, color,Comp=False):
-        self.color = color
-        self.board = Board().board
-        self.on_rail = False
-        self.can_remove = False
-        self.dice = None
-        self.Comp = Comp
-        self.White_Pieces = {}
-        self.Black_Pieces = {}
-        self.populate_Dict()
-        self.moves = []
-        
     def rail_check(self):
         # Determines if player moving has a piece on the rail
         if self.color == 'white':
@@ -175,6 +174,7 @@ class Player:
         print(self.dice)
         print(self.moves)
         return
+
 
 P1 = Player('white')
 # print(P1.White_Pieces, P1.Black_Pieces)

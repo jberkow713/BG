@@ -28,7 +28,7 @@ screen.fill(TAN)
 class Board:
     def __init__(self):
         self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
-            [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
+            [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2],[2]]
         self.buffer = 50
         self.draw_board()
         self.draw_pieces()    
@@ -84,8 +84,7 @@ class Board:
                 x_coord = start_x + x_gap*i + .5*x_gap
                 current_y = end_y- c_size
                 for _ in range(len(val)):
-                    y_coord = current_y
-                    print(y_coord,c_size)
+                    y_coord = current_y                    
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     current_y-=c_size*2 -2    
 

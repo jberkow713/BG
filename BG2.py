@@ -6,11 +6,16 @@ class Board:
 
 class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted
-    def __init__(self, color):
+    def __init__(self, color,Comp=False):
         self.color = color
         self.board = Board().board
         self.on_rail = False
-        self.dice = None 
+        self.dice = None
+        self.Comp = Comp
+        self.White_Pieces = {}
+        self.Black_Pieces = {}
+        self.populate_Dict()
+        
     def on_rail(self):
         if self.color == 'white':
             if len(self.board[0])>0:
@@ -22,6 +27,7 @@ class Player:
                 self.on_rail =True
             else:
                 self.on_rail=False
+
     def roll(self):
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
@@ -29,6 +35,14 @@ class Player:
             self.dice= [die_1] * 4
         else:
             self.dice= [die_1,die_2]
-P = Player('white')
-P.roll()
-print(P.dice)                
+        return
+    def populate_Dict(self):
+        for slot,val in enumerate(self.board):
+            if str(1) in str(val):
+                self.White_Pieces[slot]=len(str(val))
+            elif str(2) in str(val):
+                self.Black_Pieces[slot]=len(str(val))
+P1 = Player('white')
+print(P1.White_Pieces, P1.Black_Pieces)                    
+
+                

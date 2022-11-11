@@ -29,7 +29,8 @@ class Board:
         self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         self.buffer = 50
-        self.draw_board()    
+        self.draw_board()
+        self.draw_pieces()    
     def draw_board(self):
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
@@ -44,8 +45,21 @@ class Board:
         p.draw.rect(screen,BROWN,(start_x,start_y,x_gap,end_y-start_y))
         p.draw.rect(screen,BROWN,(start_x+x_gap*7,start_y,x_gap,end_y-start_y))
         p.draw.rect(screen,BROWN,(start_x+x_gap*14,start_y,x_gap+1,end_y-start_y))
+                
+
     def draw_pieces(self):
+        start_x, start_y = self.buffer,self.buffer 
+        end_x = width-self.buffer
+        end_y = height-self.buffer
+        x_gap = (end_x-start_x)/15   
+        c_size = 20
+        for i in range(1,6):
+            p.draw.circle(screen, BLACK, (start_x+x_gap*i+.5*x_gap,start_y+c_size), c_size)
+        # TODO
+        # Add pips , white and black, based on the board, 
+        # This function will be responsible for drawing the board state as it changes after each move
         pass       
+    
 
 class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted

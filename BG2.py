@@ -17,12 +17,13 @@ GREEN = (0,255,0)
 BLUE = (0,0,255)
 PURPLE = (255,0,255)
 BROWN = (139,131,120)
+TAN = (250,235,215)
 
 clock = p.time.Clock()
 screen = p.display.set_mode((width, height))
 p.display.set_caption("Backgammon")
 
-screen.fill(WHITE)
+screen.fill(TAN)
 
 class Board:
     def __init__(self):
@@ -44,22 +45,49 @@ class Board:
             p.draw.line(screen, BLACK, (start_x+i*x_gap, start_y), (start_x+i*x_gap, end_y))
         p.draw.rect(screen,BROWN,(start_x,start_y,x_gap,end_y-start_y))
         p.draw.rect(screen,BROWN,(start_x+x_gap*7,start_y,x_gap,end_y-start_y))
-        p.draw.rect(screen,BROWN,(start_x+x_gap*14,start_y,x_gap+1,end_y-start_y))
-                
+        p.draw.rect(screen,BROWN,(start_x+x_gap*14,start_y,x_gap+1,end_y-start_y))                
 
     def draw_pieces(self):
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
         end_y = height-self.buffer
         x_gap = (end_x-start_x)/15   
-        c_size = 20
-        for i in range(1,6):
-            p.draw.circle(screen, BLACK, (start_x+x_gap*i+.5*x_gap,start_y+c_size), c_size)
-        # TODO
-        # Add pips , white and black, based on the board, 
-        # This function will be responsible for drawing the board state as it changes after each move
-        pass       
-    
+        c_size = x_gap/2-1 - 8
+        top_half = self.board[0:13]
+        bottom_half = self.board[13:]
+        bottom_half = bottom_half[::-1]
+        for i in range(len(top_half)):
+            val = top_half[i]
+            if 1 in val:
+                color = RED
+            else:
+                color = BLACK  
+            if len(val)>0:
+                if i >6:
+                    i = i+1
+                x_coord = start_x + x_gap*i + .5*x_gap
+                current_y = start_y+ c_size
+                for _ in range(len(val)):
+                    y_coord = current_y
+                    print(y_coord,c_size)
+                    p.draw.circle(screen, color, (x_coord,y_coord), c_size)
+                    current_y+=c_size*2 -2
+        for i in range(len(bottom_half)):
+            val = bottom_half[i]
+            if 1 in val:
+                color = RED
+            else:
+                color = BLACK   
+            if len(val)>0:
+                if i >6:
+                    i = i+1
+                x_coord = start_x + x_gap*i + .5*x_gap
+                current_y = end_y- c_size
+                for _ in range(len(val)):
+                    y_coord = current_y
+                    print(y_coord,c_size)
+                    p.draw.circle(screen, color, (x_coord,y_coord), c_size)
+                    current_y-=c_size*2 -2    
 
 class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted

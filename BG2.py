@@ -174,7 +174,11 @@ class Player:
         print(self.dice)
         print(self.moves)
         return
-
+    def move(self):
+        # TODO 
+        # primary function to move pieces on board based on a given roll and available spots
+        # this will erase the board, draw a new board and new pieces based on updated moves
+        pass
 
 P1 = Player('white')
 # print(P1.White_Pieces, P1.Black_Pieces)

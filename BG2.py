@@ -25,18 +25,18 @@ class Player:
         self.populate_Dict()
         self.moves = []
         
-    def on_rail(self):
+    def rail_check(self):
         # Determines if player moving has a piece on the rail
         if self.color == 'white':
-            if len(self.board[0])>0:
-                self.on_rail=True 
+            if 0 in self.White_Pieces:
+                self.on_rail = True
             else:
-                self.on_rail=False         
-        if self.color == 'black':
-            if len(self.board[-1])>0:
-                self.on_rail =True
+                self.on_rail = False
+        if self.color =='black':
+            if 25 in self.Black_Pieces:
+                self.on_rail = True
             else:
-                self.on_rail=False
+                self.on_rail = False
 
     def roll(self):
         die_1 = random.randint(1,6)
@@ -103,6 +103,8 @@ P1 = Player('white')
 print(P1.White_Pieces, P1.Black_Pieces)
 P1.roll()
 P1.calc_moves(1)
+P1.rail_check()
+print(P1.on_rail)
 
 
 

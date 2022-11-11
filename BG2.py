@@ -23,6 +23,7 @@ class Player:
         self.White_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict()
+        self.moves = []
         
     def on_rail(self):
         if self.color == 'white':
@@ -78,11 +79,28 @@ class Player:
             if self.can_remove == False:
                 if spot<=0:
                     return False                
-            return True                     
-               
+            return True
+
+    def calc_moves(self,start):
+        # individual check from starting position
+        # adds all movable spots to players self.moves list
+        for die in self.dice:
+            if self.color =='white':
+                end = start + die                
+            elif self.color =='black':
+                end = start-die
+            if self.spot_open(end)==True:
+                self.moves.append(end)
+        print(self.dice)
+        print(self.moves)
+        return
+
 P1 = Player('white')
-P2 = Player('black')
 print(P1.White_Pieces, P1.Black_Pieces)
-print(P1.spot_open(6))                    
-print(P2.spot_open(18))
+P1.roll()
+P1.calc_moves(1)
+
+
+
+
                 

@@ -2,7 +2,8 @@ import random
 
 class Board:
     def __init__(self):
-        self.board = [[],11,0, 0,0,0,22222, 0,222,0,0,0,11111,22222,0,0,0,111,0, 11111, 0,0,0,0,22,[]]
+        self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+            [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
 
 class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted
@@ -36,12 +37,14 @@ class Player:
         else:
             self.dice= [die_1,die_2]
         return
+    
     def populate_Dict(self):
         for slot,val in enumerate(self.board):
-            if str(1) in str(val):
-                self.White_Pieces[slot]=len(str(val))
-            elif str(2) in str(val):
-                self.Black_Pieces[slot]=len(str(val))
+            if 1 in val:
+                self.White_Pieces[slot]=len(val)
+            elif 2 in val:
+                self.Black_Pieces[slot]=len(val)
+
 P1 = Player('white')
 print(P1.White_Pieces, P1.Black_Pieces)                    
 

@@ -26,6 +26,7 @@ class Player:
         self.moves = []
         
     def on_rail(self):
+        # Determines if player moving has a piece on the rail
         if self.color == 'white':
             if len(self.board[0])>0:
                 self.on_rail=True 
@@ -47,6 +48,7 @@ class Player:
         return
     
     def populate_Dict(self):
+        # Populates the piece dictionary for white and black
         for slot,val in enumerate(self.board):
             if 1 in val:
                 self.White_Pieces[slot]=len(val)
@@ -54,6 +56,7 @@ class Player:
                 self.Black_Pieces[slot]=len(val)
     
     def blocked(self,spot):
+        # checks if a spot is blocked for a given color
         if self.color == 'white':
             if spot in self.Black_Pieces:
                 if self.Black_Pieces[spot]>1:
@@ -66,6 +69,7 @@ class Player:
             return False     
     
     def spot_open(self, spot):
+        # Checks if a spot is open
         if self.color =='white':
             if self.blocked(spot)==True:
                 return False

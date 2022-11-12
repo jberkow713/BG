@@ -50,11 +50,13 @@ class Player:
         self.draw_pieces() 
     
     def redraw(self):
+        # redraws board, for movement updates
         screen.fill(TAN)
         self.draw_board()
         self.draw_pieces()
 
     def draw_board(self):
+        # Draws the board
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
         end_y = height-self.buffer        
@@ -70,6 +72,7 @@ class Player:
         p.draw.rect(screen,BROWN,(start_x+x_gap*14,start_y,x_gap+1,end_y-start_y))                
 
     def draw_pieces(self):
+        # Draws pieces, maps coordinates to color dictionaries for user interactions
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
         end_y = height-self.buffer
@@ -216,7 +219,7 @@ P1 = Player('red')
 # P1.calc_moves(1)
 # P1.rail_check()
 # print(P1.on_rail)
-print( P1.Red_Piece_Coords,P1.Black_Piece_Coords,)
+# print( P1.Red_Piece_Coords,P1.Black_Piece_Coords,)
 
 running = True
 while running:

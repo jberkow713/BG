@@ -27,7 +27,7 @@ screen.fill(TAN)
 
 class Board:
     def __init__(self):
-        self.board = [[1],[1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+        self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
@@ -46,7 +46,11 @@ class Player:
         self.buffer = 50
         self.draw_board()
         self.draw_pieces() 
-    
+    def redraw(self):
+        screen.fill(WHITE)
+        self.draw_board()
+        self.draw_pieces()
+
     def draw_board(self):
         start_x, start_y = self.buffer,self.buffer 
         end_x = width-self.buffer
@@ -174,16 +178,30 @@ class Player:
         print(self.dice)
         print(self.moves)
         return
-    def move(self):
-        # TODO 
-        # primary function to move pieces on board based on a given roll and available spots
-        # this will erase the board, draw a new board and new pieces based on updated moves
-        pass
+    def move(self,start,end):
+        if self.spot_open(end)==True:
+
+            piece = self.board[start].pop()
+            if self.color=='white':
+                if 2 in self.board[end]:
+                    opp_piece = self.board[end].pop()
+                    self.board[-1].append(opp_piece)
+            if self.color=='black':
+                if 1 in self.board[end]:
+                    opp_piece = self.board[end].pop()
+                    self.board[0].append(opp_piece)       
+            self.board[end].append(piece)
+            self.redraw()
+
+            return
+        else:
+            print('not open')
 
 P1 = Player('white')
+P1.move(1,6)
 # print(P1.White_Pieces, P1.Black_Pieces)
-# P1.roll()
-# P1.calc_moves(1)
+P1.roll()
+P1.calc_moves(1)
 # P1.rail_check()
 # print(P1.on_rail)
 

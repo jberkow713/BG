@@ -39,15 +39,18 @@ class Player:
         self.can_remove = False
         self.dice = None
         self.Comp = Comp
-        self.White_Pieces = {}
+        self.Red_Piece_Coords = {k: [] for k in range(26)}
+        self.Black_Piece_Coords = {k: [] for k in range(26)}
+        self.Red_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict()
         self.moves = []
         self.buffer = 50
         self.draw_board()
         self.draw_pieces() 
+    
     def redraw(self):
-        screen.fill(WHITE)
+        screen.fill(TAN)
         self.draw_board()
         self.draw_pieces()
 
@@ -75,12 +78,9 @@ class Player:
         top_half = self.board[0:13]
         bottom_half = self.board[13:]
         bottom_half = bottom_half[::-1]
+        count = 0
         for i in range(len(top_half)):
-            val = top_half[i]
-            if 1 in val:
-                color = RED
-            else:
-                color = BLACK  
+            val = top_half[i]                                   
             if len(val)>0:
                 if i >6:
                     i = i+1
@@ -88,26 +88,38 @@ class Player:
                 current_y = start_y+ c_size
                 for _ in range(len(val)):
                     y_coord = current_y
+                    if 1 in val:
+                        self.Red_Piece_Coords[count].append((x_coord,y_coord))
+                        color = RED
+                    else:
+                        self.Black_Piece_Coords[count].append((x_coord,y_coord))
+                        color = BLACK
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     current_y+=c_size*2 -2
+            count+=1        
+        count = 25
         for i in range(len(bottom_half)):
             val = bottom_half[i]
-            if 1 in val:
-                color = RED
-            else:
-                color = BLACK   
             if len(val)>0:
                 if i >6:
                     i = i+1
                 x_coord = start_x + x_gap*i + .5*x_gap
                 current_y = end_y- c_size
                 for _ in range(len(val)):
-                    y_coord = current_y                    
+                    y_coord = current_y
+                    if 1 in val:
+                        self.Red_Piece_Coords[count].append((x_coord,y_coord))
+                        color = RED
+                    else:
+                        self.Black_Piece_Coords[count].append((x_coord,y_coord))
+                        color = BLACK
+
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
-                    current_y-=c_size*2 -2    
+                    current_y-=c_size*2 -2
+            count-=1    
     def rail_check(self):
         # Determines if player moving has a piece on the rail
-        if self.color == 'white':
+        if self.color == 'red':
             if 0 in self.White_Pieces:
                 self.on_rail = True
             else:
@@ -131,26 +143,26 @@ class Player:
         # Populates the piece dictionary for white and black
         for slot,val in enumerate(self.board):
             if 1 in val:
-                self.White_Pieces[slot]=len(val)
+                self.Red_Pieces[slot]=len(val)
             elif 2 in val:
                 self.Black_Pieces[slot]=len(val)
     
     def blocked(self,spot):
         # checks if a spot is blocked for a given color
-        if self.color == 'white':
+        if self.color == 'red':
             if spot in self.Black_Pieces:
                 if self.Black_Pieces[spot]>1:
                     return True
             return False      
         if self.color =='black':
-            if spot in self.White_Pieces:
-                if self.White_Pieces[spot]>1:
+            if spot in self.Red_Pieces:
+                if self.Red_Pieces[spot]>1:
                     return True
             return False     
     
     def spot_open(self, spot):
         # Checks if a spot is open
-        if self.color =='white':
+        if self.color =='red':
             if self.blocked(spot)==True:
                 return False
             if self.can_remove == False:
@@ -166,23 +178,24 @@ class Player:
             return True
 
     def calc_moves(self,start):
-        # individual check from starting position
+        # individual check from starting position for human player, 
+        # to be used for highlighting piece movement
         # adds all movable spots to players self.moves list
+        self.moves = []
         for die in self.dice:
-            if self.color =='white':
+            if self.color =='red':
                 end = start + die                
             elif self.color =='black':
                 end = start-die
-            if self.spot_open(end)==True:
+            if self.spot_open(end)==True:                
                 self.moves.append(end)
-        print(self.dice)
-        print(self.moves)
+        
         return
     def move(self,start,end):
         if self.spot_open(end)==True:
 
             piece = self.board[start].pop()
-            if self.color=='white':
+            if self.color=='red':
                 if 2 in self.board[end]:
                     opp_piece = self.board[end].pop()
                     self.board[-1].append(opp_piece)
@@ -192,19 +205,18 @@ class Player:
                     self.board[0].append(opp_piece)       
             self.board[end].append(piece)
             self.redraw()
-
             return
         else:
             print('not open')
 
-P1 = Player('white')
-P1.move(1,6)
-# print(P1.White_Pieces, P1.Black_Pieces)
-P1.roll()
-P1.calc_moves(1)
+P1 = Player('red')
+# P1.move(1,5)
+# # print(P1.White_Pieces, P1.Black_Pieces)
+# P1.roll()
+# P1.calc_moves(1)
 # P1.rail_check()
 # print(P1.on_rail)
-
+print( P1.Red_Piece_Coords,P1.Black_Piece_Coords,)
 
 running = True
 while running:

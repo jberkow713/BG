@@ -243,7 +243,7 @@ class Player:
 
                 if self.dice_index<len(Dice)-1:
                     if New_Board not in self.temp_boards:
-                        # self.board_counter +=1
+                        
                         self.temp_boards.append(New_Board)
                 if self.dice_index==len(Dice)-1:
                     if New_Board not in self.final_boards:
@@ -251,33 +251,9 @@ class Player:
                             self.final_boards.append(New_Board)        
         if self.dice_index==0:
             self.dice_index+=1
-        # if self.board_counter == 0:
-        #     self.dice_index+=1
-
-        self.temp_boards.remove(current_board)
-        # self.board_counter-=1
-        self.find_board_states(Dice)
-
-
-
-        # TODO
-        # recursive function, each time through you remove a die
-        # for dice_list in self.dice, this is going to be a list of lists, either length 1, or length 2
-        # temp boards starts with the original board
-        # use this board to create boards with the piece movement, using the first die, of the first roll
-        # store these new boards in temp boards, and remove the original board, remove the first die from the roll
-        # length of the dice list is now 1
-        # Then, evaluate the boards in temp boards, 1 by 1, 
-        # add the next boards states using the next number to final board states
-        # remove the board in temp board states
-        # only add a new board to final board states if it doesnt already exist there
-             
-
         
-
-                
-
-        
+        self.temp_boards.remove(current_board)        
+        self.find_board_states(Dice)      
 
 P1 = Player('red')
 P1.roll()

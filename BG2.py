@@ -34,16 +34,21 @@ class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted
     def __init__(self, color,Comp=False):
         self.color = color
+        self.temp_boards = []
+        self.final_boards = []
         self.board = Board().board
+        self.temp_boards.append(self.board)
         self.on_rail = False
         self.can_remove = False
-        self.dice = None
+        self.dice = []
+        self.dice_index = 0
+        self.board_counter = 0
         self.Comp = Comp
         self.Red_Piece_Coords = {k: [] for k in range(26)}
         self.Black_Piece_Coords = {k: [] for k in range(26)}
         self.Red_Pieces = {}
         self.Black_Pieces = {}
-        self.populate_Dict()
+        self.populate_Dict(self.board)
         self.moves = []
         self.buffer = 50
         self.draw_board()
@@ -141,12 +146,13 @@ class Player:
         if die_1 == die_2:
             self.dice= [die_1] * 4
         else:
-            self.dice= [die_1,die_2]
+            self.dice.append([die_1,die_2])
+            self.dice.append([die_2,die_1])
         return
     
-    def populate_Dict(self):
+    def populate_Dict(self, board):
         # Populates the piece dictionary for white and black
-        for slot,val in enumerate(self.board):
+        for slot,val in enumerate(board):
             if 1 in val:
                 self.Red_Pieces[slot]=len(val)
             elif 2 in val:
@@ -182,47 +188,106 @@ class Player:
                     return False                
             return True
 
-    def calc_moves(self,start):
+    def calc_moves(self,start,die):
         # individual check from starting position for human player, 
         # to be used for highlighting piece movement
         # adds all movable spots to players self.moves list
-        self.moves = []
-        for die in self.dice:
-            if self.color =='red':
-                end = start + die                
-            elif self.color =='black':
-                end = start-die
-            if self.spot_open(end)==True:                
-                self.moves.append(end)
+        moves = []
         
-        return
-    def move(self,start,end):
-        if self.spot_open(end)==True:
+        if self.color =='red':
+            end = start + die                
+        elif self.color =='black':
+            end = start-die
+        if self.spot_open(end)==True:                
+            moves.append(end)        
+        return moves
 
-            piece = self.board[start].pop()
-            if self.color=='red':
-                if 2 in self.board[end]:
-                    opp_piece = self.board[end].pop()
-                    self.board[-1].append(opp_piece)
-            if self.color=='black':
-                if 1 in self.board[end]:
-                    opp_piece = self.board[end].pop()
-                    self.board[0].append(opp_piece)       
-            self.board[end].append(piece)
-            self.redraw()
-            return
+    def move(self,board,start,end):
+        if self.spot_open(end)==True:
+            if board[start]!=[]:
+                piece = board[start].pop()
+                if self.color=='red':
+                    if 2 in board[end]:
+                        opp_piece = board[end].pop()
+                        board[-1].append(opp_piece)
+                if self.color=='black':
+                    if 1 in board[end]:
+                        opp_piece = board[end].pop()
+                        board[0].append(opp_piece)       
+                board[end].append(piece)
+                # self.redraw()
+                return board
+        
+    def find_board_states(self,Dice):
+        # technically solves non double rolls for finding all board states recursively
+               
+        if len(self.temp_boards)==0:
+            return      
+        Die = Dice[self.dice_index]
+        
+        current_board = self.temp_boards[0]
+        
+        self.populate_Dict(current_board)
+        if self.color =='red':
+            Pieces = self.Red_Pieces
         else:
-            print('not open')
+            Pieces = self.Black_Pieces
+        
+        for piece in Pieces:
+            
+            Moves = self.calc_moves(piece,Die)
+            for move in Moves:
+                Temp_Board = copy.deepcopy(current_board)
+
+                New_Board = self.move(Temp_Board,piece,move)
+
+                if self.dice_index<len(Dice)-1:
+                    if New_Board not in self.temp_boards:
+                        # self.board_counter +=1
+                        self.temp_boards.append(New_Board)
+                if self.dice_index==len(Dice)-1:
+                    if New_Board not in self.final_boards:
+                        if New_Board!=None:
+                            self.final_boards.append(New_Board)        
+        if self.dice_index==0:
+            self.dice_index+=1
+        # if self.board_counter == 0:
+        #     self.dice_index+=1
+
+        self.temp_boards.remove(current_board)
+        # self.board_counter-=1
+        self.find_board_states(Dice)
+
+
+
+        # TODO
+        # recursive function, each time through you remove a die
+        # for dice_list in self.dice, this is going to be a list of lists, either length 1, or length 2
+        # temp boards starts with the original board
+        # use this board to create boards with the piece movement, using the first die, of the first roll
+        # store these new boards in temp boards, and remove the original board, remove the first die from the roll
+        # length of the dice list is now 1
+        # Then, evaluate the boards in temp boards, 1 by 1, 
+        # add the next boards states using the next number to final board states
+        # remove the board in temp board states
+        # only add a new board to final board states if it doesnt already exist there
+             
+
+        
+
+                
+
+        
 
 P1 = Player('red')
-# P1.move(1,5)
-# # print(P1.White_Pieces, P1.Black_Pieces)
-# P1.roll()
-# P1.calc_moves(1)
-# P1.rail_check()
-# print(P1.on_rail)
-print(P1.Red_Piece_Coords)
-# print( P1.Red_Piece_Coords,P1.Black_Piece_Coords,)
+P1.roll()
+print(P1.dice)
+if len(P1.dice)==2:
+    for x in P1.dice:
+
+        P1.find_board_states(x)
+print(P1.final_boards)
+
 
 running = True
 while running:

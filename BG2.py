@@ -42,7 +42,7 @@ class Player:
         self.can_remove = False
         self.dice = []
         self.dice_index = 0
-        self.board_counter = 0
+        self.double_board_tracker = 0
         self.Comp = Comp
         self.Red_Piece_Coords = {k: [] for k in range(26)}
         self.Black_Piece_Coords = {k: [] for k in range(26)}
@@ -144,7 +144,8 @@ class Player:
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
         if die_1 == die_2:
-            self.dice= [die_1] * 4
+            for _ in range(2):
+                self.dice.append([die_1,die_2])
         else:
             self.dice.append([die_1,die_2])
             self.dice.append([die_2,die_1])
@@ -225,8 +226,7 @@ class Player:
             return      
         Die = Dice[self.dice_index]
         
-        current_board = self.temp_boards[0]
-        
+        current_board = self.temp_boards[0]        
         self.populate_Dict(current_board)
         if self.color =='red':
             Pieces = self.Red_Pieces
@@ -243,26 +243,48 @@ class Player:
 
                 if self.dice_index<len(Dice)-1:
                     if New_Board not in self.temp_boards:
-                        
-                        self.temp_boards.append(New_Board)
+                        if New_Board != None:
+                            self.temp_boards.append(New_Board)
+
                 if self.dice_index==len(Dice)-1:
                     if New_Board not in self.final_boards:
                         if New_Board!=None:
                             self.final_boards.append(New_Board)        
-        if self.dice_index==0:
-            self.dice_index+=1
         
+        self.double_board_tracker-=1
+    
+        if self.dice_index==0:
+            if self.double_board_tracker <= 0:
+                self.dice_index+=1               
         self.temp_boards.remove(current_board)        
         self.find_board_states(Dice)      
+    
+    def find_board_states_doubles(self):
+        self.temp_boards = copy.deepcopy(self.final_boards)    
+        self.final_boards.clear()
+        self.double_board_tracker = len(self.temp_boards)
+        self.dice_index=0
+        self.find_board_states(self.dice[1])
 
 P1 = Player('red')
-P1.roll()
-print(P1.dice)
-if len(P1.dice)==2:
-    for x in P1.dice:
+P1.dice = [[2,2], [2,2]]
 
-        P1.find_board_states(x)
-print(P1.final_boards)
+print(P1.dice)
+
+for x in P1.dice:
+    P1.find_board_states(x)
+
+if P1.dice[0]==P1.dice[1]:
+    P1.find_board_states_doubles()
+P1.board = P1.final_boards[-56]
+P1.redraw()        
+    
+
+
+
+# print(P1.final_boards,len(P1.final_boards))
+
+
 
 
 running = True

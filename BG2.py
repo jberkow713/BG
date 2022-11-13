@@ -249,7 +249,7 @@ class Player:
                 if self.dice_index==len(Dice)-1:
                     if New_Board not in self.final_boards:
                         if New_Board!=None:
-                            self.final_boards.append(New_Board)        
+                            self.final_boards.append(New_Board)       
         
         self.double_board_tracker-=1
     
@@ -266,25 +266,20 @@ class Player:
         self.dice_index=0
         self.find_board_states(self.dice[1])
 
+    def Find_All_States(self):
+        if self.dice[0]!=self.dice[1]:
+            self.find_board_states(self.dice[0])
+        else:
+            self.find_board_states(self.dice[0])
+            self.find_board_states_doubles()    
+
+
 P1 = Player('red')
-P1.dice = [[2,2], [2,2]]
+P1.dice = [[2,4], [4,2]]
 
-print(P1.dice)
-
-for x in P1.dice:
-    P1.find_board_states(x)
-
-if P1.dice[0]==P1.dice[1]:
-    P1.find_board_states_doubles()
-P1.board = P1.final_boards[-56]
-P1.redraw()        
-    
-
-
-
-# print(P1.final_boards,len(P1.final_boards))
-
-
+P1.Find_All_States()
+P1.board = P1.final_boards[-1]
+P1.redraw()
 
 
 running = True
@@ -295,8 +290,7 @@ while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             sys.exit()
-    # if event.type == p.KEYDOWN:       
-    
+    # if event.type == p.KEYDOWN:   
     
     p.display.flip()
 

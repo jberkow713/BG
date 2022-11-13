@@ -77,7 +77,8 @@ class Player:
         end_x = width-self.buffer
         end_y = height-self.buffer
         x_gap = (end_x-start_x)/15   
-        c_size = x_gap/2-1 - 8
+        c_size = (x_gap/2)-8
+        print(c_size)
         top_half = self.board[0:13]
         bottom_half = self.board[13:]
         bottom_half = bottom_half[::-1]
@@ -92,10 +93,11 @@ class Player:
                 for _ in range(len(val)):
                     y_coord = current_y
                     if 1 in val:
-                        self.Red_Piece_Coords[count].append((x_coord,y_coord))
+                        # append the left, right, top, bottom of piece
+                        self.Red_Piece_Coords[count].append((x_coord-c_size, x_coord+c_size,y_coord-c_size,y_coord+c_size))
                         color = RED
                     else:
-                        self.Black_Piece_Coords[count].append((x_coord,y_coord))
+                        self.Black_Piece_Coords[count].append((x_coord-c_size, x_coord+c_size,y_coord-c_size,y_coord+c_size))
                         color = BLACK
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     current_y+=c_size*2 -2
@@ -111,10 +113,10 @@ class Player:
                 for _ in range(len(val)):
                     y_coord = current_y
                     if 1 in val:
-                        self.Red_Piece_Coords[count].append((x_coord,y_coord))
+                        self.Red_Piece_Coords[count].append((x_coord-c_size, x_coord+c_size,y_coord-c_size,y_coord+c_size))
                         color = RED
                     else:
-                        self.Black_Piece_Coords[count].append((x_coord,y_coord))
+                        self.Black_Piece_Coords[count].append((x_coord-c_size, x_coord+c_size,y_coord-c_size,y_coord+c_size))
                         color = BLACK
 
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
@@ -219,6 +221,7 @@ P1 = Player('red')
 # P1.calc_moves(1)
 # P1.rail_check()
 # print(P1.on_rail)
+print(P1.Red_Piece_Coords)
 # print( P1.Red_Piece_Coords,P1.Black_Piece_Coords,)
 
 running = True

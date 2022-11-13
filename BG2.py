@@ -82,8 +82,7 @@ class Player:
         end_x = width-self.buffer
         end_y = height-self.buffer
         x_gap = (end_x-start_x)/15   
-        c_size = (x_gap/2)-8
-        print(c_size)
+        c_size = (x_gap/2)-8        
         top_half = self.board[0:13]
         bottom_half = self.board[13:]
         bottom_half = bottom_half[::-1]
@@ -275,7 +274,7 @@ class Player:
 
 
 P1 = Player('red')
-P1.dice = [[2,4], [4,2]]
+P1.roll()
 
 P1.Find_All_States()
 P1.board = P1.final_boards[-1]

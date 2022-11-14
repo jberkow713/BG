@@ -60,6 +60,7 @@ class Player:
         # redraws board, for movement updates
         screen.fill(TAN)
         self.draw_board()
+        self.populate_Dict(self.board)
         self.draw_pieces()
 
     def draw_board(self):
@@ -276,16 +277,16 @@ class Player:
     def random_move(self):
         self.roll()
         self.Find_All_States()
-        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
-        print('moved',self.dice[0])        
+        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]        
+        self.populate_Dict(self.board)
         self.redraw()
         self.dice = []
 
 
 
 
-
 import time
+
 board = None
 running = True
 while running:
@@ -295,16 +296,16 @@ while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             sys.exit()
-    
-    P1 = Player('red')    
+
+    P1 = Player('red',board)
     P1.random_move()
     board = P1.board
-    P1.redraw()
-    P2 = Player('black',board)
+    P2 = Player('black', board)
     P2.random_move()
     board = P2.board
-    P2.redraw()
-    time.sleep(1)
+    time.sleep(1)       
+        
+    
     # if event.type == p.KEYDOWN:   
     
     p.display.flip()

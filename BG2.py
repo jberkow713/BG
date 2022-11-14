@@ -40,6 +40,7 @@ class Player:
             self.board = Board().board
         else:
             self.board = board
+        self.doubles = False    
         self.temp_boards.append(self.board)
         self.on_rail = False
         self.can_remove = False
@@ -132,23 +133,37 @@ class Player:
     def rail_check(self):
         # Determines if player moving has a piece on the rail
         if self.color == 'red':
-            if 0 in self.White_Pieces:
+            
+            if 0 in self.Red_Pieces:
                 self.on_rail = True
+                return self.Red_Pieces[0]
             else:
                 self.on_rail = False
+                return 0
         if self.color =='black':
             if 25 in self.Black_Pieces:
                 self.on_rail = True
+                return self.Black_Pieces[25]
             else:
                 self.on_rail = False
-
+                return 0
+    def max_off_rail(self):
+        if self.rail_check!=0:
+            if self.doubles==True:
+                return max(self.rail_check()-4,0)
+            if self.doubles==False:
+                return max(self.rail_check()-2,0)
+        else:
+            return 0            
     def roll(self):
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
         if die_1 == die_2:
             for _ in range(2):
+                self.doubles = True
                 self.dice.append([die_1,die_2])
         else:
+            self.doubles = False
             self.dice.append([die_1,die_2])
             self.dice.append([die_2,die_1])
         return
@@ -275,9 +290,35 @@ class Player:
             self.find_board_states(self.dice[0])
             self.find_board_states_doubles()    
     def random_move(self):
+        # Creating random fair move, more to come
         self.roll()
         self.Find_All_States()
-        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]        
+        # Temp fix
+        self.rail_check()
+        if self.on_rail==True:
+
+            off_rail = self.max_off_rail()
+            usable_boards = []
+            if self.color == 'red':
+                for b in self.final_boards:
+                    if len(b[0])<=off_rail:
+                        usable_boards.append(b)
+            else:
+                for b in self.final_boards:
+                    if len(b[25])<=off_rail:
+                        usable_boards.append(b)
+            if len(usable_boards)==0:
+                print('can not move')
+                return
+
+            self.board = usable_boards[random.randint(0,len(usable_boards)-1)]
+
+        else:
+            if len(self.final_boards)==0:
+                print('can not move')
+                return
+            self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
+                    
         self.populate_Dict(self.board)
         self.redraw()
         self.dice = []

@@ -235,7 +235,10 @@ class Player:
                 board[end].append(piece)
                 # self.redraw()
                 return board
-        
+    def find_off_rail_boards(self,Dice):
+        #TODO
+        # Create a separate set of movable boards when player is stuck on the rail
+        pass 
     def find_board_states(self,Dice):
         # technically solves non double rolls for finding all board states recursively
                

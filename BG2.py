@@ -32,18 +32,20 @@ class Board:
         
 class Player:
     # Players will use the same starting board, and as moves are made, the board will be adjusted
-    def __init__(self, color,Comp=False):
+    def __init__(self, color, board=None):
         self.color = color
         self.temp_boards = []
         self.final_boards = []
-        self.board = Board().board
+        if board == None:
+            self.board = Board().board
+        else:
+            self.board = board
         self.temp_boards.append(self.board)
         self.on_rail = False
         self.can_remove = False
         self.dice = []
         self.dice_index = 0
         self.double_board_tracker = 0
-        self.Comp = Comp
         self.Red_Piece_Coords = {k: [] for k in range(26)}
         self.Black_Piece_Coords = {k: [] for k in range(26)}
         self.Red_Pieces = {}
@@ -271,16 +273,20 @@ class Player:
         else:
             self.find_board_states(self.dice[0])
             self.find_board_states_doubles()    
+    def random_move(self):
+        self.roll()
+        self.Find_All_States()
+        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
+        print('moved',self.dice[0])        
+        self.redraw()
+        self.dice = []
 
 
-P1 = Player('red')
-P1.roll()
-
-P1.Find_All_States()
-P1.board = P1.final_boards[-1]
-P1.redraw()
 
 
+
+import time
+board = None
 running = True
 while running:
     
@@ -289,6 +295,16 @@ while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             sys.exit()
+    
+    P1 = Player('red')    
+    P1.random_move()
+    board = P1.board
+    P1.redraw()
+    P2 = Player('black',board)
+    P2.random_move()
+    board = P2.board
+    P2.redraw()
+    time.sleep(1)
     # if event.type == p.KEYDOWN:   
     
     p.display.flip()

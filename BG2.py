@@ -245,6 +245,10 @@ class Player:
     def find_off_rail_boards(self,Dice):
         #TODO
         # Create a separate set of movable boards when player is stuck on the rail
+        pass
+    def end_game_board_states(self, Dice):
+        # TODO
+        # create end game boards based on whether a player has all their pieces in the end section of their respective color
         pass 
     def find_board_states(self,Dice):
         # solves all board states for a given double or non double roll
@@ -322,13 +326,11 @@ class Player:
                     if len(b[25])<=off_rail:
                         usable_boards.append(b)
             if len(usable_boards)==0:
-                print('can not move')
                 return
 
             self.board = usable_boards[random.randint(0,len(usable_boards)-1)]
         else:
             if len(self.final_boards)==0:
-                print('can not move')
                 return
             self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
                     

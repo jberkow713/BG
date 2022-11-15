@@ -329,7 +329,7 @@ class Player:
                 return
 
             self.board = usable_boards[random.randint(0,len(usable_boards)-1)]
-        else:
+        elif self.on_rail==False:
             if len(self.final_boards)==0:
                 return
             self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]

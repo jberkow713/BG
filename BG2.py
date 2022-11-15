@@ -26,12 +26,14 @@ p.display.set_caption("Backgammon")
 screen.fill(TAN)
 
 class Board:
+    # Initial board fed into players
+    # 1s represent red, 2s represent black
     def __init__(self):
         self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
-    # Players will use the same starting board, and as moves are made, the board will be adjusted
+    # Player class, computer/human built into one
     def __init__(self, color, board=None):
         self.color = color
         self.temp_boards = []
@@ -58,7 +60,7 @@ class Player:
         self.draw_pieces() 
     
     def redraw(self):
-        # redraws board, for movement updates
+        # redraws board, for movement updates based on update board and piece positions
         screen.fill(TAN)
         self.draw_board()
         self.populate_Dict(self.board)
@@ -132,6 +134,7 @@ class Player:
             count-=1    
     def rail_check(self):
         # Determines if player moving has a piece on the rail
+        # To be used to force players to take off rail before moving elsewhere
         if self.color == 'red':
             
             if 0 in self.Red_Pieces:
@@ -148,7 +151,8 @@ class Player:
                 self.on_rail = False
                 return 0
     def max_off_rail(self):
-        if self.rail_check!=0:
+        # If player has a piece on rail, determines ending board rail state for viable move
+        if self.rail_check()!=0:
             if self.doubles==True:
                 return max(self.rail_check()-4,0)
             if self.doubles==False:
@@ -156,6 +160,8 @@ class Player:
         else:
             return 0            
     def roll(self):
+        # For doubles, 2 sets of the same value will be used , for recursive roll function
+        # If not doubles, 2 combinations of same roll will be used for all board possibilities
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
         if die_1 == die_2:
@@ -221,6 +227,7 @@ class Player:
         return moves
 
     def move(self,board,start,end):
+        # Moves a piece for a given board from start to end position
         if self.spot_open(end)==True:
             if board[start]!=[]:
                 piece = board[start].pop()
@@ -240,7 +247,7 @@ class Player:
         # Create a separate set of movable boards when player is stuck on the rail
         pass 
     def find_board_states(self,Dice):
-        # technically solves non double rolls for finding all board states recursively
+        # solves all board states for a given double or non double roll
                
         if len(self.temp_boards)==0:
             return      
@@ -250,9 +257,11 @@ class Player:
         self.populate_Dict(current_board)
         if self.color =='red':
             Pieces = self.Red_Pieces
+            self.rail_count = len(self.board[0])
         else:
             Pieces = self.Black_Pieces
-        
+            self.rail_count = len(self.board[25])        
+
         for piece in Pieces:
             
             Moves = self.calc_moves(piece,Die)
@@ -280,6 +289,7 @@ class Player:
         self.find_board_states(Dice)      
     
     def find_board_states_doubles(self):
+        # In the case of doubles, second recursive call is made
         self.temp_boards = copy.deepcopy(self.final_boards)    
         self.final_boards.clear()
         self.double_board_tracker = len(self.temp_boards)
@@ -287,6 +297,7 @@ class Player:
         self.find_board_states(self.dice[1])
 
     def Find_All_States(self):
+        # Finds all board states using nested functionality created above
         if self.dice[0]!=self.dice[1]:
             self.find_board_states(self.dice[0])
         else:
@@ -315,7 +326,6 @@ class Player:
                 return
 
             self.board = usable_boards[random.randint(0,len(usable_boards)-1)]
-
         else:
             if len(self.final_boards)==0:
                 print('can not move')
@@ -326,11 +336,10 @@ class Player:
         self.redraw()
         self.dice = []
 
-
-
-
 import time
 
+# Basic game loop idea, original board is used, then players feed in updated boards into 
+# Each other's instances, 
 board = None
 running = True
 while running:
@@ -348,10 +357,7 @@ while running:
     P2.random_move()
     board = P2.board
     time.sleep(1)       
-        
-    
-    # if event.type == p.KEYDOWN:   
-    
+       
     p.display.flip()
 
 

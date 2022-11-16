@@ -101,6 +101,7 @@ class Player:
                     i = i+1
                 x_coord = start_x + x_gap*i + .5*x_gap
                 current_y = start_y+ c_size
+                inner_count = 0
                 for _ in range(len(val)):
                     y_coord = current_y
                     if 1 in val:
@@ -111,7 +112,9 @@ class Player:
                         self.Black_Piece_Coords[count].append((x_coord-c_size, x_coord+c_size,y_coord-c_size,y_coord+c_size))
                         color = BLACK
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
-                    current_y+=c_size*2 -2
+                    if inner_count <5:
+                        current_y+=c_size*2 -2
+                    inner_count+=1
             count+=1        
         count = 25
         for i in range(len(bottom_half)):
@@ -121,6 +124,7 @@ class Player:
                     i = i+1
                 x_coord = start_x + x_gap*i + .5*x_gap
                 current_y = end_y - c_size
+                inner_count = 0
                 for _ in range(len(val)):
                     y_coord = current_y
                     if 1 in val:
@@ -131,7 +135,9 @@ class Player:
                         color = BLACK
 
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
-                    current_y-=c_size*2 -2
+                    if inner_count <5:
+                        current_y-=c_size*2 -2
+                    inner_count+=1
             count-=1    
     def rail_check(self):
         # Determines if player moving has a piece on the rail

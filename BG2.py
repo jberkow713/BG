@@ -406,6 +406,3 @@ while running:
     time.sleep(1)       
        
     p.display.flip()
-
-
-                

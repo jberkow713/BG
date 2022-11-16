@@ -219,32 +219,39 @@ class Player:
 
     def move(self,board,start,end):
         # Moves a piece for a given board from start to end position
+        if board[start]==[]:
+            return
         if self.spot_open(end)==True:
-            if board[start]!=[]:
-                piece = board[start].pop()
-                if self.color=='red':
-                    if 2 in board[end]:
-                        opp_piece = board[end].pop()
-                        board[-1].append(opp_piece)
-                if self.color=='black':
-                    if 1 in board[end]:
-                        opp_piece = board[end].pop()
-                        board[0].append(opp_piece)       
-                board[end].append(piece)
-                # self.redraw()
-                return board
+             
+            piece = board[start][0]
+            
+            if self.color=='red':
+                if 2 in board[end]:                    
+                    board[0].append(piece)
+                    board[start].remove(piece)
+                else:
+                    board[end].append(piece)
+                    board[start].remove(piece)
+
+            if self.color=='black':
+                if 1 in board[end]:                                       
+                    board[25].append(piece)       
+                    board[start].remove(piece)
+                else:
+                    board[end].append(piece)
+                    board[start].remove(piece) 
+            # self.redraw()
+            return board
     
     def find_off_rail_boards(self,Dice):
         
         # Create a separate set of movable boards when player is stuck on the rail
                         
         if self.color =='red':
-            self.rail_count = len(self.board[0])
-            
+            self.rail_count = len(self.board[0])            
             Piece = 0
         elif self.color=='black':
-            self.rail_count = len(self.board[25])
-            
+            self.rail_count = len(self.board[25])            
             Piece = 25
         # If pieces on rail >= Number of Dice, force all movable pieces off rail, return the board  
         
@@ -320,7 +327,7 @@ class Player:
             Pieces = self.Black_Pieces               
 
         for piece in Pieces:
-            
+            print(Pieces)    
             Moves = self.calc_moves(piece,Die)
             for move in Moves:
                 Temp_Board = copy.deepcopy(current_board)
@@ -369,18 +376,7 @@ class Player:
         # Creating random fair move, more to come
         self.roll()
         self.rail_check()              
-        # If piece on rail, run separate function 
-        if self.on_rail==True:
-            if self.doubles == True:
-                Dice = self.dice[0]+self.dice[1]               
-            else:
-                Dice = self.dice[0]                                
-            self.board = self.find_off_rail_boards(Dice)            
-            self.populate_Dict(self.board)
-            self.redraw()
-            self.dice = []
-            return        
-
+        
         self.Find_All_States()
         self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
         self.populate_Dict(self.board)
@@ -388,10 +384,16 @@ class Player:
         self.dice = []
         return
 
+
+
+
+
+
 import time
 
 # Basic game loop idea, original board is used, then players feed in updated boards into 
 # Each other's instances, 
+# board = None
 board = None
 running = True
 while running:
@@ -402,13 +404,45 @@ while running:
         if event.type == p.QUIT:
             sys.exit()
 
-    P1 = Player('red',board)
-    P1.random_move()
+    
+    P1 = Player('red',board)    
+    P1.roll()    
+    
+    for x in P1.dice[0]:
+        
+        pieces = [x for x in P1.Red_Pieces.keys()]
+        random_piece = pieces[random.randint(0,len(pieces)-1)]     
+
+        P1.move(P1.board,random_piece, random_piece+x)
+        P1.populate_Dict(P1.board)
+        
+    P1.populate_Dict(P1.board)
+    P1.redraw()
     board = P1.board
-     
-    P2 = Player('black', board)
-    P2.random_move()
+
+    P2 = Player('black',board)
+    P2.roll()
+    
+    for x in P2.dice[0]:
+        
+        pieces = [x for x in P2.Black_Pieces.keys()]
+        random_piece = pieces[random.randint(0,len(pieces)-1)]        
+        P2.move(P2.board,random_piece, random_piece-x)
+        P2.populate_Dict(P2.board)        
+    
+    P2.populate_Dict(P2.board)
+    P2.redraw()
     board = P2.board
+
+
+
+    # P1 = Player('red',board)
+    # P1.move(self.board, 1,4)
+    # board = P1.board
+     
+    # P2 = Player('black', board)
+    # P2.random_move()
+    # board = P2.board
     
     
     time.sleep(1)       

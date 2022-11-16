@@ -120,7 +120,7 @@ class Player:
                 if i >6:
                     i = i+1
                 x_coord = start_x + x_gap*i + .5*x_gap
-                current_y = end_y- c_size
+                current_y = end_y - c_size
                 for _ in range(len(val)):
                     y_coord = current_y
                     if 1 in val:
@@ -186,39 +186,29 @@ class Player:
     def blocked(self,spot):
         # checks if a spot is blocked for a given color
         if self.color == 'red':
-            if spot in self.Black_Pieces:
-                if self.Black_Pieces[spot]>1:
-                    return True
+            if spot in self.Black_Pieces and self.Black_Pieces[spot]>1:                
+                return True
             return False      
         if self.color =='black':
-            if spot in self.Red_Pieces:
-                if self.Red_Pieces[spot]>1:
-                    return True
+            if spot in self.Red_Pieces and self.Red_Pieces[spot]>1:
+                return True
             return False     
     
     def spot_open(self, spot):
         # Checks if a spot is open
+        
         if self.color =='red':
-            if self.blocked(spot)==True:
-                return False
-            if self.can_remove == False:
-                if spot>=25:
-                    return False                
-            return True
+            if self.blocked(spot)==False and spot<25:
+                return True
         if self.color =='black':
-            if self.blocked(spot)==True:
-                return False
-            if self.can_remove == False:
-                if spot<=0:
-                    return False                
-            return True
+            if self.blocked(spot)==False and spot>0:                         
+                return True
 
     def calc_moves(self,start,die):
         # individual check from starting position for human player, 
         # to be used for highlighting piece movement
         # adds all movable spots to players self.moves list
-        moves = []
-        
+        moves = []        
         if self.color =='red':
             end = start + die                
         elif self.color =='black':
@@ -250,9 +240,11 @@ class Player:
                         
         if self.color =='red':
             self.rail_count = len(self.board[0])
+            
             Piece = 0
         elif self.color=='black':
             self.rail_count = len(self.board[25])
+            
             Piece = 25
         # If pieces on rail >= Number of Dice, force all movable pieces off rail, return the board  
         
@@ -261,16 +253,17 @@ class Player:
             for die in Dice:
                 moves = self.calc_moves(Piece,die)
                 if len(moves)>0:                    
-                    self.move(self.temp_boards[0],Piece,moves[0])            
+                    self.move(self.board,Piece,moves[0])            
             
             return self.temp_boards[0]
         
         if self.rail_count<len(Dice):
-                        
+                      
             if self.doubles==True:
                 die = Dice[0]
                 moves = self.calc_moves(Piece,die)
-                if len(moves)==0:                    
+                if len(moves)==0:
+                    print('cant move')                    
                     return self.replica_board  
                 else:
                     for i in range(self.rail_count):
@@ -279,18 +272,30 @@ class Player:
                     self.dice = [Dice[0:2], Dice[2:]]
                     self.Find_All_States()                    
 
-                    return self.final_boards[random.randint(0,len(self.final_boards)-1)]    
-            elif self.doubles==False:
+                    return self.final_boards[random.randint(0,len(self.final_boards)-1)]
+
+            else:
+                print(self.temp_boards[0])
+                
                 for die in Dice:
-                    moves = self.calc_moves(Piece,die)
-                    if len(moves)>0:
+                    print(die)
+                    moves = self.calc_moves(Piece,die)                    
+                    if moves!=[]:                        
                         self.move(self.temp_boards[0],Piece,moves[0])
+                        print(self.temp_boards[0]) 
                         for d in Dice:
                             if d != die:
+                                                              
                                 self.find_board_states([0,d])
+                                
                         self.temp_boards.append(self.replica_board)
-                if len(self.final_boards)==0:                    
-                    return self.replica_board                
+                        self.dice_index=0                            
+                            
+                           
+                if len(self.final_boards)==0:                                      
+                    return self.replica_board
+                
+                print(len(self.final_boards)) 
                 return self.final_boards[random.randint(0,len(self.final_boards)-1)]      
         
 
@@ -302,11 +307,12 @@ class Player:
     def find_board_states(self,Dice):
         # solves all board states for a given double or non double roll
                
-        if len(self.temp_boards)==0:
+        if len(self.temp_boards)==0:            
             return      
         Die = Dice[self.dice_index]
         
-        current_board = self.temp_boards[0]        
+        current_board = self.temp_boards[0]
+               
         self.populate_Dict(current_board)
         if self.color =='red':
             Pieces = self.Red_Pieces            
@@ -321,12 +327,12 @@ class Player:
 
                 New_Board = self.move(Temp_Board,piece,move)
 
-                if self.dice_index<len(Dice)-1:
+                if self.dice_index==0:
                     if New_Board not in self.temp_boards:
                         if New_Board != None:
                             self.temp_boards.append(New_Board)
 
-                if self.dice_index==len(Dice)-1:
+                if self.dice_index==1:
                     if New_Board not in self.final_boards:
                         if New_Board!=None:
                             self.final_boards.append(New_Board)       
@@ -398,10 +404,12 @@ while running:
 
     P1 = Player('red',board)
     P1.random_move()
-    board = P1.board   
+    board = P1.board
+     
     P2 = Player('black', board)
     P2.random_move()
     board = P2.board
+    
     
     time.sleep(1)       
        

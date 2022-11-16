@@ -42,6 +42,7 @@ class Player:
             self.board = Board().board
         else:
             self.board = board
+        self.replica_board = copy.deepcopy(self.board)    
         self.doubles = False    
         self.temp_boards.append(self.board)
         self.on_rail = False
@@ -242,14 +243,62 @@ class Player:
                 board[end].append(piece)
                 # self.redraw()
                 return board
+    
     def find_off_rail_boards(self,Dice):
-        #TODO
+        
         # Create a separate set of movable boards when player is stuck on the rail
-        pass
+                        
+        if self.color =='red':
+            self.rail_count = len(self.board[0])
+            Piece = 0
+        elif self.color=='black':
+            self.rail_count = len(self.board[25])
+            Piece = 25
+        # If pieces on rail >= Number of Dice, force all movable pieces off rail, return the board  
+        
+        if self.rail_count>=len(Dice):
+            
+            for die in Dice:
+                moves = self.calc_moves(Piece,die)
+                if len(moves)>0:                    
+                    self.move(self.temp_boards[0],Piece,moves[0])            
+            
+            return self.temp_boards[0]
+        
+        if self.rail_count<len(Dice):
+                        
+            if self.doubles==True:
+                die = Dice[0]
+                moves = self.calc_moves(Piece,die)
+                if len(moves)==0:                    
+                    return self.replica_board  
+                else:
+                    for i in range(self.rail_count):
+                        self.move(self.temp_boards[0],Piece,moves[0])
+                        Dice[i]=0
+                    self.dice = [Dice[0:2], Dice[2:]]
+                    self.Find_All_States()                    
+
+                    return self.final_boards[random.randint(0,len(self.final_boards)-1)]    
+            elif self.doubles==False:
+                for die in Dice:
+                    moves = self.calc_moves(Piece,die)
+                    if len(moves)>0:
+                        self.move(self.temp_boards[0],Piece,moves[0])
+                        for d in Dice:
+                            if d != die:
+                                self.find_board_states([0,d])
+                        self.temp_boards.append(self.replica_board)
+                if len(self.final_boards)==0:                    
+                    return self.replica_board                
+                return self.final_boards[random.randint(0,len(self.final_boards)-1)]      
+        
+
     def end_game_board_states(self, Dice):
         # TODO
         # create end game boards based on whether a player has all their pieces in the end section of their respective color
-        pass 
+        pass
+
     def find_board_states(self,Dice):
         # solves all board states for a given double or non double roll
                
@@ -260,11 +309,9 @@ class Player:
         current_board = self.temp_boards[0]        
         self.populate_Dict(current_board)
         if self.color =='red':
-            Pieces = self.Red_Pieces
-            self.rail_count = len(self.board[0])
+            Pieces = self.Red_Pieces            
         else:
-            Pieces = self.Black_Pieces
-            self.rail_count = len(self.board[25])        
+            Pieces = self.Black_Pieces               
 
         for piece in Pieces:
             
@@ -304,39 +351,36 @@ class Player:
         # Finds all board states using nested functionality created above
         if self.dice[0]!=self.dice[1]:
             self.find_board_states(self.dice[0])
+            self.dice_index=0
+            self.temp_boards.append(self.replica_board)
+            self.find_board_states(self.dice[1])
+            
         else:
             self.find_board_states(self.dice[0])
-            self.find_board_states_doubles()    
+            self.find_board_states_doubles()
+                  
     def random_move(self):
         # Creating random fair move, more to come
         self.roll()
-        self.Find_All_States()
-        # Temp fix
-        self.rail_check()
+        self.rail_check()              
+        # If piece on rail, run separate function 
         if self.on_rail==True:
-
-            off_rail = self.max_off_rail()
-            usable_boards = []
-            if self.color == 'red':
-                for b in self.final_boards:
-                    if len(b[0])<=off_rail:
-                        usable_boards.append(b)
+            if self.doubles == True:
+                Dice = self.dice[0]+self.dice[1]               
             else:
-                for b in self.final_boards:
-                    if len(b[25])<=off_rail:
-                        usable_boards.append(b)
-            if len(usable_boards)==0:
-                return
+                Dice = self.dice[0]                                
+            self.board = self.find_off_rail_boards(Dice)            
+            self.populate_Dict(self.board)
+            self.redraw()
+            self.dice = []
+            return        
 
-            self.board = usable_boards[random.randint(0,len(usable_boards)-1)]
-        else:
-            if len(self.final_boards)==0:
-                return
-            self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
-                    
+        self.Find_All_States()
+        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
         self.populate_Dict(self.board)
         self.redraw()
         self.dice = []
+        return
 
 import time
 
@@ -354,10 +398,11 @@ while running:
 
     P1 = Player('red',board)
     P1.random_move()
-    board = P1.board
+    board = P1.board   
     P2 = Player('black', board)
     P2.random_move()
     board = P2.board
+    
     time.sleep(1)       
        
     p.display.flip()

@@ -408,10 +408,9 @@ class Player:
 
 import time
 
-# Basic game loop idea, original board is used, then players feed in updated boards into 
-# Each other's instances, 
-# board = None
 
+# This script should take a starting board, and return all final board states, given a non doubles roll,
+# And given no pieces on the rail
 P1 = Player('red')
 P1.roll()
 die_1 = P1.dice[0][0]
@@ -439,13 +438,7 @@ for board_2 in die_2_boards:
         
 print(States, len(States))
 
-
-# die_2_boards = P1.find_Board_states(P1.board,P1.dice[0][1])
-# print(die_2_boards)        
-         
-
-
-
+# Below is just a simulation of movement around the board alternating turns
 
 board = None
 running = True

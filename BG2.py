@@ -239,8 +239,28 @@ class Player:
                     board[end].append(p)            
             return board
     
-    def find_board_states(self):
-        pass
+    def find_Board_states(self,board,die):
+        # Moves all moves from one Board State using one die
+
+        self.populate_Dict(board)
+        if self.color =='red':
+            Pieces = sorted([x for x in self.Red_Pieces.keys()])            
+        else:
+            Pieces = sorted([x for x in self.Black_Pieces.keys()])   
+        
+        Possible_Boards = []
+
+        for piece in Pieces:            
+            Moves = self.calc_moves(piece,die)
+
+            if Moves!=[]:
+                temp_board = copy.deepcopy(board)
+                                  
+                self.move(temp_board,piece,Moves[0])
+                Possible_Boards.append(temp_board)
+
+        return Possible_Boards
+
 
 
 
@@ -391,6 +411,42 @@ import time
 # Basic game loop idea, original board is used, then players feed in updated boards into 
 # Each other's instances, 
 # board = None
+
+P1 = Player('red')
+P1.roll()
+die_1 = P1.dice[0][0]
+die_2 = P1.dice[0][1]
+print(die_1,die_2)
+
+Original = copy.deepcopy(P1.board)
+die_1_boards = P1.find_Board_states(P1.board,die_1)
+die_2_boards = P1.find_Board_states(P1.board, die_2)
+
+States = []
+for board in die_1_boards:    
+    second_boards = P1.find_Board_states(board, die_2)
+    for x in second_boards:
+        States.append(x)
+
+P1.Red_Pieces = {}
+P1.populate_Dict(Original)
+
+for board_2 in die_2_boards:    
+    second_boards = P1.find_Board_states(board_2, die_1)
+    for x in second_boards:
+        if x not in States:
+            States.append(x)
+        
+print(States, len(States))
+
+
+# die_2_boards = P1.find_Board_states(P1.board,P1.dice[0][1])
+# print(die_2_boards)        
+         
+
+
+
+
 board = None
 running = True
 while running:

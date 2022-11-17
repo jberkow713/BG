@@ -157,15 +157,7 @@ class Player:
             else:
                 self.on_rail = False
                 return 0
-    def max_off_rail(self):
-        # If player has a piece on rail, determines ending board rail state for viable move
-        if self.rail_check()!=0:
-            if self.doubles==True:
-                return max(self.rail_check()-4,0)
-            if self.doubles==False:
-                return max(self.rail_check()-2,0)
-        else:
-            return 0            
+            
     def roll(self):
         # For doubles, 2 sets of the same value will be used , for recursive roll function
         # If not doubles, 2 combinations of same roll will be used for all board possibilities
@@ -225,28 +217,26 @@ class Player:
 
     def move(self,board,start,end):
         # Moves a piece for a given board from start to end position
-        if board[start]==[]:
-            return
-        if self.spot_open(end)==True:
-             
-            piece = board[start][0]
-            
+        # if board[start]==[]:
+        #     return
+        if self.spot_open(end)==True:            
+            p = board[start].pop()
+            if board[start]==[]:
+                if self.color=='red':
+                    del self.Red_Pieces[start]
+                elif self.color=='black':
+                    del self.Black_Pieces[start]    
             if self.color=='red':
-                if 2 in board[end]:                    
-                    board[0].append(piece)
-                    board[start].remove(piece)
+                if 2 in board[end]:
+                    board[0].append(p)                                      
                 else:
-                    board[end].append(piece)
-                    board[start].remove(piece)
+                    board[end].append(p)                    
 
             if self.color=='black':
                 if 1 in board[end]:                                       
-                    board[25].append(piece)       
-                    board[start].remove(piece)
+                    board[25].append(p)                    
                 else:
-                    board[end].append(piece)
-                    board[start].remove(piece) 
-            # self.redraw()
+                    board[end].append(p)            
             return board
     
     def find_off_rail_boards(self,Dice):
@@ -414,13 +404,15 @@ while running:
     P1 = Player('red',board)    
     P1.roll()    
     
-    for x in P1.dice[0]:
+    for die in P1.dice[0]:
         
         pieces = [x for x in P1.Red_Pieces.keys()]
-        random_piece = pieces[random.randint(0,len(pieces)-1)]     
-
-        P1.move(P1.board,random_piece, random_piece+x)
+        
+        random_piece = pieces[random.randint(0,len(pieces)-1)]       
+        P1.move(P1.board,random_piece, random_piece+die)
         P1.populate_Dict(P1.board)
+        
+
         
     P1.populate_Dict(P1.board)
     P1.redraw()
@@ -429,12 +421,12 @@ while running:
     P2 = Player('black',board)
     P2.roll()
     
-    for x in P2.dice[0]:
+    for die in P2.dice[0]:
         
         pieces = [x for x in P2.Black_Pieces.keys()]
-        random_piece = pieces[random.randint(0,len(pieces)-1)]        
-        P2.move(P2.board,random_piece, random_piece-x)
-        P2.populate_Dict(P2.board)        
+        random_piece = pieces[random.randint(0,len(pieces)-1)]                
+        P2.move(P2.board,random_piece, random_piece-die)
+        P2.populate_Dict(P2.board)      
     
     P2.populate_Dict(P2.board)
     P2.redraw()
@@ -451,6 +443,6 @@ while running:
     # board = P2.board
     
     
-    time.sleep(1)       
+    # time.sleep(1)       
        
     p.display.flip()

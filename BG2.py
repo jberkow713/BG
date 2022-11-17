@@ -239,6 +239,12 @@ class Player:
                     board[end].append(p)            
             return board
     
+    def find_board_states(self):
+        pass
+
+
+
+
     def find_off_rail_boards(self,Dice):
         
         # Create a separate set of movable boards when player is stuck on the rail
@@ -380,11 +386,6 @@ class Player:
         self.dice = []
         return
 
-
-
-
-
-
 import time
 
 # Basic game loop idea, original board is used, then players feed in updated boards into 
@@ -410,8 +411,7 @@ while running:
         
         random_piece = pieces[random.randint(0,len(pieces)-1)]       
         P1.move(P1.board,random_piece, random_piece+die)
-        P1.populate_Dict(P1.board)
-        
+        P1.populate_Dict(P1.board)        
 
         
     P1.populate_Dict(P1.board)
@@ -443,6 +443,6 @@ while running:
     # board = P2.board
     
     
-    # time.sleep(1)       
+    time.sleep(1)       
        
     p.display.flip()

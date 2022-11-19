@@ -30,7 +30,7 @@ class Board:
     # Initial board fed into players
     # 1s represent red, 2s represent black
     def __init__(self):
-        self.board = [[1,1,1],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+        self.board = [[1],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
@@ -288,13 +288,14 @@ class Player:
                     States.append(x)                    
         return States
 
-    def Non_rail_doubles_states(self):
+    def Non_rail_doubles_states(self,die=None):
         # recurive function to find all board state
-        # Assumes no pieces on rail
+        # Assumes no pieces on rail,optional parameter for die input
         if self.count ==4:
-            return self.stored_boards
+            return 
         
-        die = self.dice[0][0]
+        if die==None:
+            die = self.dice[0][0]
         Boards = []        
         for board in self.stored_boards:
             self.clear_dict()
@@ -305,6 +306,47 @@ class Player:
         self.stored_boards = Boards
         self.count+=1
         self.Non_rail_doubles_states()
+    
+    def Rail_Non_Doubles(self):
+        #Moves a non double roll with piece(s) starting on rail 
+        if self.color =='red':
+            Start = 0
+            Count = self.Red_Pieces[0]
+        elif self.color=='black':
+            Start = 25
+            Count = self.Black_Pieces[25]
+        if Count>=2:
+            for die in self.dice[0]:
+                moves = self.calc_moves(Start,die)
+                if moves!=[]:
+                   self.move(self.board,Start,moves[0])
+            return        
+        
+        Temporary_Stored_Boards = []
+        
+        if Count ==1:
+            for die in self.dice[0]:
+                
+                for x in self.dice[0]:
+                    if x!=die:
+                        other = x  
+                moves = self.calc_moves(Start,die)
+                if moves!=[]:
+                   self.move(self.board,Start,moves[0])
+                   self.stored_boards.clear()
+                   self.stored_boards.append(self.board)
+                   self.count = 3
+                   self.Non_rail_doubles_states(die=other)                   
+                   for board in self.stored_boards:
+                    if board not in Temporary_Stored_Boards:
+                        Temporary_Stored_Boards.append(board)
+
+                self.stored_boards.clear()
+                self.board = self.replica_board
+                self.populate_Dict(self.board)
+                           
+            self.stored_boards = Temporary_Stored_Boards
+            return
 
     def Rail_Doubles(self):
         # Run this function with pieces on the rail, if you roll doubles
@@ -340,8 +382,8 @@ class Player:
 # And given no pieces on the rail
 P1 = Player('red')
 P1.doubles=True
-P1.dice = [[2,2],[2,2]]
-P1.Rail_Doubles()
+P1.dice = [[2,3],[3,2]]
+P1.Rail_Non_Doubles()
 print(P1.stored_boards)
 
 

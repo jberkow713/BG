@@ -44,19 +44,18 @@ class Player:
         else:
             self.board = board
         self.replica_board = copy.deepcopy(self.board)    
-        self.doubles = False    
-        self.temp_boards.append(self.board)
+        self.doubles = False        
         self.on_rail = False
         self.can_remove = False
         self.dice = []
-        self.dice_index = 0
-        self.double_board_tracker = 0
+        self.count = 0        
         self.Red_Piece_Coords = {k: [] for k in range(26)}
         self.Black_Piece_Coords = {k: [] for k in range(26)}
         self.Red_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict(self.board)
         self.stored_boards = []
+        self.stored_boards.append(self.board)
         self.moves = []
         self.buffer = 50
         self.draw_board()
@@ -286,48 +285,41 @@ class Player:
             second_boards = self.find_Board_states(board_2, die_1)
             for x in second_boards:
                 if x not in States:
-                    States.append(x)
-                    
+                    States.append(x)                    
         return States
 
     def Non_rail_doubles_states(self):
-        die = self.dice[0][0]        
-        die_1_boards = self.find_Board_states(self.board,die)
-        Second_boards = []
-        for board in die_1_boards:
+        # recurive function to find all board state
+        # Assumes no pieces on rail
+        if self.count ==4:
+            return self.stored_boards
+        
+        die = self.dice[0][0]
+        Boards = []        
+        for board in self.stored_boards:
             self.clear_dict()
-            second_boards = self.find_Board_states(board, die)
-            for x in second_boards:
-                if x not in Second_boards:
-                    Second_boards.append(x)
-        Third_boards = []
-        for board in Second_boards:
-            self.clear_dict()    
-            third_boards = self.find_Board_states(board, die)
-            for x in third_boards:
-                if x not in Third_boards:
-                    Third_boards.append(x)
-        Final_Boards = []
-        for board in Third_boards:
-            self.clear_dict()
-            final_boards = self.find_Board_states(board,die)
-            for x in final_boards:
-                if x not in Final_Boards:
-                    Final_Boards.append(x)
-        return Final_Boards,len(Final_Boards)
+            next_boards = self.find_Board_states(board, die)
+            for x in next_boards:
+                if x not in Boards:
+                    Boards.append(x)
+        self.stored_boards = Boards
+        self.count+=1
+        self.Non_rail_doubles_states()
 
-
+        
 # This script should take a starting board, and return all final board states, given a non doubles roll,
 # And given no pieces on the rail
 P1 = Player('red')
-P1.doubles =True
-P1.dice = [[3,3],[3,3]]
+P1.doubles=True
+P1.dice = [[2,2],[2,2]]
 if P1.doubles==False:
     print(P1.dice[0])
     print(P1.Non_rail_non_doubles_states())
 if P1.doubles==True:
     print(P1.dice)
-    print(P1.Non_rail_doubles_states())
+    P1.Non_rail_doubles_states()
+    print(P1.stored_boards)
+
 # Below is just a simulation of movement around the board alternating turns
 
 board = None

@@ -174,7 +174,11 @@ class Player:
             self.dice.append([die_1,die_2])
             self.dice.append([die_2,die_1])
         return
-    
+    def clear_dict(self):
+        if self.color =='red':
+            self.Red_Pieces = {}
+        elif self.color=='black':
+            self.Black_Pieces = {}
     def populate_Dict(self, board):
         # Populates the piece dictionary for white and black
         for slot,val in enumerate(board):
@@ -246,7 +250,7 @@ class Player:
 
         self.populate_Dict(board)
         if self.color =='red':
-            Pieces = sorted([x for x in self.Red_Pieces.keys()])            
+            Pieces = sorted([x for x in self.Red_Pieces.keys()])                      
         else:
             Pieces = sorted([x for x in self.Black_Pieces.keys()])   
         
@@ -260,44 +264,70 @@ class Player:
         
         return Possible_Boards
 
-    def Non_rail_board_states(self):
+    def Non_rail_non_doubles_states(self):
         # Assumes a roll and a board exist
         # For non doubles
-        if self.dice[0]!=self.dice[1]:
+        die_1 = self.dice[0][0]
+        die_2 = self.dice[0][1]
+        
+        Original = copy.deepcopy(self.board)
+        die_1_boards = self.find_Board_states(self.board,die_1)
+        die_2_boards = self.find_Board_states(self.board, die_2)
 
-            die_1 = self.dice[0][0]
-            die_2 = self.dice[0][1]
-            
-            Original = copy.deepcopy(self.board)
-            die_1_boards = self.find_Board_states(self.board,die_1)
-            die_2_boards = self.find_Board_states(self.board, die_2)
+        States = []
+        for board in die_1_boards:    
+            second_boards = self.find_Board_states(board, die_2)
+            for x in second_boards:
+                States.append(x)
+        self.clear_dict()
+        self.populate_Dict(Original)
 
-            States = []
-            for board in die_1_boards:    
-                second_boards = self.find_Board_states(board, die_2)
-                for x in second_boards:
+        for board_2 in die_2_boards:    
+            second_boards = self.find_Board_states(board_2, die_1)
+            for x in second_boards:
+                if x not in States:
                     States.append(x)
-            if self.color =='red':
-                self.Red_Pieces = {}
-            elif self.color=='black':
-                self.Black_Pieces = {}
-            self.populate_Dict(Original)
-
-            for board_2 in die_2_boards:    
-                second_boards = self.find_Board_states(board_2, die_1)
-                for x in second_boards:
-                    if x not in States:
-                        States.append(x)
                     
-            return States
+        return States
+
+    def Non_rail_doubles_states(self):
+        die = self.dice[0][0]        
+        die_1_boards = self.find_Board_states(self.board,die)
+        Second_boards = []
+        for board in die_1_boards:
+            self.clear_dict()
+            second_boards = self.find_Board_states(board, die)
+            for x in second_boards:
+                if x not in Second_boards:
+                    Second_boards.append(x)
+        Third_boards = []
+        for board in Second_boards:
+            self.clear_dict()    
+            third_boards = self.find_Board_states(board, die)
+            for x in third_boards:
+                if x not in Third_boards:
+                    Third_boards.append(x)
+        Final_Boards = []
+        for board in Third_boards:
+            self.clear_dict()
+            final_boards = self.find_Board_states(board,die)
+            for x in final_boards:
+                if x not in Final_Boards:
+                    Final_Boards.append(x)
+        return Final_Boards,len(Final_Boards)
+
 
 # This script should take a starting board, and return all final board states, given a non doubles roll,
 # And given no pieces on the rail
 P1 = Player('red')
-P1.roll()
-print(P1.dice[0])
-print(P1.Non_rail_board_states())
-
+P1.doubles =True
+P1.dice = [[3,3],[3,3]]
+if P1.doubles==False:
+    print(P1.dice[0])
+    print(P1.Non_rail_non_doubles_states())
+if P1.doubles==True:
+    print(P1.dice)
+    print(P1.Non_rail_doubles_states())
 # Below is just a simulation of movement around the board alternating turns
 
 board = None

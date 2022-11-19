@@ -51,6 +51,7 @@ class Player:
         self.doubles = False        
         self.on_rail = False
         self.can_remove = False
+        self.furthest_piece = None
         self.dice = []
         self.count = 0        
         self.Red_Piece_Coords = {k: [] for k in range(26)}
@@ -65,6 +66,25 @@ class Player:
         self.draw_board()
         self.draw_pieces() 
     
+    def Can_remove(self):
+        if self.color=='red':
+            s = sorted([x for x in self.Red_Pieces])            
+            if min(s)>=19:
+                self.can_remove=True                
+                self.furthest_piece = min(s)
+            else:                
+                self.can_remove=False
+                self.furthest_piece=None     
+        if self.color=='black':
+            s = sorted([x for x in self.Black_Pieces])
+            if max(s)<=6:
+                self.can_remove=True                
+                self.furthest_piece = max(s)
+            else:
+                self.can_remove=False
+                self.furthest_piece = None     
+        return     
+
     def redraw(self):
         # redraws board, for movement updates based on update board and piece positions
         screen.fill(TAN)
@@ -224,25 +244,51 @@ class Player:
         if self.color =='black':
             if self.blocked(spot)==False and spot>0:                         
                 return True
-
+    
+    def spot_open_furthest(self,spot):
+        if self.color=='red':
+            if self.blocked(spot)==False:                
+                return True                 
+        if self.color=='black':
+            if self.blocked(spot)==False:                
+                return True                       
     def calc_moves(self,start,die):
         # individual check from starting position for human player, 
         # to be used for highlighting piece movement
         # adds all movable spots to players self.moves list
-        moves = []        
+        moves = []
+
         if self.color =='red':
-            end = start + die                
+            if self.furthest_piece!=None:
+                if self.furthest_piece+die>=25:
+                    return [25]
+            end = start + die
         elif self.color =='black':
+            if self.furthest_piece!=None:
+                if self.furthest_piece-die<=0:
+                    return[0]
             end = start-die
-        if self.spot_open(end)==True:                
-            moves.append(end)        
+
+        if start==self.furthest_piece:           
+            
+            if self.spot_open_furthest(end)==True:
+                                                
+                if self.color=='red':                    
+                    moves.append(min(25,end))                    
+                    return moves
+                else:                    
+                    moves.append(max(0,end))                    
+                    return moves    
+        else:
+            if self.spot_open(end)==True:                
+                moves.append(end)        
         return moves
 
     def move(self,board,start,end):
         # Moves a piece for a given board from start to end position
         # if board[start]==[]:
         #     return
-        if self.spot_open(end)==True:            
+        if self.spot_open(end)==True or self.spot_open_furthest(end)==True:            
             p = board[start].pop()
             if board[start]==[]:
                 if self.color=='red':
@@ -261,18 +307,21 @@ class Player:
                 else:
                     board[end].append(p)            
             return board
+            
     
     def find_Board_states(self,board,die):
         # Moves all moves from one Board State using one die
         self.clear_dict()
         self.populate_Dict(board)
         if self.color =='red':
-            Pieces = sorted([x for x in self.Red_Pieces.keys()])                      
+            Pieces = sorted([x for x in self.Red_Pieces.keys()])
+
         else:
             Pieces = sorted([x for x in self.Black_Pieces.keys()])   
         
         Possible_Boards = []
-        for piece in Pieces:            
+        for piece in Pieces:
+
             Moves = self.calc_moves(piece,die)
             if Moves!=[]:
                 temp_board = copy.deepcopy(board)   
@@ -396,6 +445,7 @@ class Player:
         # Random move based on board state from computer
         self.roll()
         self.rail_check()
+        self.Can_remove()
         if self.on_rail==False:
             if self.doubles==False:
                 self.Non_rail_non_doubles_states()
@@ -407,7 +457,9 @@ class Player:
             else:
                 self.Rail_Doubles()
         if self.stored_boards == []:
-            return         
+            return
+        
+                         
         self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
                 
         self.redraw()

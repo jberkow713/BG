@@ -139,18 +139,19 @@ class Player:
                     if inner_count <5:
                         current_y-=c_size*2 -2
                     inner_count+=1
-            count-=1    
+            count-=1
+
     def rail_check(self):
         # Determines if player moving has a piece on the rail
         # To be used to force players to take off rail before moving elsewhere
-        if self.color == 'red':
-            
+        if self.color == 'red':            
             if 0 in self.Red_Pieces:
                 self.on_rail = True
                 return self.Red_Pieces[0]
             else:
                 self.on_rail = False
                 return 0
+
         if self.color =='black':
             if 25 in self.Black_Pieces:
                 self.on_rail = True
@@ -173,11 +174,13 @@ class Player:
             self.dice.append([die_1,die_2])
             self.dice.append([die_2,die_1])
         return
+
     def clear_dict(self):
         if self.color =='red':
             self.Red_Pieces = {}
         elif self.color=='black':
             self.Black_Pieces = {}
+
     def populate_Dict(self, board):
         # Populates the piece dictionary for white and black
         for slot,val in enumerate(board):
@@ -259,8 +262,7 @@ class Player:
             if Moves!=[]:
                 temp_board = copy.deepcopy(board)   
                 self.move(temp_board,piece,Moves[0])
-                Possible_Boards.append(temp_board)
-        
+                Possible_Boards.append(temp_board)        
         return Possible_Boards
 
     def Non_rail_non_doubles_states(self):
@@ -280,8 +282,7 @@ class Player:
                 States.append(x)
         
         self.clear_dict()
-        self.populate_Dict(Original)
-        
+        self.populate_Dict(Original)        
 
         for board_2 in die_2_boards:    
             second_boards = self.find_Board_states(board_2, die_1)
@@ -377,6 +378,7 @@ class Player:
                 self.Non_rail_doubles_states()
     
     def Random_Move(self):
+        # Random move based on board state from computer
         self.roll()
         self.rail_check()
         if self.on_rail==False:
@@ -418,5 +420,4 @@ while running:
     board = P2.board    
     
     time.sleep(1)       
-       
     p.display.flip()

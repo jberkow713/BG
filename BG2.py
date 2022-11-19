@@ -20,6 +20,10 @@ PURPLE = (255,0,255)
 BROWN = (139,131,120)
 TAN = (250,235,215)
 
+font = p.font.SysFont(None, 36)
+
+
+
 clock = p.time.Clock()
 screen = p.display.set_mode((width, height))
 p.display.set_caption("Backgammon")
@@ -115,6 +119,10 @@ class Player:
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     if inner_count <5:
                         current_y+=c_size*2 -2
+                    # if inner_count>4:
+                    #     img = font.render(f'{inner_count+1}', True, BLUE)
+                    #     screen
+                    #     screen.blit(img, (x_coord,y_coord+c_size))    
                     inner_count+=1
             count+=1        
         count = 25
@@ -138,6 +146,9 @@ class Player:
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     if inner_count <5:
                         current_y-=c_size*2 -2
+                    # if inner_count>4:
+                    #     img = font.render(f'{inner_count+1}', True, BLUE)
+                    #     screen.blit(img, (x_coord,y_coord+c_size))      
                     inner_count+=1
             count-=1
 
@@ -419,5 +430,5 @@ while running:
     P2.Random_Move()   
     board = P2.board    
     
-    time.sleep(1)       
+    time.sleep(.3)       
     p.display.flip()

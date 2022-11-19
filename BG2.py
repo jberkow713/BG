@@ -119,10 +119,11 @@ class Player:
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     if inner_count <5:
                         current_y+=c_size*2 -2
-                    # if inner_count>4:
-                    #     img = font.render(f'{inner_count+1}', True, BLUE)
-                    #     screen
-                    #     screen.blit(img, (x_coord,y_coord+c_size))    
+                    if inner_count>4:
+                        img = font.render(f'{inner_count+1}', True, WHITE)
+                        screen.blit(img, (x_coord-c_size/2,y_coord))    
+                        overlap = font.render(None, 0, TAN)
+                        screen.blit(overlap, (x_coord-c_size/2,y_coord))
                     inner_count+=1
             count+=1        
         count = 25
@@ -146,9 +147,12 @@ class Player:
                     p.draw.circle(screen, color, (x_coord,y_coord), c_size)
                     if inner_count <5:
                         current_y-=c_size*2 -2
-                    # if inner_count>4:
-                    #     img = font.render(f'{inner_count+1}', True, BLUE)
-                    #     screen.blit(img, (x_coord,y_coord+c_size))      
+                    if inner_count>4:
+                        img = font.render(f'{inner_count+1}', True, WHITE)
+                        screen.blit(img, (x_coord-c_size/2,y_coord))    
+                        overlap = font.render(None, 0, TAN)
+                        screen.blit(overlap, (x_coord-c_size/2,y_coord))
+
                     inner_count+=1
             count-=1
 

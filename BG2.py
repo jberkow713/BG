@@ -5,6 +5,7 @@ from pygame.constants import MOUSEBUTTONDOWN
 import sys
 import itertools
 import copy
+import time
 
 p.init()
 width = 1200
@@ -55,6 +56,7 @@ class Player:
         self.Red_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict(self.board)
+        self.stored_boards = []
         self.moves = []
         self.buffer = 50
         self.draw_board()
@@ -249,194 +251,52 @@ class Player:
             Pieces = sorted([x for x in self.Black_Pieces.keys()])   
         
         Possible_Boards = []
-
         for piece in Pieces:            
             Moves = self.calc_moves(piece,die)
-
             if Moves!=[]:
-                temp_board = copy.deepcopy(board)
-                                  
+                temp_board = copy.deepcopy(board)                                  
                 self.move(temp_board,piece,Moves[0])
                 Possible_Boards.append(temp_board)
-
+        
         return Possible_Boards
 
-
-
-
-
-    def find_off_rail_boards(self,Dice):
-        
-        # Create a separate set of movable boards when player is stuck on the rail
-                        
-        if self.color =='red':
-            self.rail_count = len(self.board[0])            
-            Piece = 0
-        elif self.color=='black':
-            self.rail_count = len(self.board[25])            
-            Piece = 25
-        # If pieces on rail >= Number of Dice, force all movable pieces off rail, return the board  
-        
-        if self.rail_count>=len(Dice):
-            
-            for die in Dice:
-                moves = self.calc_moves(Piece,die)
-                if len(moves)>0:                    
-                    self.move(self.board,Piece,moves[0])            
-            
-            return self.temp_boards[0]
-        
-        if self.rail_count<len(Dice):
-                      
-            if self.doubles==True:
-                die = Dice[0]
-                moves = self.calc_moves(Piece,die)
-                if len(moves)==0:
-                    print('cant move')                    
-                    return self.replica_board  
-                else:
-                    for i in range(self.rail_count):
-                        self.move(self.temp_boards[0],Piece,moves[0])
-                        Dice[i]=0
-                    self.dice = [Dice[0:2], Dice[2:]]
-                    self.Find_All_States()                    
-
-                    return self.final_boards[random.randint(0,len(self.final_boards)-1)]
-
-            else:
-                print(self.temp_boards[0])
-                
-                for die in Dice:
-                    print(die)
-                    moves = self.calc_moves(Piece,die)                    
-                    if moves!=[]:                        
-                        self.move(self.temp_boards[0],Piece,moves[0])
-                        print(self.temp_boards[0]) 
-                        for d in Dice:
-                            if d != die:
-                                                              
-                                self.find_board_states([0,d])
-                                
-                        self.temp_boards.append(self.replica_board)
-                        self.dice_index=0                            
-                            
-                           
-                if len(self.final_boards)==0:                                      
-                    return self.replica_board
-                
-                print(len(self.final_boards)) 
-                return self.final_boards[random.randint(0,len(self.final_boards)-1)]      
-        
-
-    def end_game_board_states(self, Dice):
-        # TODO
-        # create end game boards based on whether a player has all their pieces in the end section of their respective color
-        pass
-
-    def find_board_states(self,Dice):
-        # solves all board states for a given double or non double roll
-               
-        if len(self.temp_boards)==0:            
-            return      
-        Die = Dice[self.dice_index]
-        
-        current_board = self.temp_boards[0]
-               
-        self.populate_Dict(current_board)
-        if self.color =='red':
-            Pieces = self.Red_Pieces            
-        else:
-            Pieces = self.Black_Pieces               
-
-        for piece in Pieces:
-            print(Pieces)    
-            Moves = self.calc_moves(piece,Die)
-            for move in Moves:
-                Temp_Board = copy.deepcopy(current_board)
-
-                New_Board = self.move(Temp_Board,piece,move)
-
-                if self.dice_index==0:
-                    if New_Board not in self.temp_boards:
-                        if New_Board != None:
-                            self.temp_boards.append(New_Board)
-
-                if self.dice_index==1:
-                    if New_Board not in self.final_boards:
-                        if New_Board!=None:
-                            self.final_boards.append(New_Board)       
-        
-        self.double_board_tracker-=1
-    
-        if self.dice_index==0:
-            if self.double_board_tracker <= 0:
-                self.dice_index+=1               
-        self.temp_boards.remove(current_board)        
-        self.find_board_states(Dice)      
-    
-    def find_board_states_doubles(self):
-        # In the case of doubles, second recursive call is made
-        self.temp_boards = copy.deepcopy(self.final_boards)    
-        self.final_boards.clear()
-        self.double_board_tracker = len(self.temp_boards)
-        self.dice_index=0
-        self.find_board_states(self.dice[1])
-
-    def Find_All_States(self):
-        # Finds all board states using nested functionality created above
+    def Non_rail_board_states(self):
+        # Assumes a roll and a board exist
+        # For non doubles
         if self.dice[0]!=self.dice[1]:
-            self.find_board_states(self.dice[0])
-            self.dice_index=0
-            self.temp_boards.append(self.replica_board)
-            self.find_board_states(self.dice[1])
+
+            die_1 = self.dice[0][0]
+            die_2 = self.dice[0][1]
             
-        else:
-            self.find_board_states(self.dice[0])
-            self.find_board_states_doubles()
-                  
-    def random_move(self):
-        # Creating random fair move, more to come
-        self.roll()
-        self.rail_check()              
-        
-        self.Find_All_States()
-        self.board = self.final_boards[random.randint(0,len(self.final_boards)-1)]
-        self.populate_Dict(self.board)
-        self.redraw()
-        self.dice = []
-        return
+            Original = copy.deepcopy(self.board)
+            die_1_boards = self.find_Board_states(self.board,die_1)
+            die_2_boards = self.find_Board_states(self.board, die_2)
 
-import time
+            States = []
+            for board in die_1_boards:    
+                second_boards = self.find_Board_states(board, die_2)
+                for x in second_boards:
+                    States.append(x)
+            if self.color =='red':
+                self.Red_Pieces = {}
+            elif self.color=='black':
+                self.Black_Pieces = {}
+            self.populate_Dict(Original)
 
+            for board_2 in die_2_boards:    
+                second_boards = self.find_Board_states(board_2, die_1)
+                for x in second_boards:
+                    if x not in States:
+                        States.append(x)
+                    
+            return States
 
 # This script should take a starting board, and return all final board states, given a non doubles roll,
 # And given no pieces on the rail
 P1 = Player('red')
 P1.roll()
-die_1 = P1.dice[0][0]
-die_2 = P1.dice[0][1]
-print(die_1,die_2)
-
-Original = copy.deepcopy(P1.board)
-die_1_boards = P1.find_Board_states(P1.board,die_1)
-die_2_boards = P1.find_Board_states(P1.board, die_2)
-
-States = []
-for board in die_1_boards:    
-    second_boards = P1.find_Board_states(board, die_2)
-    for x in second_boards:
-        States.append(x)
-
-P1.Red_Pieces = {}
-P1.populate_Dict(Original)
-
-for board_2 in die_2_boards:    
-    second_boards = P1.find_Board_states(board_2, die_1)
-    for x in second_boards:
-        if x not in States:
-            States.append(x)
-        
-print(States, len(States))
+print(P1.dice[0])
+print(P1.Non_rail_board_states())
 
 # Below is just a simulation of movement around the board alternating turns
 

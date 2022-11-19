@@ -30,7 +30,7 @@ class Board:
     # Initial board fed into players
     # 1s represent red, 2s represent black
     def __init__(self):
-        self.board = [[1],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+        self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
@@ -246,7 +246,7 @@ class Player:
     
     def find_Board_states(self,board,die):
         # Moves all moves from one Board State using one die
-
+        self.clear_dict()
         self.populate_Dict(board)
         if self.color =='red':
             Pieces = sorted([x for x in self.Red_Pieces.keys()])                      
@@ -257,7 +257,7 @@ class Player:
         for piece in Pieces:            
             Moves = self.calc_moves(piece,die)
             if Moves!=[]:
-                temp_board = copy.deepcopy(board)                                  
+                temp_board = copy.deepcopy(board)   
                 self.move(temp_board,piece,Moves[0])
                 Possible_Boards.append(temp_board)
         
@@ -278,15 +278,18 @@ class Player:
             second_boards = self.find_Board_states(board, die_2)
             for x in second_boards:
                 States.append(x)
+        
         self.clear_dict()
         self.populate_Dict(Original)
+        
 
         for board_2 in die_2_boards:    
             second_boards = self.find_Board_states(board_2, die_1)
             for x in second_boards:
                 if x not in States:
                     States.append(x)                    
-        return States
+        self.stored_boards=States
+        return
 
     def Non_rail_doubles_states(self,die=None):
         # recurive function to find all board state
@@ -372,23 +375,29 @@ class Player:
                 self.stored_boards.clear()                    
                 self.stored_boards.append(self.board)
                 self.Non_rail_doubles_states()
-
-
-
-
-
-
-# This script should take a starting board, and return all final board states, given a non doubles roll,
-# And given no pieces on the rail
-P1 = Player('red')
-P1.doubles=True
-P1.dice = [[2,3],[3,2]]
-P1.Rail_Non_Doubles()
-print(P1.stored_boards)
-
-
+    
+    def Random_Move(self):
+        self.roll()
+        self.rail_check()
+        if self.on_rail==False:
+            if self.doubles==False:
+                self.Non_rail_non_doubles_states()
+            else:
+                self.Non_rail_doubles_states()
+        elif self.on_rail==True:
+            if self.doubles==False:
+                self.Rail_Non_Doubles()
+            else:
+                self.Rail_Doubles()
+        if self.stored_boards == []:
+            return         
+        self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
+                
+        self.redraw()
+        return
 
 # Below is just a simulation of movement around the board alternating turns
+# With everything except the end game
 
 board = None
 running = True
@@ -400,32 +409,12 @@ while running:
         if event.type == p.QUIT:
             sys.exit()
     
-    P1 = Player('red',board)    
-    P1.roll()    
-    
-    for die in P1.dice[0]:
-        
-        pieces = [x for x in P1.Red_Pieces.keys()]        
-        random_piece = pieces[random.randint(0,len(pieces)-1)]       
-        P1.move(P1.board,random_piece, random_piece+die)
-        P1.populate_Dict(P1.board)
-        
-    P1.populate_Dict(P1.board)
-    P1.redraw()
+    P1 = Player('red',board)        
+    P1.Random_Move()    
     board = P1.board
 
-    P2 = Player('black',board)
-    P2.roll()
-    
-    for die in P2.dice[0]:
-        
-        pieces = [x for x in P2.Black_Pieces.keys()]
-        random_piece = pieces[random.randint(0,len(pieces)-1)]                
-        P2.move(P2.board,random_piece, random_piece-die)
-        P2.populate_Dict(P2.board)      
-    
-    P2.populate_Dict(P2.board)
-    P2.redraw()
+    P2 = Player('black',board)    
+    P2.Random_Move()   
     board = P2.board    
     
     time.sleep(1)       

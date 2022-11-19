@@ -30,7 +30,7 @@ class Board:
     # Initial board fed into players
     # 1s represent red, 2s represent black
     def __init__(self):
-        self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
+        self.board = [[1,1,1],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
@@ -306,19 +306,45 @@ class Player:
         self.count+=1
         self.Non_rail_doubles_states()
 
-        
+    def Rail_Doubles(self):
+        # Run this function with pieces on the rail, if you roll doubles
+        Die = self.dice[0][0]
+        if self.color =='red':
+            Start = 0
+            End = Start+Die 
+            Count = self.Red_Pieces[0]
+        elif self.color=='black':
+            Start = 25
+            End = Start-Die
+            Count = self.Black_Pieces[25]
+        if Count >=4:
+            if self.calc_moves(Start,Die)!=[]:
+                for _ in range(4):
+                    self.move(self.board,Start,End)
+                return             
+        elif Count <4:
+            if self.calc_moves(Start,Die)!=[]:
+                for _ in range(Count):
+                    self.move(self.board,Start,End)
+                    self.count+=1
+                self.stored_boards.clear()                    
+                self.stored_boards.append(self.board)
+                self.Non_rail_doubles_states()
+
+
+
+
+
+
 # This script should take a starting board, and return all final board states, given a non doubles roll,
 # And given no pieces on the rail
 P1 = Player('red')
 P1.doubles=True
 P1.dice = [[2,2],[2,2]]
-if P1.doubles==False:
-    print(P1.dice[0])
-    print(P1.Non_rail_non_doubles_states())
-if P1.doubles==True:
-    print(P1.dice)
-    P1.Non_rail_doubles_states()
-    print(P1.stored_boards)
+P1.Rail_Doubles()
+print(P1.stored_boards)
+
+
 
 # Below is just a simulation of movement around the board alternating turns
 

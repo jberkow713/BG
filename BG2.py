@@ -257,7 +257,6 @@ class Player:
         # to be used for highlighting piece movement
         # adds all movable spots to players self.moves list
         moves = []
-
         if self.color =='red':
             if self.furthest_piece!=None:
                 if self.furthest_piece+die>=25:
@@ -269,10 +268,8 @@ class Player:
                     return[0]
             end = start-die
 
-        if start==self.furthest_piece:           
-            
-            if self.spot_open_furthest(end)==True:
-                                                
+        if start==self.furthest_piece:            
+            if self.spot_open_furthest(end)==True:                                                
                 if self.color=='red':                    
                     moves.append(min(25,end))                    
                     return moves
@@ -306,22 +303,20 @@ class Player:
                     board[25].append(p)                    
                 else:
                     board[end].append(p)            
-            return board
-            
+            return board            
     
     def find_Board_states(self,board,die):
         # Moves all moves from one Board State using one die
         self.clear_dict()
         self.populate_Dict(board)
+
         if self.color =='red':
             Pieces = sorted([x for x in self.Red_Pieces.keys()])
-
         else:
-            Pieces = sorted([x for x in self.Black_Pieces.keys()])   
+            Pieces = sorted([x for x in self.Black_Pieces.keys()])
         
         Possible_Boards = []
         for piece in Pieces:
-
             Moves = self.calc_moves(piece,die)
             if Moves!=[]:
                 temp_board = copy.deepcopy(board)   
@@ -457,11 +452,9 @@ class Player:
             else:
                 self.Rail_Doubles()
         if self.stored_boards == []:
-            return
-        
+            return        
                          
-        self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
-                
+        self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
         self.redraw()
         return
 

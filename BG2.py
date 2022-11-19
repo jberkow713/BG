@@ -309,19 +309,16 @@ while running:
     for event in p.event.get():
         if event.type == p.QUIT:
             sys.exit()
-
     
     P1 = Player('red',board)    
     P1.roll()    
     
     for die in P1.dice[0]:
         
-        pieces = [x for x in P1.Red_Pieces.keys()]
-        
+        pieces = [x for x in P1.Red_Pieces.keys()]        
         random_piece = pieces[random.randint(0,len(pieces)-1)]       
         P1.move(P1.board,random_piece, random_piece+die)
-        P1.populate_Dict(P1.board)        
-
+        P1.populate_Dict(P1.board)
         
     P1.populate_Dict(P1.board)
     P1.redraw()
@@ -339,18 +336,7 @@ while running:
     
     P2.populate_Dict(P2.board)
     P2.redraw()
-    board = P2.board
-
-
-
-    # P1 = Player('red',board)
-    # P1.move(self.board, 1,4)
-    # board = P1.board
-     
-    # P2 = Player('black', board)
-    # P2.random_move()
-    # board = P2.board
-    
+    board = P2.board    
     
     time.sleep(1)       
        

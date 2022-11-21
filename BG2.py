@@ -21,9 +21,6 @@ BROWN = (139,131,120)
 TAN = (250,235,215)
 
 font = p.font.SysFont(None, 36)
-
-
-
 clock = p.time.Clock()
 screen = p.display.set_mode((width, height))
 p.display.set_caption("Backgammon")
@@ -455,7 +452,7 @@ class Player:
                 self.Rail_Doubles()
         if self.stored_boards == []:
             return        
-        print(len(self.stored_boards))                 
+        # print(len(self.stored_boards))                 
         self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
         self.redraw()
         return
@@ -511,7 +508,6 @@ class Player:
 # After how many games are you altering the chance of randomizing an action?
 # after how many games do you alter the decay rate of a win/loss?
 
-
 possible_moves = []
 board = None
 running = True
@@ -524,21 +520,12 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)        
-    P1.Random_Move()
-    
-    # if P1.stored_boards!=0:
-    #     possible_moves.append(len(P1.stored_boards))  
-    board = P1.board
-
-    
+    P1.Random_Move()    
+    board = P1.board  
 
     P2 = Player('black',board)    
-    P2.Random_Move()
-    # if P2.stored_boards!=0:
-    #     possible_moves.append(len(P2.stored_boards))     
-    board = P2.board
-
-       
+    P2.Random_Move()      
+    board = P2.board       
     
-    # time.sleep(.3)       
+    time.sleep(.3)       
     p.display.flip()

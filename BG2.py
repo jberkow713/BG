@@ -34,6 +34,8 @@ class Board:
     # Initial board fed into players
     # 1s represent red, 2s represent black
     def __init__(self):
+        # self.board = [[],[1,],[1], [],[2],[2],[2,2,2], [],[2,2],[2],[],[1,1],[1,1,1],\
+        #     [2,2,2],[2,2],[],[],[1,1,],[1], [1,1,1], [1],[1],[],[2],[2],[]]
         self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
@@ -315,7 +317,7 @@ class Player:
         else:
             Pieces = sorted([x for x in self.Black_Pieces.keys()])
         
-        Possible_Boards = []
+        Possible_Boards = []        
         for piece in Pieces:
             Moves = self.calc_moves(piece,die)
             if Moves!=[]:
@@ -453,7 +455,7 @@ class Player:
                 self.Rail_Doubles()
         if self.stored_boards == []:
             return        
-                         
+        print(len(self.stored_boards))                 
         self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
         self.redraw()
         return
@@ -461,6 +463,56 @@ class Player:
 # Below is just a simulation of movement around the board alternating turns
 # With everything except the end game
 
+# TODO
+# Create a reinforced learning idea, based on theory, and test it
+
+# Random moves will be made, boards will be saved for a particular game for each color
+
+# 1)At the end of each game, board states will be given a value based on outcome of the game
+# 2)Alternatively, can save the board state as a function of the board state,
+# So I don't need to save tuples of lists, instead just run the boardstate through function,
+# Output a value, save that value in the dictionary
+
+# Build a relationship function between colors, to represent board states
+
+# So determining the function itself will be faster, but maybe not as accurate
+# Can use multiple evaluation functions, 
+# Can use just evaluating the boards, and start training multiple models simultaneously
+
+# In the case where you save board states , you need to save red and black
+# So Red moves, saves the ending board state as a tuple key 
+# # Black moves, saves the ending board state as a tuple key
+
+# In the case where you evaluate board states through a function, you just need to store
+# The value, 
+
+
+# Game ends, all board states one player used who lost the game, -1
+# All moves other board states player used who won the game, +1
+# Each player will have their own dictionary of board states
+# Run it 100000 times
+# Store separate dictionaries for each color, not ideal, but useful for this testing
+
+# Need to create function that determines end of game, and then basically restarts the game
+# From there, determine in future games, determine all possible board states for given starting board
+
+# After the initial 100000 games
+# 
+# Throw the possible board states into either the function, to create an outcome,
+# Or the dictionary of saved board states
+#   
+# Then determine which of those has highest value, 
+# then make corresponding move, but it also needs to be randomized, 
+
+# How often do you randomize? You want to lean towards the boards with highest value, but sometimes,
+# You want to randomize the action, to allow for more exploration
+
+# How often are changing the rate of exploration? 
+# After how many games are you altering the chance of randomizing an action?
+# after how many games do you alter the decay rate of a win/loss?
+
+
+possible_moves = []
 board = None
 running = True
 while running:
@@ -472,12 +524,21 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)        
-    P1.Random_Move()    
+    P1.Random_Move()
+    
+    # if P1.stored_boards!=0:
+    #     possible_moves.append(len(P1.stored_boards))  
     board = P1.board
 
-    P2 = Player('black',board)    
-    P2.Random_Move()   
-    board = P2.board    
     
-    time.sleep(.3)       
+
+    P2 = Player('black',board)    
+    P2.Random_Move()
+    # if P2.stored_boards!=0:
+    #     possible_moves.append(len(P2.stored_boards))     
+    board = P2.board
+
+       
+    
+    # time.sleep(.3)       
     p.display.flip()

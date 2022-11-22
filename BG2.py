@@ -21,9 +21,6 @@ BROWN = (139,131,120)
 TAN = (250,235,215)
 
 font = p.font.SysFont(None, 36)
-
-
-
 clock = p.time.Clock()
 screen = p.display.set_mode((width, height))
 p.display.set_caption("Backgammon")
@@ -43,47 +40,56 @@ class Player:
     # Player class, computer/human built into one
     def __init__(self, color, board=None):
         self.win=False
-        self.color = color
-        self.temp_boards = []
-        self.final_boards = []
         if board == None:
             self.board = Board().board
         else:
             self.board = board
-        self.replica_board = copy.deepcopy(self.board)    
-        self.doubles = False        
-        self.on_rail = False
-        self.can_remove = False
-        self.furthest_piece = None
-        self.dice = []
-        self.count = 0        
-        self.Red_Piece_Coords = {k: [] for k in range(26)}
-        self.Black_Piece_Coords = {k: [] for k in range(26)}
+        self.color = color
         self.Red_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict(self.board)
-        self.stored_boards = []
-        self.stored_boards.append(self.board)
-        self.moves = []
-        self.buffer = 50
-        self.draw_board()
-        self.draw_pieces()
-        self.win=False
+        self.win_check()
+        if self.win==False:
+            
+            self.temp_boards = []
+            self.final_boards = []
+            self.replica_board = copy.deepcopy(self.board)    
+            self.doubles = False        
+            self.on_rail = False
+            self.can_remove = False
+            self.furthest_piece = None
+            self.dice = []
+            self.count = 0        
+            self.Red_Piece_Coords = {k: [] for k in range(26)}
+            self.Black_Piece_Coords = {k: [] for k in range(26)}
+            self.stored_boards = []
+            self.stored_boards.append(self.board)
+            self.moves = []
+            self.buffer = 50
+            self.draw_board()
+            self.draw_pieces()        
+                
+    def win_check(self):
         if 25 in self.Red_Pieces:
             if self.Red_Pieces[25]==15:
                 self.win=True
-                print('Red Wins')
+                # print('Red Wins')
                 self.board = Board().board
+                return 
+
         if 0 in self.Black_Pieces:
             if self.Black_Pieces[0]==15:            
                 self.win=True
-                print('Black Wins')
-                self.board = Board().board         
-    
+                # print('Black Wins')
+                self.board = Board().board
+                
+                return
+
+
     def Can_remove(self):
         if self.color=='red':
             s = sorted([x for x in self.Red_Pieces])            
-            if self.win==False:
+            if len(s)>0:
                 if min(s)>=19:
                     self.can_remove=True                
                     self.furthest_piece = min(s)
@@ -91,9 +97,8 @@ class Player:
                     self.can_remove=False
                     self.furthest_piece=None     
         if self.color=='black':
-            s = sorted([x for x in self.Black_Pieces])
-            if self.win==False:
-
+            s = sorted([x for x in self.Black_Pieces])          
+            if len(s)>0:
                 if max(s)<=6:
                     self.can_remove=True                
                     self.furthest_piece = max(s)
@@ -456,24 +461,25 @@ class Player:
     
     def Random_Move(self):
         # Random move based on board state from computer
-        self.roll()
-        self.rail_check()
-        self.Can_remove()
-        if self.on_rail==False:
-            if self.doubles==False:
-                self.Non_rail_non_doubles_states()
-            else:
-                self.Non_rail_doubles_states()
-        elif self.on_rail==True:
-            if self.doubles==False:
-                self.Rail_Non_Doubles()
-            else:
-                self.Rail_Doubles()
-        if self.stored_boards == []:
-            return        
-        self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
-        self.redraw()
-        return
+        if self.win==False:
+            self.roll()
+            self.rail_check()
+            self.Can_remove()
+            if self.on_rail==False:
+                if self.doubles==False:
+                    self.Non_rail_non_doubles_states()
+                else:
+                    self.Non_rail_doubles_states()
+            elif self.on_rail==True:
+                if self.doubles==False:
+                    self.Rail_Non_Doubles()
+                else:
+                    self.Rail_Doubles()
+            if self.stored_boards == []:
+                return        
+            self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
+            self.redraw()
+            return
 
 # Below is just a simulation of movement around the board alternating turns
 # With everything except the end game
@@ -526,7 +532,6 @@ class Player:
 # After how many games are you altering the chance of randomizing an action?
 # after how many games do you alter the decay rate of a win/loss?
 
-
 possible_moves = []
 board = None
 running = True
@@ -539,21 +544,12 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)        
-    P1.Random_Move()
-    
-    # if P1.stored_boards!=0:
-    #     possible_moves.append(len(P1.stored_boards))  
-    board = P1.board
-
-    
+    P1.Random_Move()    
+    board = P1.board  
 
     P2 = Player('black',board)    
-    P2.Random_Move()
-    # if P2.stored_boards!=0:
-    #     possible_moves.append(len(P2.stored_boards))     
-    board = P2.board
-
-       
+    P2.Random_Move()      
+    board = P2.board       
     
-    time.sleep(.05)       
+    # time.sleep(.05)       
     p.display.flip()

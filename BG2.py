@@ -42,6 +42,7 @@ class Board:
 class Player:
     # Player class, computer/human built into one
     def __init__(self, color, board=None):
+        self.win=False
         self.color = color
         self.temp_boards = []
         self.final_boards = []
@@ -66,25 +67,39 @@ class Player:
         self.moves = []
         self.buffer = 50
         self.draw_board()
-        self.draw_pieces() 
+        self.draw_pieces()
+        self.win=False
+        if 25 in self.Red_Pieces:
+            if self.Red_Pieces[25]==15:
+                self.win=True
+                print('Red Wins')
+                self.board = Board().board
+        if 0 in self.Black_Pieces:
+            if self.Black_Pieces[0]==15:            
+                self.win=True
+                print('Black Wins')
+                self.board = Board().board         
     
     def Can_remove(self):
         if self.color=='red':
             s = sorted([x for x in self.Red_Pieces])            
-            if min(s)>=19:
-                self.can_remove=True                
-                self.furthest_piece = min(s)
-            else:                
-                self.can_remove=False
-                self.furthest_piece=None     
+            if self.win==False:
+                if min(s)>=19:
+                    self.can_remove=True                
+                    self.furthest_piece = min(s)
+                else:                
+                    self.can_remove=False
+                    self.furthest_piece=None     
         if self.color=='black':
             s = sorted([x for x in self.Black_Pieces])
-            if max(s)<=6:
-                self.can_remove=True                
-                self.furthest_piece = max(s)
-            else:
-                self.can_remove=False
-                self.furthest_piece = None     
+            if self.win==False:
+
+                if max(s)<=6:
+                    self.can_remove=True                
+                    self.furthest_piece = max(s)
+                else:
+                    self.can_remove=False
+                    self.furthest_piece = None     
         return     
 
     def redraw(self):
@@ -219,13 +234,14 @@ class Player:
             self.Black_Pieces = {}
 
     def populate_Dict(self, board):
-        # Populates the piece dictionary for white and black
+        # Populates the piece dictionary for red and black
         for slot,val in enumerate(board):
             if 1 in val:
                 self.Red_Pieces[slot]=len(val)
             elif 2 in val:
                 self.Black_Pieces[slot]=len(val)
-    
+                
+
     def blocked(self,spot):
         # checks if a spot is blocked for a given color
         if self.color == 'red':
@@ -455,7 +471,6 @@ class Player:
                 self.Rail_Doubles()
         if self.stored_boards == []:
             return        
-        print(len(self.stored_boards))                 
         self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
         self.redraw()
         return
@@ -540,5 +555,5 @@ while running:
 
        
     
-    # time.sleep(.3)       
+    time.sleep(.05)       
     p.display.flip()

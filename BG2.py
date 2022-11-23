@@ -84,6 +84,18 @@ class Player:
                 # print('Black Wins')
                 self.board = Board().board                
                 return
+    def generate_random_board(self):
+        board = [[] for x in range(26)]
+        for _ in range(15):
+            can_insert = False
+            while can_insert==False:
+                red = random.randint(1,24)
+                black = random.randint(1,24)
+                if 2 not in board[red] and 1 not in board[black]!=1:
+                    board[red].append(1)
+                    board[black].append(2)
+                    can_insert=True 
+        return board 
 
     def Can_remove(self):
         if self.color=='red':
@@ -462,7 +474,7 @@ class Player:
         # Random move based on board state from computer
         self.win_check()
         if self.win==True:
-            self.board= Board().board
+            self.board=self.generate_random_board()
         if self.win==False:
             self.roll()
             self.rail_check()
@@ -553,5 +565,5 @@ while running:
     P2.Random_Move()      
     board = P2.board       
     
-    time.sleep(.3)       
+    time.sleep(.1)       
     p.display.flip()

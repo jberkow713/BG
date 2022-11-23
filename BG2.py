@@ -70,6 +70,7 @@ class Player:
             self.draw_pieces()        
                 
     def win_check(self):
+        
         if 25 in self.Red_Pieces:
             if self.Red_Pieces[25]==15:
                 self.win=True
@@ -81,10 +82,8 @@ class Player:
             if self.Black_Pieces[0]==15:            
                 self.win=True
                 # print('Black Wins')
-                self.board = Board().board
-                
+                self.board = Board().board                
                 return
-
 
     def Can_remove(self):
         if self.color=='red':
@@ -461,6 +460,9 @@ class Player:
     
     def Random_Move(self):
         # Random move based on board state from computer
+        self.win_check()
+        if self.win==True:
+            self.board= Board().board
         if self.win==False:
             self.roll()
             self.rail_check()
@@ -551,5 +553,5 @@ while running:
     P2.Random_Move()      
     board = P2.board       
     
-    # time.sleep(.05)       
+    time.sleep(.3)       
     p.display.flip()

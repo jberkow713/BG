@@ -44,13 +44,14 @@ class Player:
             self.board = Board().board
         else:
             self.board = board
+
         self.color = color
         self.Red_Pieces = {}
         self.Black_Pieces = {}
         self.populate_Dict(self.board)
         self.win_check()
         if self.win==False:
-            
+            self.take_off=False    
             self.temp_boards = []
             self.final_boards = []
             self.replica_board = copy.deepcopy(self.board)    
@@ -292,27 +293,50 @@ class Player:
         # adds all movable spots to players self.moves list
         moves = []
         if self.color =='red':
+            end = start + die
             if self.furthest_piece!=None:
                 if self.furthest_piece+die>=25:
-                    return [25]
-            end = start + die
+                    # self.populate_Dict(self.board)
+                    self.clear_dict()
+                    self.populate_Dict(self.board)
+                    self.furthest_piece = min([x for x in self.Red_Pieces])
+                    
+                    self.board[self.furthest_piece].remove(1)
+                    self.take_off=True
+                    self.redraw()
+                    self.clear_dict()
+                    self.populate_Dict(self.board)
+                    if len(self.Red_Pieces)==0:
+                        self.win=True
+                        self.board = self.generate_random_board()
+                    
+                    return 
+                    
+                    
+            
         elif self.color =='black':
+            end = start-die
             if self.furthest_piece!=None:
                 if self.furthest_piece-die<=0:
-                    return[0]
-            end = start-die
-
-        if start==self.furthest_piece:            
-            if self.spot_open_furthest(end)==True:                                                
-                if self.color=='red':                    
-                    moves.append(min(25,end))                    
-                    return moves
-                else:                    
-                    moves.append(max(0,end))                    
-                    return moves    
-        else:
-            if self.spot_open(end)==True:                
-                moves.append(end)        
+                    # self.populate_Dict(self.board)
+                    self.clear_dict()
+                    self.populate_Dict(self.board)
+                    self.furthest_piece = max([x for x in self.Black_Pieces])                    
+                    self.board[self.furthest_piece].remove(2)
+                    self.take_off=True
+                    self.redraw()
+                    self.clear_dict()
+                    self.populate_Dict(self.board)
+                    if (len(self.Black_Pieces))==0:
+                        self.win=True
+                        self.board = self.generate_random_board()
+                    
+                    return
+         
+                   
+        
+        if self.spot_open(end)==True:                
+            moves.append(end)        
         return moves
 
     def move(self,board,start,end):
@@ -352,10 +376,13 @@ class Player:
         Possible_Boards = []        
         for piece in Pieces:
             Moves = self.calc_moves(piece,die)
-            if Moves!=[]:
-                temp_board = copy.deepcopy(board)   
-                self.move(temp_board,piece,Moves[0])
-                Possible_Boards.append(temp_board)        
+            if self.win==True:
+                break
+            if self.take_off==False:
+                if Moves!=[]:
+                    temp_board = copy.deepcopy(board)   
+                    self.move(temp_board,piece,Moves[0])
+                    Possible_Boards.append(temp_board)        
         return Possible_Boards
 
     def Non_rail_non_doubles_states(self):

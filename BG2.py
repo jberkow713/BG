@@ -310,8 +310,7 @@ class Player:
                         self.win=True
                         self.board = self.generate_random_board()
                     
-                    return 
-                    
+                    return                   
                     
             
         elif self.color =='black':
@@ -573,6 +572,8 @@ class Player:
 # After how many games are you altering the chance of randomizing an action?
 # after how many games do you alter the decay rate of a win/loss?
 
+Red_wins = 0
+Black_wins = 0
 possible_moves = []
 board = None
 running = True
@@ -586,11 +587,17 @@ while running:
     
     P1 = Player('red',board)        
     P1.Random_Move()    
+    if P1.win==True:
+        Red_wins+=1
     board = P1.board  
 
     P2 = Player('black',board)    
-    P2.Random_Move()      
+    P2.Random_Move()
+    if P2.win==True:
+        Black_wins+=1      
     board = P2.board       
     
-    time.sleep(.1)       
+
+    print(Red_wins,Black_wins)
+    # time.sleep(.1)       
     p.display.flip()

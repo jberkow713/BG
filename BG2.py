@@ -498,6 +498,7 @@ class Player:
     
     def Random_Move(self):
         # Random move based on board state from computer
+        
         self.win_check()
         if self.win==True:
             self.board=self.generate_random_board()
@@ -516,8 +517,10 @@ class Player:
                 else:
                     self.Rail_Doubles()
             if self.stored_boards == []:
+
                 return        
             self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
+            
             # print(self.board)                
             self.redraw()
             return
@@ -617,10 +620,10 @@ Red_Moves = []
 Black_Moves = []
 board = None
 running = True
+
 while running:
     
-    clock.tick(FPS)
-    
+    clock.tick(FPS)    
     for event in p.event.get():
         if event.type == p.QUIT:
             sys.exit()
@@ -628,15 +631,16 @@ while running:
     P1 = Player('red',board)        
     P1.Random_Move()    
     if P1.win==True:
-        print(Red_Moves,len(Red_Moves))
+        # print(Red_Moves,len(Red_Moves))
         # print(Red_wins,Black_wins)
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
     board = P1.board
     
+                
     conversion = P1.eval_board_experiment(board)
-    if conversion>10:
+    if conversion==7.5:
         print(board)
     Red_Moves.append(conversion)   
 
@@ -644,17 +648,17 @@ while running:
     P2.Random_Move()
     if P2.win==True:
         print(Black_Moves,len(Black_Moves))
-        # print(Red_wins,Black_wins)
+        print(Red_wins,Black_wins)
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
     board = P2.board
     
-    conversion = P2.eval_board_experiment(board)
-    if conversion>10:
-        print(board)
-    Black_Moves.append(conversion)    
+    # conversion = P2.eval_board_experiment(board)
+    # # if conversion==10.5:
+    # #     print(board)
+    # Black_Moves.append(conversion)    
 
    
-    time.sleep(.05)       
+    time.sleep(.15)       
     p.display.flip()

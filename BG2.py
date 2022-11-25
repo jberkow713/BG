@@ -517,11 +517,12 @@ class Player:
                     self.Rail_Doubles()
             if self.stored_boards == []:
                 return        
-            self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]                
+            self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
+            # print(self.board)                
             self.redraw()
             return
     def distance_to_piece(self,p_1,p_2):
-        if abs(p_1-p_2)<=9 and abs(p_1-p_2)>0:
+        if abs(p_1-p_2)<=9:
             val_dict = {1:1, 2:1.5, 3:2, 4:2.5, 5:3, 6:6, 7:2,8:1.5, 9:1}
             return val_dict[abs(p_1-p_2)]
         else:
@@ -539,16 +540,19 @@ class Player:
         if self.color =='red':
             furthest_black = max([x for x in Black])
             sums = 0
+            
             for x in Red:
                 if Red[x]>1:
                     sums += self.distance_to_piece(x,furthest_black)
+            
             return sums
-        else:
+        elif self.color=='black':
             sums = 0
             furthest_red = min([x for x in Red])
             for x in Black:
                 if Black[x]>1:
                     sums += self.distance_to_piece(x, furthest_red)
+                
             return sums
         
 
@@ -625,26 +629,32 @@ while running:
     P1.Random_Move()    
     if P1.win==True:
         print(Red_Moves,len(Red_Moves))
-        print(Red_wins,Black_wins)
+        # print(Red_wins,Black_wins)
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
     board = P1.board
-    Red_Moves.append(P1.eval_board_experiment(board))  
+    
+    conversion = P1.eval_board_experiment(board)
+    if conversion>10:
+        print(board)
+    Red_Moves.append(conversion)   
 
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
         print(Black_Moves,len(Black_Moves))
-        print(Red_wins,Black_wins)
+        # print(Red_wins,Black_wins)
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
     board = P2.board
-    Black_Moves.append(P2.eval_board_experiment(board))  
-
     
+    conversion = P2.eval_board_experiment(board)
+    if conversion>10:
+        print(board)
+    Black_Moves.append(conversion)    
 
    
-    time.sleep(.3)       
+    time.sleep(.05)       
     p.display.flip()

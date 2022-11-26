@@ -92,24 +92,20 @@ class Player:
         return board 
 
     def Can_remove(self):
+        self.can_remove=False
+        self.furthest_piece=None  
         if self.color=='red':
             s = sorted([x for x in self.Red_Pieces])            
             if len(s)>0:
                 if min(s)>=19:
                     self.can_remove=True                
-                    self.furthest_piece = min(s)
-                else:                
-                    self.can_remove=False
-                    self.furthest_piece=None     
+                    self.furthest_piece = min(s)                   
         if self.color=='black':
             s = sorted([x for x in self.Black_Pieces])          
             if len(s)>0:
                 if max(s)<=6:
                     self.can_remove=True                
-                    self.furthest_piece = max(s)
-                else:
-                    self.can_remove=False
-                    self.furthest_piece = None     
+                    self.furthest_piece = max(s)                     
         return     
 
     def redraw(self):
@@ -206,12 +202,12 @@ class Player:
     def rail_check(self):
         # Determines if player moving has a piece on the rail
         # To be used to force players to take off rail before moving elsewhere
+        self.on_rail=False
         if self.color == 'red':            
             if 0 in self.Red_Pieces:
                 self.on_rail = True
                 return self.Red_Pieces[0]
             else:
-                self.on_rail = False
                 return 0
 
         if self.color =='black':
@@ -219,7 +215,6 @@ class Player:
                 self.on_rail = True
                 return self.Black_Pieces[25]
             else:
-                self.on_rail = False
                 return 0
             
     def roll(self):
@@ -249,8 +244,7 @@ class Player:
             if 1 in val:
                 self.Red_Pieces[slot]=len(val)
             elif 2 in val:
-                self.Black_Pieces[slot]=len(val)
-                
+                self.Black_Pieces[slot]=len(val)                
 
     def blocked(self,spot):
         # checks if a spot is blocked for a given color
@@ -264,8 +258,7 @@ class Player:
             return False     
     
     def spot_open(self, spot):
-        # Checks if a spot is open
-        
+        # Checks if a spot is open        
         if self.color =='red':
             if self.blocked(spot)==False and spot<25:
                 return True
@@ -298,8 +291,7 @@ class Player:
                     self.off_board = self.board
                     self.redraw()
                     self.clear_dict()
-                    self.populate_Dict(self.board)
-                                  
+                    self.populate_Dict(self.board)                                  
                     return                   
             
         elif self.color =='black':
@@ -308,8 +300,7 @@ class Player:
                 if self.furthest_piece-die<=0:
                     # self.populate_Dict(self.board)
                     self.clear_dict()
-                    self.populate_Dict(self.board)
-                    
+                    self.populate_Dict(self.board)                    
                     self.furthest_piece = max([x for x in self.Black_Pieces])                    
                     self.board[self.furthest_piece].remove(2)
                     self.take_off=True
@@ -317,9 +308,7 @@ class Player:
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)                 
-                    return
-         
-                   
+                    return                  
         
         if self.spot_open(end)==True:                
             moves.append(end)        
@@ -327,9 +316,7 @@ class Player:
 
     def move(self,board,start,end):
         # Moves a piece for a given board from start to end position
-        # if board[start]==[]:
-        #     return
-        if self.spot_open(end)==True or self.spot_open_furthest(end)==True:            
+        if self.spot_open(end)==True:            
             p = board[start].pop()
             if board[start]==[]:
                 if self.color=='red':
@@ -340,8 +327,7 @@ class Player:
                 if 2 in board[end]:
                     board[0].append(p)                                      
                 else:
-                    board[end].append(p)                    
-
+                    board[end].append(p)
             if self.color=='black':
                 if 1 in board[end]:                                       
                     board[25].append(p)                    
@@ -353,7 +339,6 @@ class Player:
         # Moves all moves from one Board State using one die
         self.clear_dict()
         self.populate_Dict(board)
-
         if self.color =='red':
             Pieces = sorted([x for x in self.Red_Pieces.keys()])
         else:
@@ -364,11 +349,11 @@ class Player:
             Moves = self.calc_moves(piece,die)
             if self.win==True or self.take_off==True:
                 break
-            if self.take_off==False:
-                if Moves!=[]:
-                    temp_board = copy.deepcopy(board)   
-                    self.move(temp_board,piece,Moves[0])
-                    Possible_Boards.append(temp_board)        
+            # if self.take_off==False:
+            if Moves!=[]:
+                temp_board = copy.deepcopy(board)   
+                self.move(temp_board,piece,Moves[0])
+                Possible_Boards.append(temp_board)        
         return Possible_Boards
 
     def Non_rail_non_doubles_states(self):
@@ -385,11 +370,9 @@ class Player:
         for board in die_1_boards:    
             second_boards = self.find_Board_states(board, die_2)
             for x in second_boards:
-                States.append(x)
-        
+                States.append(x)        
         self.clear_dict()
-        self.populate_Dict(Original)        
-
+        self.populate_Dict(Original)
         for board_2 in die_2_boards:    
             second_boards = self.find_Board_states(board_2, die_1)
             for x in second_boards:
@@ -402,8 +385,7 @@ class Player:
         # recurive function to find all board state
         # Assumes no pieces on rail,optional parameter for die input
         if self.count ==4:
-            return 
-        
+            return       
         if die==None:
             die = self.dice[0][0]
         Boards = []        
@@ -432,11 +414,9 @@ class Player:
                    self.move(self.board,Start,moves[0])
             return        
         
-        Temporary_Stored_Boards = []
-        
+        Temporary_Stored_Boards = []        
         if Count ==1:
-            for die in self.dice[0]:
-                
+            for die in self.dice[0]:                
                 for x in self.dice[0]:
                     if x!=die:
                         other = x  
@@ -484,16 +464,13 @@ class Player:
                 self.Non_rail_doubles_states()
     
     def Random_Move(self):
-        # Random move based on board state from computer
-        
-        
+        # Random move based on board state from computer        
         self.roll()
         self.rail_check()
         self.Can_remove()
         if self.on_rail==False:
             if self.doubles==False:
-                self.Non_rail_non_doubles_states()
-                
+                self.Non_rail_non_doubles_states()                
             else:
                 self.Non_rail_doubles_states()
                 
@@ -502,22 +479,18 @@ class Player:
                 self.Rail_Non_Doubles()
             else:
                 self.Rail_Doubles()
+        
         if self.take_off==True:
             self.board = self.off_board
             if self.win_check()==True:
-                self.board = Board().board
-                    
+                self.board = Board().board                    
         elif self.stored_boards == []:            
             self.board = self.replica_board
         else:
-
-            self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
-        
-        # print(self.board)                
-                    
-        self.redraw()
-                
+            self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]        
+        self.redraw()                
         return
+        
     def distance_to_piece(self,p_1,p_2):
         if abs(p_1-p_2)<=9:
             val_dict = {1:1, 2:1.5, 3:2, 4:2.5, 5:3, 6:6, 7:2,8:1.5, 9:1}
@@ -536,20 +509,18 @@ class Player:
         
         if self.color =='red':
             furthest_black = max([x for x in Black])
-            sums = 0
-            
+            sums = 0            
             for x in Red:
                 if Red[x]>1:
-                    sums += self.distance_to_piece(x,furthest_black)
-            
+                    sums += self.distance_to_piece(x,furthest_black)            
             return sums
+
         elif self.color=='black':
             sums = 0
             furthest_red = min([x for x in Red])
             for x in Black:
                 if Black[x]>1:
-                    sums += self.distance_to_piece(x, furthest_red)
-                
+                    sums += self.distance_to_piece(x, furthest_red)                
             return sums
 
 
@@ -557,49 +528,36 @@ class Player:
 # With everything except the end game
 
 # TODO
-# Create a reinforced learning idea, based on theory, and test it
-
 # Random moves will be made, boards will be saved for a particular game for each color
 
 # 1)At the end of each game, board states will be given a value based on outcome of the game
 # 2)Alternatively, can save the board state as a function of the board state,
 # So I don't need to save tuples of lists, instead just run the boardstate through function,
 # Output a value, save that value in the dictionary
-
 # Build a relationship function between colors, to represent board states
-
 # So determining the function itself will be faster, but maybe not as accurate
 # Can use multiple evaluation functions, 
 # Can use just evaluating the boards, and start training multiple models simultaneously
-
 # In the case where you save board states , you need to save red and black
 # So Red moves, saves the ending board state as a tuple key 
 # # Black moves, saves the ending board state as a tuple key
-
 # In the case where you evaluate board states through a function, you just need to store
-# The value, 
-
-
+# The value,
 # Game ends, all board states one player used who lost the game, -1
 # All moves other board states player used who won the game, +1
 # Each player will have their own dictionary of board states
 # Run it 100000 times
 # Store separate dictionaries for each color, not ideal, but useful for this testing
-
 # Need to create function that determines end of game, and then basically restarts the game
 # From there, determine in future games, determine all possible board states for given starting board
 
-# After the initial 100000 games
-# 
+# After the initial 100000 games# 
 # Throw the possible board states into either the function, to create an outcome,
-# Or the dictionary of saved board states
-#   
+# Or the dictionary of saved board states#   
 # Then determine which of those has highest value, 
-# then make corresponding move, but it also needs to be randomized, 
-
+# then make corresponding move, but it also needs to be randomized,
 # How often do you randomize? You want to lean towards the boards with highest value, but sometimes,
 # You want to randomize the action, to allow for more exploration
-
 # How often are changing the rate of exploration? 
 # After how many games are you altering the chance of randomizing an action?
 # after how many games do you alter the decay rate of a win/loss?
@@ -626,16 +584,11 @@ while running:
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
-    board = P1.board
-    for x in board:
-        if 1 in x and 2 in x:
-            print('error')
-    
-                
+    board = P1.board                   
     # conversion = P1.eval_board_experiment(board)
     # # if conversion==7.5:
     # #     print(board)
-    # Red_Moves.append(conversion)   
+    # Red_Moves.append(conversion)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
@@ -645,12 +598,7 @@ while running:
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
-    board = P2.board
-    for x in board:
-        if 1 in x and 2 in x:
-            print('error')
-    
-    
+    board = P2.board   
    
     # time.sleep(.15)       
     p.display.flip()

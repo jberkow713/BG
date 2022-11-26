@@ -48,43 +48,36 @@ class Player:
         self.color = color
         self.Red_Pieces = {}
         self.Black_Pieces = {}
-        self.populate_Dict(self.board)
-        self.win_check()
-        if self.win==False:
-            self.take_off=False    
-            self.temp_boards = []
-            self.final_boards = []
-            self.replica_board = copy.deepcopy(self.board)    
-            self.doubles = False        
-            self.on_rail = False
-            self.can_remove = False
-            self.furthest_piece = None
-            self.dice = []
-            self.count = 0        
-            self.Red_Piece_Coords = {k: [] for k in range(26)}
-            self.Black_Piece_Coords = {k: [] for k in range(26)}
-            self.stored_boards = []
-            self.stored_boards.append(self.board)
-            self.moves = []
-            self.buffer = 50
-            self.draw_board()
-            self.draw_pieces()        
-                
+        self.populate_Dict(self.board)       
+        self.take_off=False    
+        self.temp_boards = []
+        self.final_boards = []
+        self.replica_board = copy.deepcopy(self.board)    
+        self.doubles = False        
+        self.on_rail = False
+        self.can_remove = False
+        self.furthest_piece = None
+        self.dice = []
+        self.count = 0        
+        self.Red_Piece_Coords = {k: [] for k in range(26)}
+        self.Black_Piece_Coords = {k: [] for k in range(26)}
+        self.stored_boards = []
+        self.stored_boards.append(self.board)
+        self.moves = []
+        self.buffer = 50
+        self.draw_board()
+        self.draw_pieces()                
+    
     def win_check(self):
-        
-        if 25 in self.Red_Pieces:
-            if self.Red_Pieces[25]==15:
-                self.win=True
-                # print('Red Wins')
-                self.board = Board().board
-                return 
+        if self.color=='red':
+            piece = 1
+        else:
+            piece = 2
+        for x in self.board:
+            if piece in x:
+                return False 
+        return True
 
-        if 0 in self.Black_Pieces:
-            if self.Black_Pieces[0]==15:            
-                self.win=True
-                # print('Black Wins')
-                self.board = Board().board                
-                return
     def generate_random_board(self):
         board = [[] for x in range(26)]
         for _ in range(15):
@@ -299,19 +292,15 @@ class Player:
                     # self.populate_Dict(self.board)
                     self.clear_dict()
                     self.populate_Dict(self.board)
-                    self.furthest_piece = min([x for x in self.Red_Pieces])
-                    
+                    self.furthest_piece = min([x for x in self.Red_Pieces])                    
                     self.board[self.furthest_piece].remove(1)
                     self.take_off=True
+                    self.off_board = self.board
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)
-                    if len(self.Red_Pieces)==0:
-                        self.win=True
-                        self.board = self.generate_random_board()
-                    
+                                  
                     return                   
-                    
             
         elif self.color =='black':
             end = start-die
@@ -320,16 +309,14 @@ class Player:
                     # self.populate_Dict(self.board)
                     self.clear_dict()
                     self.populate_Dict(self.board)
+                    
                     self.furthest_piece = max([x for x in self.Black_Pieces])                    
                     self.board[self.furthest_piece].remove(2)
                     self.take_off=True
+                    self.off_board = self.board
                     self.redraw()
                     self.clear_dict()
-                    self.populate_Dict(self.board)
-                    if (len(self.Black_Pieces))==0:
-                        self.win=True
-                        self.board = self.generate_random_board()
-                    
+                    self.populate_Dict(self.board)                 
                     return
          
                    
@@ -375,7 +362,7 @@ class Player:
         Possible_Boards = []        
         for piece in Pieces:
             Moves = self.calc_moves(piece,die)
-            if self.win==True:
+            if self.win==True or self.take_off==True:
                 break
             if self.take_off==False:
                 if Moves!=[]:
@@ -499,31 +486,38 @@ class Player:
     def Random_Move(self):
         # Random move based on board state from computer
         
-        self.win_check()
-        if self.win==True:
-            self.board=self.generate_random_board()
-        if self.win==False:
-            self.roll()
-            self.rail_check()
-            self.Can_remove()
-            if self.on_rail==False:
-                if self.doubles==False:
-                    self.Non_rail_non_doubles_states()
-                else:
-                    self.Non_rail_doubles_states()
-            elif self.on_rail==True:
-                if self.doubles==False:
-                    self.Rail_Non_Doubles()
-                else:
-                    self.Rail_Doubles()
-            if self.stored_boards == []:
+        
+        self.roll()
+        self.rail_check()
+        self.Can_remove()
+        if self.on_rail==False:
+            if self.doubles==False:
+                self.Non_rail_non_doubles_states()
+                
+            else:
+                self.Non_rail_doubles_states()
+                
+        elif self.on_rail==True:
+            if self.doubles==False:
+                self.Rail_Non_Doubles()
+            else:
+                self.Rail_Doubles()
+        if self.take_off==True:
+            self.board = self.off_board
+            if self.win_check()==True:
+                self.board = Board().board
+                    
+        elif self.stored_boards == []:            
+            self.board = self.replica_board
+        else:
 
-                return        
             self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)]
-            
-            # print(self.board)                
-            self.redraw()
-            return
+        
+        # print(self.board)                
+                    
+        self.redraw()
+                
+        return
     def distance_to_piece(self,p_1,p_2):
         if abs(p_1-p_2)<=9:
             val_dict = {1:1, 2:1.5, 3:2, 4:2.5, 5:3, 6:6, 7:2,8:1.5, 9:1}
@@ -557,10 +551,6 @@ class Player:
                     sums += self.distance_to_piece(x, furthest_red)
                 
             return sums
-        
-
-
-
 
 
 # Below is just a simulation of movement around the board alternating turns
@@ -637,28 +627,30 @@ while running:
         Black_Moves.clear()
         Red_wins+=1
     board = P1.board
+    for x in board:
+        if 1 in x and 2 in x:
+            print('error')
     
                 
-    conversion = P1.eval_board_experiment(board)
-    if conversion==7.5:
-        print(board)
-    Red_Moves.append(conversion)   
+    # conversion = P1.eval_board_experiment(board)
+    # # if conversion==7.5:
+    # #     print(board)
+    # Red_Moves.append(conversion)   
 
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
-        print(Black_Moves,len(Black_Moves))
+        # print(Black_Moves,len(Black_Moves))
         print(Red_wins,Black_wins)
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
     board = P2.board
+    for x in board:
+        if 1 in x and 2 in x:
+            print('error')
     
-    # conversion = P2.eval_board_experiment(board)
-    # # if conversion==10.5:
-    # #     print(board)
-    # Black_Moves.append(conversion)    
-
+    
    
-    time.sleep(.15)       
+    # time.sleep(.15)       
     p.display.flip()

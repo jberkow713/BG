@@ -6,6 +6,7 @@ import sys
 import itertools
 import copy
 import time
+import json
 
 p.init()
 width = 1200
@@ -527,45 +528,28 @@ class Player:
                 if Black[x]>1:
                     sums += self.distance_to_piece(x, furthest_red)                
             return sums
+    
+    def record_eval(self, L1, L2):
+        
+        with open("Scores.json") as file:    
+            Eval = json.load(file)
+        print(Eval)        
+        for val in L1:
+            if val not in Eval:
+                Eval[val]=1
+            else:
+                Eval[val]+=1
+        for val2 in L2:
+            if val2 not in Eval:
+                Eval[val2]=-1
+            else:
+                Eval[val2]-=1
 
+        with open('Scores.json', 'w') as fp:
+            json.dump(Eval, fp)
 
-# Below is just a simulation of movement around the board alternating turns
-# With everything except the end game
+        return    
 
-# TODO
-# Random moves will be made, boards will be saved for a particular game for each color
-
-# 1)At the end of each game, board states will be given a value based on outcome of the game
-# 2)Alternatively, can save the board state as a function of the board state,
-# So I don't need to save tuples of lists, instead just run the boardstate through function,
-# Output a value, save that value in the dictionary
-# Build a relationship function between colors, to represent board states
-# So determining the function itself will be faster, but maybe not as accurate
-# Can use multiple evaluation functions, 
-# Can use just evaluating the boards, and start training multiple models simultaneously
-# In the case where you save board states , you need to save red and black
-# So Red moves, saves the ending board state as a tuple key 
-# # Black moves, saves the ending board state as a tuple key
-# In the case where you evaluate board states through a function, you just need to store
-# The value,
-# Game ends, all board states one player used who lost the game, -1
-# All moves other board states player used who won the game, +1
-# Each player will have their own dictionary of board states
-# Run it 100000 times
-# Store separate dictionaries for each color, not ideal, but useful for this testing
-# Need to create function that determines end of game, and then basically restarts the game
-# From there, determine in future games, determine all possible board states for given starting board
-
-# After the initial 100000 games# 
-# Throw the possible board states into either the function, to create an outcome,
-# Or the dictionary of saved board states#   
-# Then determine which of those has highest value, 
-# then make corresponding move, but it also needs to be randomized,
-# How often do you randomize? You want to lean towards the boards with highest value, but sometimes,
-# You want to randomize the action, to allow for more exploration
-# How often are changing the rate of exploration? 
-# After how many games are you altering the chance of randomizing an action?
-# after how many games do you alter the decay rate of a win/loss?
 
 Red_wins = 0
 Black_wins = 0
@@ -573,9 +557,12 @@ Red_Moves = []
 Black_Moves = []
 board = None
 running = True
+Games = 0
 
 while running:
     
+    if Games ==25:
+        break
     clock.tick(FPS)    
     for event in p.event.get():
         if event.type == p.QUIT:
@@ -584,8 +571,10 @@ while running:
     P1 = Player('red',board)        
     P1.Random_Move()    
     if P1.win==True:
-    
-        print(Red_Moves,len(Red_Moves))        
+
+        P1.record_eval(Red_Moves,Black_Moves)
+        Games+=1
+              
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
@@ -597,7 +586,10 @@ while running:
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
-        print(Black_Moves,len(Black_Moves))        
+
+        P2.record_eval(Black_Moves,Red_Moves)
+        Games+=1
+             
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
@@ -606,5 +598,5 @@ while running:
     conversion = P2.eval_board_experiment(board)    
     Black_Moves.append(conversion)     
    
-    # time.sleep(.15)       
+    # time.sleep(.5)       
     p.display.flip()

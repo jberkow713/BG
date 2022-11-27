@@ -76,6 +76,7 @@ class Player:
         for x in self.board:
             if piece in x:
                 return False 
+        self.win=True
         return True
 
     def generate_random_board(self):
@@ -285,10 +286,12 @@ class Player:
                     # self.populate_Dict(self.board)
                     self.clear_dict()
                     self.populate_Dict(self.board)
-                    self.furthest_piece = min([x for x in self.Red_Pieces])                    
-                    self.board[self.furthest_piece].remove(1)
-                    self.take_off=True
-                    self.off_board = self.board
+                    if self.Red_Pieces!= {}:
+
+                        self.furthest_piece = min([x for x in self.Red_Pieces])                    
+                        self.board[self.furthest_piece].remove(1)
+                        self.take_off=True
+                        self.off_board = self.board
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)                                  
@@ -300,11 +303,13 @@ class Player:
                 if self.furthest_piece-die<=0:
                     # self.populate_Dict(self.board)
                     self.clear_dict()
-                    self.populate_Dict(self.board)                    
-                    self.furthest_piece = max([x for x in self.Black_Pieces])                    
-                    self.board[self.furthest_piece].remove(2)
-                    self.take_off=True
-                    self.off_board = self.board
+                    self.populate_Dict(self.board)
+                    if self.Black_Pieces!={}:
+
+                        self.furthest_piece = max([x for x in self.Black_Pieces])                    
+                        self.board[self.furthest_piece].remove(2)
+                        self.take_off=True
+                        self.off_board = self.board
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)                 
@@ -579,26 +584,27 @@ while running:
     P1 = Player('red',board)        
     P1.Random_Move()    
     if P1.win==True:
-        # print(Red_Moves,len(Red_Moves))
-        # print(Red_wins,Black_wins)
+    
+        print(Red_Moves,len(Red_Moves))        
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
+    
     board = P1.board                   
-    # conversion = P1.eval_board_experiment(board)
-    # # if conversion==7.5:
-    # #     print(board)
-    # Red_Moves.append(conversion)  
+    conversion = P1.eval_board_experiment(board)
+    Red_Moves.append(conversion)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
-        # print(Black_Moves,len(Black_Moves))
-        print(Red_wins,Black_wins)
+        print(Black_Moves,len(Black_Moves))        
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      
-    board = P2.board   
+    
+    board = P2.board
+    conversion = P2.eval_board_experiment(board)    
+    Black_Moves.append(conversion)     
    
     # time.sleep(.15)       
     p.display.flip()

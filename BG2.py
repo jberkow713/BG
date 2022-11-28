@@ -505,6 +505,7 @@ class Player:
             return 0       
 
     def eval_board_experiment(self,board):
+        # Evaluation metric using distance to blocks from furthest piece
         Red = {}
         Black = {}
         for slot,val in enumerate(board):
@@ -530,7 +531,7 @@ class Player:
             return sums
     
     def record_eval(self, L1, L2):
-        
+        # Records evaluation for given json file
         with open("Scores.json") as file:    
             Eval = json.load(file)
           
@@ -549,6 +550,7 @@ class Player:
             json.dump(Eval, fp)
 
         return    
+# Viewing evaluation dictionary pre-games
 with open("Scores.json") as file:    
     Eval = json.load(file)
 print(Eval)  
@@ -564,6 +566,7 @@ Games = 0
 while running:
     
     if Games ==100:
+        # Viewing updated Scoring dictionary post games
         with open("Scores.json") as file:    
             Eval = json.load(file)
         print(Eval)    
@@ -602,6 +605,8 @@ while running:
     board = P2.board
     conversion = P2.eval_board_experiment(board)    
     Black_Moves.append(conversion)     
-   
+    
+    # Optional Time parameter to view changing board states
+
     # time.sleep(.5)       
     p.display.flip()

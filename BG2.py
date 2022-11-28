@@ -533,7 +533,7 @@ class Player:
         
         with open("Scores.json") as file:    
             Eval = json.load(file)
-        print(Eval)        
+          
         for val in L1:
             if val not in Eval:
                 Eval[val]=1
@@ -549,7 +549,9 @@ class Player:
             json.dump(Eval, fp)
 
         return    
-
+with open("Scores.json") as file:    
+    Eval = json.load(file)
+print(Eval)  
 
 Red_wins = 0
 Black_wins = 0
@@ -561,7 +563,10 @@ Games = 0
 
 while running:
     
-    if Games ==25:
+    if Games ==100:
+        with open("Scores.json") as file:    
+            Eval = json.load(file)
+        print(Eval)    
         break
     clock.tick(FPS)    
     for event in p.event.get():

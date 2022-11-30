@@ -503,7 +503,13 @@ class Player:
             return val_dict[abs(p_1-p_2)]
         else:
             return 0       
-
+    def distance_to_piece_2(self,p_1,p_2):
+        dist = abs(p_1-p_2)
+        if dist<7 and dist>2 :
+            val_dict = {3:2, 4:4, 5:6, 6:8}
+            return val_dict[abs(p_1-p_2)]
+        else:
+            return 0   
     def eval_board_experiment(self,board):
         # Evaluation metric using distance to blocks from furthest piece
         Red = {}
@@ -529,31 +535,69 @@ class Player:
                 if Black[x]>1:
                     sums += self.distance_to_piece(x, furthest_red)                
             return sums
-    
-    def record_eval(self, L1, L2):
+    def Eval_2(self,board):
+        Red = {}
+        Black = {}
+        for slot,val in enumerate(board):
+            if 1 in val:
+                Red[slot]=len(val)
+            elif 2 in val:
+                Black[slot]=len(val) 
+        
+        if self.color =='red':
+            furthest_black = max([x for x in Black])
+            sums = 0            
+            for x in Red:
+                if Red[x]>1:
+                    sums += self.distance_to_piece_2(x,furthest_black)            
+            return sums
+
+        elif self.color=='black':
+            sums = 0
+            furthest_red = min([x for x in Red])
+            for x in Black:
+                if Black[x]>1:
+                    sums += self.distance_to_piece_2(x, furthest_red)                
+            return sums
+    def Eval_3(self, board):
+        
+        R = []
+        for x in board:
+            if len(x)==0:
+                R.append(str(0))
+            else:
+                l = []
+                for y in x:
+                    l.append(str(y))
+                R.append(''.join(l))
+        return''.join(R)
+
+    def record_eval(self, File,L1, L2,increment=1,decrement=1):
         # Records evaluation for given json file
-        with open("Scores.json") as file:    
+        with open(File) as file:    
             Eval = json.load(file)
-          
+        
         for val in L1:
             if val not in Eval:
-                Eval[val]=1
+                Eval[val]=increment
             else:
-                Eval[val]+=1
+                Eval[val]+=increment
         for val2 in L2:
             if val2 not in Eval:
-                Eval[val2]=-1
+                Eval[val2]=-1*decrement
             else:
-                Eval[val2]-=1
+                Eval[val2]-=decrement
 
-        with open('Scores.json', 'w') as fp:
+        with open(File, 'w') as fp:
             json.dump(Eval, fp)
 
         return    
 # Viewing evaluation dictionary pre-games
-with open("Scores.json") as file:    
-    Eval = json.load(file)
-print(Eval)  
+
+# with open("Scores_3.json") as file:    
+#     Eval = json.load(file)
+# x = sorted([x for x in Eval.values()], reverse=True)
+# print(x)
 
 Red_wins = 0
 Black_wins = 0
@@ -565,10 +609,12 @@ Games = 0
 
 while running:
     
-    if Games ==100:
+    if Games ==10:
         # Viewing updated Scoring dictionary post games
-        with open("Scores.json") as file:    
+        with open("Scores_3.json") as file:    
             Eval = json.load(file)
+            x = sorted([x for x in Eval.values()], reverse=True)
+            print(x)
         print(Eval)    
         break
     clock.tick(FPS)    
@@ -580,7 +626,8 @@ while running:
     P1.Random_Move()    
     if P1.win==True:
 
-        P1.record_eval(Red_Moves,Black_Moves)
+        # P1.record_eval('Scores.json',Red_Moves,Black_Moves)
+        P1.record_eval('Scores_3.json',Red_Moves,Black_Moves)
         Games+=1
               
         Red_Moves.clear()
@@ -588,14 +635,18 @@ while running:
         Red_wins+=1
     
     board = P1.board                   
-    conversion = P1.eval_board_experiment(board)
-    Red_Moves.append(conversion)  
+    # conversion = P1.eval_board_experiment(board)
+    conversion2 = P1.Eval_3(board)
+    
+    # Red_Moves.append(conversion)
+    Red_Moves.append(conversion2)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
 
-        P2.record_eval(Black_Moves,Red_Moves)
+        # P2.record_eval('Scores.json',Black_Moves,Red_Moves)
+        P2.record_eval('Scores_3.json',Black_Moves,Red_Moves)
         Games+=1
              
         Red_Moves.clear()
@@ -603,8 +654,10 @@ while running:
         Black_wins+=1      
     
     board = P2.board
-    conversion = P2.eval_board_experiment(board)    
-    Black_Moves.append(conversion)     
+    # conversion = P2.eval_board_experiment(board)
+    conversion2 = P2.Eval_3(board)    
+    # Black_Moves.append(conversion)
+    Black_Moves.append(conversion2)     
     
     # Optional Time parameter to view changing board states
 

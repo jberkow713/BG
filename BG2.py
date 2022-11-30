@@ -503,13 +503,7 @@ class Player:
             return val_dict[abs(p_1-p_2)]
         else:
             return 0       
-    def distance_to_piece_2(self,p_1,p_2):
-        dist = abs(p_1-p_2)
-        if dist<7 and dist>2 :
-            val_dict = {3:2, 4:4, 5:6, 6:8}
-            return val_dict[abs(p_1-p_2)]
-        else:
-            return 0   
+      
     def eval_board_experiment(self,board):
         # Evaluation metric using distance to blocks from furthest piece
         Red = {}
@@ -535,30 +529,7 @@ class Player:
                 if Black[x]>1:
                     sums += self.distance_to_piece(x, furthest_red)                
             return sums
-    def Eval_2(self,board):
-        Red = {}
-        Black = {}
-        for slot,val in enumerate(board):
-            if 1 in val:
-                Red[slot]=len(val)
-            elif 2 in val:
-                Black[slot]=len(val) 
-        
-        if self.color =='red':
-            furthest_black = max([x for x in Black])
-            sums = 0            
-            for x in Red:
-                if Red[x]>1:
-                    sums += self.distance_to_piece_2(x,furthest_black)            
-            return sums
-
-        elif self.color=='black':
-            sums = 0
-            furthest_red = min([x for x in Red])
-            for x in Black:
-                if Black[x]>1:
-                    sums += self.distance_to_piece_2(x, furthest_red)                
-            return sums
+    
     def Eval_3(self, board):
         
         R = []

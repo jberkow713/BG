@@ -613,9 +613,8 @@ while running:
         # Viewing updated Scoring dictionary post games
         with open("Scores_3.json") as file:    
             Eval = json.load(file)
-            x = sorted([x for x in Eval.values()], reverse=True)
-            print(x)
-        print(Eval)    
+            # print(sorted([x for x in Eval.values()], reverse=True))
+            print(len(Eval))            
         break
     clock.tick(FPS)    
     for event in p.event.get():
@@ -627,7 +626,7 @@ while running:
     if P1.win==True:
 
         # P1.record_eval('Scores.json',Red_Moves,Black_Moves)
-        P1.record_eval('Scores_3.json',Red_Moves,Black_Moves)
+        # P1.record_eval('Scores_3.json',Red_Moves,Black_Moves)
         Games+=1
               
         Red_Moves.clear()
@@ -636,17 +635,17 @@ while running:
     
     board = P1.board                   
     # conversion = P1.eval_board_experiment(board)
-    conversion2 = P1.Eval_3(board)
+    # conversion2 = P1.Eval_3(board)
     
     # Red_Moves.append(conversion)
-    Red_Moves.append(conversion2)  
+    # Red_Moves.append(conversion2)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
 
         # P2.record_eval('Scores.json',Black_Moves,Red_Moves)
-        P2.record_eval('Scores_3.json',Black_Moves,Red_Moves)
+        # P2.record_eval('Scores_3.json',Black_Moves,Red_Moves)
         Games+=1
              
         Red_Moves.clear()
@@ -655,11 +654,11 @@ while running:
     
     board = P2.board
     # conversion = P2.eval_board_experiment(board)
-    conversion2 = P2.Eval_3(board)    
+    # conversion2 = P2.Eval_3(board)    
     # Black_Moves.append(conversion)
-    Black_Moves.append(conversion2)     
+    # Black_Moves.append(conversion2)     
     
     # Optional Time parameter to view changing board states
 
-    # time.sleep(.5)       
+    time.sleep(.1)       
     p.display.flip()

@@ -32,13 +32,11 @@ class Board:
     # Initial board fed into players
     # 1s represent red, 2s represent black
     def __init__(self):
-        # self.board = [[],[1,],[1], [],[2],[2],[2,2,2], [],[2,2],[2],[],[1,1],[1,1,1],\
-        #     [2,2,2],[2,2],[],[],[1,1,],[1], [1,1,1], [1],[1],[],[2],[2],[]]
         self.board = [[],[1,1],[], [],[],[],[2,2,2,2,2], [],[2,2,2],[],[],[],[1,1,1,1,1],\
             [2,2,2,2,2],[],[],[],[1,1,1],[], [1,1,1,1,1], [],[],[],[],[2,2],[]]
         
 class Player:
-    # Player class, computer/human built into one
+    # Player class, comp/human built into one
     def __init__(self, color, board=None):
         self.win=False
         if board == None:
@@ -81,6 +79,7 @@ class Player:
         return True
 
     def generate_random_board(self):
+        # Random board generator for reinforcement learning testing
         board = [[] for x in range(26)]
         for _ in range(15):
             can_insert = False
@@ -94,6 +93,7 @@ class Player:
         return board 
 
     def Can_remove(self):
+        # Determines if pieces can be moved off of board
         self.can_remove=False
         self.furthest_piece=None  
         if self.color=='red':
@@ -111,7 +111,7 @@ class Player:
         return     
 
     def redraw(self):
-        # redraws board, for movement updates based on update board and piece positions
+        # Redraws board, for movement updates based on update board and piece positions
         screen.fill(TAN)
         self.draw_board()
         self.populate_Dict(self.board)
@@ -202,7 +202,7 @@ class Player:
             count-=1
 
     def rail_check(self):
-        # Determines if player moving has a piece on the rail
+        # Determines if player has a piece on the rail
         # To be used to force players to take off rail before moving elsewhere
         self.on_rail=False
         if self.color == 'red':            
@@ -211,7 +211,6 @@ class Player:
                 return self.Red_Pieces[0]
             else:
                 return 0
-
         if self.color =='black':
             if 25 in self.Black_Pieces:
                 self.on_rail = True
@@ -220,8 +219,8 @@ class Player:
                 return 0
             
     def roll(self):
-        # For doubles, 2 sets of the same value will be used , for recursive roll function
-        # If not doubles, 2 combinations of same roll will be used for all board possibilities
+        # For doubles, 2 sets of the same value will be used
+        # If not doubles, 2 combinations of same roll will be used
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
         if die_1 == die_2:
@@ -235,13 +234,14 @@ class Player:
         return
 
     def clear_dict(self):
+        # Clears player's piece dictionary
         if self.color =='red':
             self.Red_Pieces = {}
         elif self.color=='black':
             self.Black_Pieces = {}
 
     def populate_Dict(self, board):
-        # Populates the piece dictionary for red and black
+        # Populates the piece dictionary for both red and black
         for slot,val in enumerate(board):
             if 1 in val:
                 self.Red_Pieces[slot]=len(val)
@@ -276,19 +276,15 @@ class Player:
             if self.blocked(spot)==False:                
                 return True                       
     def calc_moves(self,start,die):
-        # individual check from starting position for human player, 
-        # to be used for highlighting piece movement
-        # adds all movable spots to players self.moves list
+        # Calculates moves from a starting position for a given die
         moves = []
         if self.color =='red':
             end = start + die
             if self.furthest_piece!=None:
-                if self.furthest_piece+die>=25:
-                    # self.populate_Dict(self.board)
+                if self.furthest_piece+die>=25:                    
                     self.clear_dict()
                     self.populate_Dict(self.board)
                     if self.Red_Pieces!= {}:
-
                         self.furthest_piece = min([x for x in self.Red_Pieces])                    
                         self.board[self.furthest_piece].remove(1)
                         self.take_off=True
@@ -296,17 +292,14 @@ class Player:
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)                                  
-                    return                   
-            
+                    return            
         elif self.color =='black':
             end = start-die
             if self.furthest_piece!=None:
-                if self.furthest_piece-die<=0:
-                    # self.populate_Dict(self.board)
+                if self.furthest_piece-die<=0:                    
                     self.clear_dict()
                     self.populate_Dict(self.board)
                     if self.Black_Pieces!={}:
-
                         self.furthest_piece = max([x for x in self.Black_Pieces])                    
                         self.board[self.furthest_piece].remove(2)
                         self.take_off=True
@@ -314,8 +307,7 @@ class Player:
                     self.redraw()
                     self.clear_dict()
                     self.populate_Dict(self.board)                 
-                    return                  
-        
+                    return        
         if self.spot_open(end)==True:                
             moves.append(end)        
         return moves
@@ -342,20 +334,18 @@ class Player:
             return board            
     
     def find_Board_states(self,board,die):
-        # Moves all moves from one Board State using one die
+        # Finds all board states using a starting board state and die
         self.clear_dict()
         self.populate_Dict(board)
         if self.color =='red':
             Pieces = sorted([x for x in self.Red_Pieces.keys()])
         else:
-            Pieces = sorted([x for x in self.Black_Pieces.keys()])
-        
+            Pieces = sorted([x for x in self.Black_Pieces.keys()])        
         Possible_Boards = []        
         for piece in Pieces:
             Moves = self.calc_moves(piece,die)
             if self.win==True or self.take_off==True:
-                break
-            # if self.take_off==False:
+                break            
             if Moves!=[]:
                 temp_board = copy.deepcopy(board)   
                 self.move(temp_board,piece,Moves[0])
@@ -363,15 +353,12 @@ class Player:
         return Possible_Boards
 
     def Non_rail_non_doubles_states(self):
-        # Assumes a roll and a board exist
-        # For non doubles
+        # Creates board states for non double rolls using non rail starting board states
         die_1 = self.dice[0][0]
-        die_2 = self.dice[0][1]
-        
+        die_2 = self.dice[0][1]        
         Original = copy.deepcopy(self.board)
         die_1_boards = self.find_Board_states(self.board,die_1)
         die_2_boards = self.find_Board_states(self.board, die_2)
-
         States = []
         for board in die_1_boards:    
             second_boards = self.find_Board_states(board, die_2)
@@ -388,8 +375,7 @@ class Player:
         return
 
     def Non_rail_doubles_states(self,die=None):
-        # recurive function to find all board state
-        # Assumes no pieces on rail,optional parameter for die input
+        #Recurive function to find all board states for doubles or other cases        
         if self.count ==4:
             return       
         if die==None:
@@ -436,16 +422,14 @@ class Player:
                    for board in self.stored_boards:
                     if board not in Temporary_Stored_Boards:
                         Temporary_Stored_Boards.append(board)
-
                 self.stored_boards.clear()
                 self.board = self.replica_board
-                self.populate_Dict(self.board)
-                           
+                self.populate_Dict(self.board)                           
             self.stored_boards = Temporary_Stored_Boards
             return
 
     def Rail_Doubles(self):
-        # Run this function with pieces on the rail, if you roll doubles
+        # Finds board states when doubles are rolled with pieces on rail
         Die = self.dice[0][0]
         if self.color =='red':
             Start = 0
@@ -478,14 +462,12 @@ class Player:
             if self.doubles==False:
                 self.Non_rail_non_doubles_states()                
             else:
-                self.Non_rail_doubles_states()
-                
+                self.Non_rail_doubles_states()                
         elif self.on_rail==True:
             if self.doubles==False:
                 self.Rail_Non_Doubles()
             else:
-                self.Rail_Doubles()
-        
+                self.Rail_Doubles()        
         if self.take_off==True:
             self.board = self.off_board
             if self.win_check()==True:
@@ -498,6 +480,8 @@ class Player:
         return
         
     def distance_to_piece(self,p_1,p_2):
+        # Finds absolute distance from p_1 to p_2
+        # returns value based on this distance
         if abs(p_1-p_2)<=9:
             val_dict = {1:1, 2:1.5, 3:2, 4:2.5, 5:3, 6:6, 7:2,8:1.5, 9:1}
             return val_dict[abs(p_1-p_2)]
@@ -512,8 +496,7 @@ class Player:
             if 1 in val:
                 Red[slot]=len(val)
             elif 2 in val:
-                Black[slot]=len(val) 
-        
+                Black[slot]=len(val)       
         if self.color =='red':
             furthest_black = max([x for x in Black])
             sums = 0            
@@ -521,7 +504,6 @@ class Player:
                 if Red[x]>1:
                     sums += self.distance_to_piece(x,furthest_black)            
             return sums
-
         elif self.color=='black':
             sums = 0
             furthest_red = min([x for x in Red])
@@ -531,23 +513,32 @@ class Player:
             return sums
     
     def Eval_3(self, board):
-        
+        # Transforms list of list board state into string representation
+        # Sample output: "1222222220000020000022010122211111211111110"
         R = []
+        Open = 0
+        Red_Count = 0
+        Black_Count = 0
         for x in board:
             if len(x)==0:
+                Open+=1
                 R.append(str(0))
             else:
                 l = []
                 for y in x:
+                    if y==1:
+                        Red_Count+=1
+                    else:
+                        Black_Count+=1    
                     l.append(str(y))
-                R.append(''.join(l))
+                R.append(''.join(l))        
+
         return''.join(R)
 
     def record_eval(self, File,L1, L2,increment=1,decrement=1):
-        # Records evaluation for given json file
+        # Records evaluation for given json file based on list of board representations
         with open(File) as file:    
-            Eval = json.load(file)
-        
+            Eval = json.load(file)        
         for val in L1:
             if val not in Eval:
                 Eval[val]=increment
@@ -558,17 +549,9 @@ class Player:
                 Eval[val2]=-1*decrement
             else:
                 Eval[val2]-=decrement
-
         with open(File, 'w') as fp:
             json.dump(Eval, fp)
-
         return    
-# Viewing evaluation dictionary pre-games
-
-# with open("Scores_3.json") as file:    
-#     Eval = json.load(file)
-# x = sorted([x for x in Eval.values()], reverse=True)
-# print(x)
 
 Red_wins = 0
 Black_wins = 0
@@ -582,10 +565,10 @@ while running:
     
     if Games ==10:
         # Viewing updated Scoring dictionary post games
-        with open("Scores_3.json") as file:    
-            Eval = json.load(file)
-            # print(sorted([x for x in Eval.values()], reverse=True))
-            print(len(Eval))            
+        # with open("Scores_3.json") as file:    
+        #     Eval = json.load(file)
+        #     print(sorted([x for x in Eval.values()], reverse=True))
+        #     print(len(Eval))            
         break
     clock.tick(FPS)    
     for event in p.event.get():
@@ -598,16 +581,14 @@ while running:
 
         # P1.record_eval('Scores.json',Red_Moves,Black_Moves)
         # P1.record_eval('Scores_3.json',Red_Moves,Black_Moves)
-        Games+=1
-              
+        Games+=1              
         Red_Moves.clear()
         Black_Moves.clear()
         Red_wins+=1
     
     board = P1.board                   
     # conversion = P1.eval_board_experiment(board)
-    # conversion2 = P1.Eval_3(board)
-    
+    # conversion2 = P1.Eval_3(board)    
     # Red_Moves.append(conversion)
     # Red_Moves.append(conversion2)  
 
@@ -617,8 +598,7 @@ while running:
 
         # P2.record_eval('Scores.json',Black_Moves,Red_Moves)
         # P2.record_eval('Scores_3.json',Black_Moves,Red_Moves)
-        Games+=1
-             
+        Games+=1             
         Red_Moves.clear()
         Black_Moves.clear()
         Black_wins+=1      

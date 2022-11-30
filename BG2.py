@@ -534,6 +534,52 @@ class Player:
                 R.append(''.join(l))        
 
         return''.join(R)
+    def Eval_4(self, board):
+        #Evaluation Metric 4, combining consecutive blocks and overall blocks relative to color   
+        red_blocks = 0
+        black_blocks = 0
+        max_consec_red_blocks = 0
+        max_consec_black_blocks = 0        
+        starting_red_block_index = 0
+        starting_black_block_index = 0
+        red_consec_counter = 0
+        black_consec_counter = 0
+        for x in board[1:25]:
+            copy_max_black = copy.deepcopy(max_consec_black_blocks)
+            copy_max_red = copy.deepcopy(max_consec_red_blocks)            
+            if x!=[]:
+                if 1 in x and len(x)>1:
+                    starting_black_block_index=0
+                    red_blocks+=1
+                    if red_consec_counter == starting_red_block_index:
+                        red_consec_counter+=1
+                        starting_red_block_index+=1
+                        if red_consec_counter>max_consec_red_blocks:
+                            max_consec_red_blocks = red_consec_counter 
+                    else:
+                        starting_red_block_index = red_consec_counter = 1
+                        max_consec_red_blocks = copy_max_red
+                        
+                if 2 in x and len(x)>1:
+                    starting_red_block_index=0
+                    black_blocks+=1
+                    if black_consec_counter == starting_black_block_index:
+
+                        black_consec_counter+=1
+                        starting_black_block_index+=1
+                        if black_consec_counter>max_consec_black_blocks:
+                            max_consec_black_blocks = black_consec_counter 
+                    else:
+                        starting_black_block_index = black_consec_counter=1
+                        max_consec_black_blocks = copy_max_black                                   
+            else:
+                starting_red_block_index=0
+                starting_black_block_index=0
+        if self.color=='red':
+            return (max_consec_red_blocks**2 + red_blocks)-(max_consec_black_blocks**2+black_blocks)
+        else:
+            return (max_consec_black_blocks**2 + black_blocks)-(max_consec_red_blocks**2+red_blocks)
+    
 
     def record_eval(self, File,L1, L2,increment=1,decrement=1):
         # Records evaluation for given json file based on list of board representations
@@ -582,15 +628,14 @@ while running:
         # P1.record_eval('Scores.json',Red_Moves,Black_Moves)
         # P1.record_eval('Scores_3.json',Red_Moves,Black_Moves)
         Games+=1              
+        print(Red_Moves)
         Red_Moves.clear()
         Black_Moves.clear()
-        Red_wins+=1
+        Red_wins+=1        
     
-    board = P1.board                   
-    # conversion = P1.eval_board_experiment(board)
-    # conversion2 = P1.Eval_3(board)    
-    # Red_Moves.append(conversion)
-    # Red_Moves.append(conversion2)  
+    board = P1.board   
+    conversion = P1.Eval_4(board)
+    Red_Moves.append(conversion)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
@@ -600,16 +645,15 @@ while running:
         # P2.record_eval('Scores_3.json',Black_Moves,Red_Moves)
         Games+=1             
         Red_Moves.clear()
+        print(Black_Moves)
         Black_Moves.clear()
         Black_wins+=1      
     
-    board = P2.board
-    # conversion = P2.eval_board_experiment(board)
-    # conversion2 = P2.Eval_3(board)    
-    # Black_Moves.append(conversion)
-    # Black_Moves.append(conversion2)     
+    board = P2.board    
+    conversion = P2.Eval_4(board)
+    Black_Moves.append(conversion)       
     
     # Optional Time parameter to view changing board states
 
-    time.sleep(.1)       
+    # time.sleep(.1)       
     p.display.flip()

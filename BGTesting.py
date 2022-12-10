@@ -653,10 +653,26 @@ class Player:
         
         else:            
             return Final_Board
+    def pip_count(self):
+        count = 0
+        if self.color=='red':
+            for pos,Count in self.Red_Pieces.items():
+                count += (25-pos)*Count
+        elif self.color=='black':
+            for pos,Count in self.Black_Pieces.items():
+                count +=pos*Count
+        return count                 
     def Matrix_Eval_Board(self, board):
         # TODO
         # Represent the board in very simplistic way in matrix form, 
-        # To feed into pytorch model
+        # To feed into pytorch AI
+        # Example output
+        # [0,0,0,1,0,0,1,0,0,0,1,0]
+        
+        # pip differential >30, pip differential<30, pip differential >60,
+        # pip differential <60, can block , can make consec blocks, 
+        # can block furthest piece 3,4,5 away, can block furthest piece 6 away,
+        # Can hit, Can hit multiple, Can take off 1 or less,Can take off multiple
         pass
 
 # File 5 working with func eval_3, but slow in processing data, need to find new way of 

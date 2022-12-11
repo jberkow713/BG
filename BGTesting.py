@@ -653,24 +653,40 @@ class Player:
         
         else:            
             return Final_Board
-    def pip_count(self):
+    def pip_differential(self):
         count = 0
+        opp_count = 0
         if self.color=='red':
             for pos,Count in self.Red_Pieces.items():
                 count += (25-pos)*Count
+            for pos,Count in self.Black_Pieces.items():
+                opp_count += pos*Count   
+
         elif self.color=='black':
             for pos,Count in self.Black_Pieces.items():
                 count +=pos*Count
-        return count                 
+            for pos,Count in self.Black_Pieces.items():
+                opp_count += (25-pos)*Count    
+        return count-opp_count
+
     def Matrix_Eval_Board(self, board):
         # TODO
         # Represent the board in very simplistic way in matrix form, 
         # To feed into pytorch AI
         # Example output
         # [0,0,0,1,0,0,1,0,0,0,1,0]
+        Matrix =  np.zeros(12).astype(int)
+        count = self.pip_differential()
+        if count>=30 and count <=60:
+            Matrix[0]=1
+        if count >60:
+            Matrix[1]=1
+        if count <=-30 and count >=-60:
+            Matrix[2]=1
+        if count <-60:
+            Matrix[3]=1          
         
-        # pip differential >30, pip differential<30, pip differential >60,
-        # pip differential <60, can block , can make consec blocks, 
+        #  can block , can make consec blocks, 
         # can block furthest piece 3,4,5 away, can block furthest piece 6 away,
         # Can hit, Can hit multiple, Can take off 1 or less,Can take off multiple
         pass

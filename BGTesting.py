@@ -672,57 +672,59 @@ class Player:
         # To feed into pytorch AI
         # Example output
         # [0,0,0,1,0,0,1,0]
-        self.clear_dict()
-        self.populate_Dict(board)
+        if self.can_remove == False:
 
-        Matrix =  np.zeros(9).astype(int)
-        count = self.pip_differential(board)
-        if count>=30 and count <=60:
-            Matrix[0]=1
-        if count >60:
-            Matrix[1]=1
-        if count <=-30 and count >=-60:
-            Matrix[2]=1
-        if count <-60:
-            Matrix[3]=1
+            self.clear_dict()
+            self.populate_Dict(board)
 
-        if self.color =='red':
-            Pieces = self.Red_Pieces            
-            Original_Opp = self.Black_Copy
-            furthest_Opp = max([x for x in Original_Opp])
-            rail_count = len(self.replica_board[25])
-            new_rail = len(board[25])
+            Matrix =  np.zeros(9).astype(int)
+            count = self.pip_differential(board)
+            if count>=30 and count <=60:
+                Matrix[0]=1
+            if count >60:
+                Matrix[1]=1
+            if count <=-30 and count >=-60:
+                Matrix[2]=1
+            if count <-60:
+                Matrix[3]=1
+
+            if self.color =='red':
+                Pieces = self.Red_Pieces            
+                Original_Opp = self.Black_Copy
+                furthest_Opp = max([x for x in Original_Opp])
+                rail_count = len(self.replica_board[25])
+                new_rail = len(board[25])
+                
+            elif self.color=='black':
+                Pieces = self.Black_Pieces            
+                Original_Opp = self.Red_Copy
+                furthest_Opp = min([x for x in Original_Opp])
+                rail_count = len(self.replica_board[0])
+                new_rail = len(board[0])       
             
-        elif self.color=='black':
-            Pieces = self.Black_Pieces            
-            Original_Opp = self.Red_Copy
-            furthest_Opp = min([x for x in Original_Opp])
-            rail_count = len(self.replica_board[0])
-            new_rail = len(board[0])       
-        
-        blocks = sorted([x for x in Pieces if Pieces[x]>1])
-        count = 0
-        for _ in blocks:
-            if count +1<len(blocks):
-                if abs(blocks[count]-blocks[count+1])==1:
-                    Matrix[4]=1
-                    break
-            count+=1
-        L = [3,4,5]       
-        for x in blocks:
-            dist = self.distance_to_piece(x,furthest_Opp)
-            if dist in L:
-                Matrix[5]=1
-            if dist==6:
-                Matrix[6]=1    
-            if dist>6:
-                break        
-        if new_rail-rail_count==1:
-            Matrix[7]=1
-        if new_rail-rail_count>1:
-            Matrix[8]=1    
-        
-        return str(Matrix)
+            blocks = sorted([x for x in Pieces if Pieces[x]>1])
+            count = 0
+            for _ in blocks:
+                if count +1<len(blocks):
+                    if abs(blocks[count]-blocks[count+1])==1:
+                        Matrix[4]=1
+                        break
+                count+=1
+            L = [3,4,5]       
+            for x in blocks:
+                dist = self.distance_to_piece(x,furthest_Opp)
+                if dist in L:
+                    Matrix[5]=1
+                if dist==6:
+                    Matrix[6]=1    
+                if dist>6:
+                    break        
+            if new_rail-rail_count==1:
+                Matrix[7]=1
+            if new_rail-rail_count>1:
+                Matrix[8]=1    
+            
+            return str(Matrix)
 
 # File 5 working with func eval_3, but slow in processing data, need to find new way of 
 # representing board states to dramatically speed up play time and testing
@@ -737,7 +739,7 @@ Games = 0
 
 while running:
     
-    if Games ==50:
+    if Games ==500:
         print(Red_wins/Black_wins)                            
         break
     
@@ -756,8 +758,10 @@ while running:
         Red_Moves.clear()
         Black_Moves.clear()               
     
-    board = P1.board   
-    Red_Moves.append(P1.Matrix_Eval_Board(board))  
+    board = P1.board
+    conversion = P1.Matrix_Eval_Board(board)
+    if conversion!=None:
+        Red_Moves.append(conversion)  
 
     P2 = Player('black',board)    
     P2.Random_Move()
@@ -769,7 +773,9 @@ while running:
         Black_Moves.clear()         
     
     board = P2.board    
-    Black_Moves.append(P2.Matrix_Eval_Board(board))        
+    conversion = P2.Matrix_Eval_Board(board)
+    if conversion!=None:
+        Black_Moves.append(conversion)       
     
     # Optional Time parameter to view changing board states
 

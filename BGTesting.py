@@ -632,7 +632,7 @@ class Player:
         
         with open(File) as file:    
             Stored_Info = json.load(file)
-        Keys = [int(x) for x in Stored_Info]               
+        Keys = [x for x in Stored_Info]               
         
         best_board = -100
         Final_Board = None
@@ -739,7 +739,7 @@ Games = 0
 
 while running:
     
-    if Games ==500:
+    if Games ==100:
         print(Red_wins/Black_wins)                            
         break
     
@@ -749,11 +749,14 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)        
-    # P1.Random_Move(reinforced=True,File='Scores_5.json',Func=P1.Eval_3)
-    P1.Random_Move()    
+    P1.Random_Move(reinforced=True,File='Scores_7.json',Func=P1.Matrix_Eval_Board)
+    # P1.Random_Move()    
     if P1.win==True:
+        print(Red_wins,Black_wins)
         Red_wins+=1       
         Games+=1
+        if Games%100==0:
+            print(Games)
         P1.record_eval('Scores_7.json',Red_Moves,Black_Moves)                    
         Red_Moves.clear()
         Black_Moves.clear()               
@@ -766,7 +769,10 @@ while running:
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
+        print(Red_wins,Black_wins)
         Games+=1
+        if Games%100==0:
+            print(Games)
         Black_wins+=1        
         P2.record_eval('Scores_7.json',Black_Moves,Red_Moves)                      
         Red_Moves.clear()

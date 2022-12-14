@@ -632,18 +632,28 @@ class Player:
         
         with open(File) as file:    
             Stored_Info = json.load(file)
-        Keys = [x for x in Stored_Info]               
+        Keys = [x for x in Stored_Info]
         
-        best_board = -100
+         
+        
+        # This default value is the main source of changing the outcome
+        # By altering this default value, you alter the frequency of the random choice
+        # Thus altering the exploration rate, and altering the criteria for when you choose
+        # A stored value, or not
+        # The higher this value is , relative to all values in the list, the higher the exploration rate is
+        # After a good deal of games, you want to lower this value relative to all values in the list,
+        # TO reduce exploration
+
+
+        val = 0
         Final_Board = None
         for board in boards:
             output = func(board)
             
             if output in Keys:
-                output = str(output)
-                if Stored_Info[output]>best_board:
+                if Stored_Info[output]>val:
                     Final_Board=board 
-                    best_board = Stored_Info[output]
+                    val = Stored_Info[output]
 
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)] 
@@ -739,7 +749,7 @@ Games = 0
 
 while running:
     
-    if Games ==100:
+    if Games ==500:
         print(Red_wins/Black_wins)                            
         break
     

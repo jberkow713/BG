@@ -643,9 +643,12 @@ class Player:
         # The higher this value is , relative to all values in the list, the higher the exploration rate is
         # After a good deal of games, you want to lower this value relative to all values in the list,
         # TO reduce exploration
+        # The higher you set this value, the more value you are attaching to specific moves, and the less 
+        # value you are attaching to all other moves, meaning your selection criteria is basically higher
+        # You can do whatever you like at random...unless you see this specific board, and then you must choose it
 
 
-        val = 0
+        val = 1000
         Final_Board = None
         for board in boards:
             output = func(board)

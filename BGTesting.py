@@ -632,9 +632,7 @@ class Player:
         
         with open(File) as file:    
             Stored_Info = json.load(file)
-        Keys = [x for x in Stored_Info]
-        
-         
+        Keys = [x for x in Stored_Info]        
         
         # This default value is the main source of changing the outcome
         # By altering this default value, you alter the frequency of the random choice
@@ -709,14 +707,12 @@ class Player:
                 Pieces = self.Red_Pieces            
                 Original_Opp = self.Black_Copy
                 furthest_Opp = max([x for x in Original_Opp])
-                rail_count = len(self.replica_board[25])
                 new_rail = len(board[25])
                 
             elif self.color=='black':
                 Pieces = self.Black_Pieces            
                 Original_Opp = self.Red_Copy
                 furthest_Opp = min([x for x in Original_Opp])
-                rail_count = len(self.replica_board[0])
                 new_rail = len(board[0])       
             
             blocks = sorted([x for x in Pieces if Pieces[x]>1])
@@ -736,12 +732,22 @@ class Player:
                     Matrix[6]=1    
                 if dist>6:
                     break        
-            if new_rail-rail_count==1:
+            
+            if new_rail==1:
                 Matrix[7]=1
-            if new_rail-rail_count>1:
+            if new_rail>1:
                 Matrix[8]=1    
             
             return str(Matrix)
+    def Matrix_2_eval(self, board):
+        # To store in Json_9
+        # Some ideas
+        # Just check for how many you can hit, 
+        # Check for consec blocks
+        # check if winning/losing
+        # TODO
+        # Create alternative board function, train with random comps, test against current model
+        pass
 
 # File 5 working with func eval_3, but slow in processing data, need to find new way of 
 # representing board states to dramatically speed up play time and testing
@@ -756,7 +762,7 @@ Games = 0
 
 while running:
     
-    if Games ==500:
+    if Games ==1000:
         print(Red_wins/Black_wins)                            
         break
     
@@ -766,15 +772,15 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)        
-    P1.Random_Move(reinforced=True,File='Scores_7.json',Func=P1.Matrix_Eval_Board)
-    # P1.Random_Move()    
+    # P1.Random_Move(reinforced=True,File='Scores_7.json',Func=P1.Matrix_Eval_Board)
+    P1.Random_Move()    
     if P1.win==True:
         print(Red_wins,Black_wins)
         Red_wins+=1       
         Games+=1
         if Games%100==0:
             print(Games)
-        P1.record_eval('Scores_7.json',Red_Moves,Black_Moves)                    
+        P1.record_eval('Scores_8.json',Red_Moves,Black_Moves)                    
         Red_Moves.clear()
         Black_Moves.clear()               
     
@@ -791,7 +797,7 @@ while running:
         if Games%100==0:
             print(Games)
         Black_wins+=1        
-        P2.record_eval('Scores_7.json',Black_Moves,Red_Moves)                      
+        P2.record_eval('Scores_8.json',Black_Moves,Red_Moves)                      
         Red_Moves.clear()
         Black_Moves.clear()         
     

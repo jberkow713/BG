@@ -646,9 +646,13 @@ class Player:
         # The higher you set this value, the more value you are attaching to specific moves, and the less 
         # value you are attaching to all other moves, meaning your selection criteria is basically higher
         # You can do whatever you like at random...unless you see this specific board, and then you must choose it
-
-
-        val = 1000
+        Vals = sorted([x for x in Stored_Info.values()])
+        l = len(Vals)
+        if l %2 == 0:
+            val = Vals[int(l/2)]
+        else:
+            val = Vals[int((l/2)+.5)]    
+        
         Final_Board = None
         for board in boards:
             output = func(board)
@@ -657,7 +661,7 @@ class Player:
                 if Stored_Info[output]>val:
                     Final_Board=board 
                     val = Stored_Info[output]
-
+        
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)] 
         

@@ -477,8 +477,8 @@ class Player:
                 self.board = Board().board                    
         elif self.stored_boards == []:            
             self.board = self.replica_board
-        else:
-            if reinforced==False or self.can_remove==True:
+        elif self.take_off==False and self.stored_boards!=[]:
+            if reinforced==False:
                 self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)] 
             else:
                 self.board =  self.reinforced_test(File,Func, self.stored_boards)                   
@@ -644,13 +644,11 @@ class Player:
         # The higher you set this value, the more value you are attaching to specific moves, and the less 
         # value you are attaching to all other moves, meaning your selection criteria is basically higher
         # You can do whatever you like at random...unless you see this specific board, and then you must choose it
-        Vals = sorted([x for x in Stored_Info.values()])
-        l = len(Vals)
-        if l %2 == 0:
-            val = Vals[int(l/2)]
-        else:
-            val = Vals[int((l/2)+.5)]    
-        
+        vals = sorted([x for x in Stored_Info.values()], reverse=True)
+        val = vals[5]
+        # This is kind of arbitrary...figure out a better way to represent a portion of moves based on some
+        # mathematical formula
+                
         Final_Board = None
         for board in boards:
             output = func(board)
@@ -659,14 +657,14 @@ class Player:
                 if Stored_Info[output]>val:
                     Final_Board=board 
                     val = Stored_Info[output]
-        
+        # print(val)
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)] 
         
         else:            
             return Final_Board
             
-    def pip_differential(self,board):
+    def pip_differential(self):
         count = 0
         opp_count = 0
         if self.color=='red':
@@ -682,7 +680,7 @@ class Player:
                 opp_count += (25-pos)*Count    
         return count-opp_count
 
-    def Matrix_Eval_Board(self, board):
+    def Matrix_Eval_Board(self, board,STR=True):
         # Represent the board in very simplistic way in matrix form, 
         # To feed into pytorch AI
         # Example output
@@ -693,7 +691,7 @@ class Player:
             self.populate_Dict(board)
 
             Matrix =  np.zeros(9).astype(int)
-            count = self.pip_differential(board)
+            count = self.pip_differential()
             if count>=30 and count <=60:
                 Matrix[0]=1
             if count >60:
@@ -738,17 +736,63 @@ class Player:
             if new_rail>1:
                 Matrix[8]=1    
             
-            return str(Matrix)
-    def Matrix_2_eval(self, board):
+            if STR==True:
+                return str(Matrix)
+            else:
+                return Matrix
+
+    def Matrix_Eval_Board_2(self,board):
+        # For Tensor use
+        return self.Matrix_Eval_Board(board,STR=False)
+    
+    def Matrix_3_eval(self, board, STR=True):
         # To store in Json_9
         # Some ideas
-        # Just check for how many you can hit, 
-        # Check for consec blocks
-        # check if winning/losing
-        # TODO
-        # Create alternative board function, train with random comps, test against current model
-        pass
+        if self.can_remove == False:
 
+            self.clear_dict()
+            self.populate_Dict(board)
+
+            Matrix =  np.zeros(5).astype(int)
+            if self.color =='red':
+
+                Pieces = self.Red_Pieces            
+                Original_Opp = self.Black_Copy
+                furthest_Opp = max([x for x in Original_Opp])
+                new_rail = len(board[25])
+                    
+            elif self.color=='black':
+                Pieces = self.Black_Pieces            
+                Original_Opp = self.Red_Copy
+                furthest_Opp = min([x for x in Original_Opp])
+                new_rail = len(board[0])       
+            
+            blocks = sorted([x for x in Pieces if Pieces[x]>1])
+            count = 0
+            for _ in blocks:
+                if count +1<len(blocks):
+                    if abs(blocks[count]-blocks[count+1])==1:
+                        Matrix[0]=1
+                        break
+                count+=1
+            L = [3,4,5]       
+            for x in blocks:
+                dist = self.distance_to_piece(x,furthest_Opp)
+                if dist in L:
+                    Matrix[1]=1
+                if dist==6:
+                    Matrix[2]=1    
+                if dist>6:
+                    break        
+            
+            if new_rail==1:
+                Matrix[3]=1
+            if new_rail>1:
+                Matrix[4]=new_rail   
+            if STR==True:
+                return str(Matrix)
+            else:
+                return Matrix
 # File 5 working with func eval_3, but slow in processing data, need to find new way of 
 # representing board states to dramatically speed up play time and testing
 
@@ -762,7 +806,7 @@ Games = 0
 
 while running:
     
-    if Games ==1000:
+    if Games ==500:
         print(Red_wins/Black_wins)                            
         break
     
@@ -771,19 +815,22 @@ while running:
         if event.type == p.QUIT:
             sys.exit()
     
-    P1 = Player('red',board)        
-    # P1.Random_Move(reinforced=True,File='Scores_7.json',Func=P1.Matrix_Eval_Board)
-    P1.Random_Move()    
+    P1 = Player('red',board)
+    # P1.Random_Move()     
+    P1.Random_Move(reinforced=True,File='Scores_8.json',Func=P1.Matrix_Eval_Board)
+    # P1.Random_Move()    
     if P1.win==True:
-        print(Red_wins,Black_wins)
+        print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')
         Red_wins+=1       
         Games+=1
         if Games%100==0:
             print(Games)
+               
         P1.record_eval('Scores_8.json',Red_Moves,Black_Moves)                    
         Red_Moves.clear()
         Black_Moves.clear()               
-    
+        
+
     board = P1.board
     conversion = P1.Matrix_Eval_Board(board)
     if conversion!=None:
@@ -792,14 +839,17 @@ while running:
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
-        print(Red_wins,Black_wins)
+        print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')
         Games+=1
+        Black_wins+=1   
         if Games%100==0:
             print(Games)
-        Black_wins+=1        
-        P2.record_eval('Scores_8.json',Black_Moves,Red_Moves)                      
+                
+             
+        P2.record_eval('Scores_8.json',Black_Moves, Red_Moves)                     
         Red_Moves.clear()
         Black_Moves.clear()         
+        
     
     board = P2.board    
     conversion = P2.Matrix_Eval_Board(board)
@@ -808,5 +858,5 @@ while running:
     
     # Optional Time parameter to view changing board states
 
-    # time.sleep(.1)       
+    # time.sleep(.05)       
     p.display.flip()

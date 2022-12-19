@@ -644,11 +644,13 @@ class Player:
         # The higher you set this value, the more value you are attaching to specific moves, and the less 
         # value you are attaching to all other moves, meaning your selection criteria is basically higher
         # You can do whatever you like at random...unless you see this specific board, and then you must choose it
-        vals = sorted([x for x in Stored_Info.values()], reverse=True)
-        val = vals[5]
+        # vals = sorted([x for x in Stored_Info.values()], reverse=True)
+        # val = vals[5]
         # This is kind of arbitrary...figure out a better way to represent a portion of moves based on some
         # mathematical formula
-                
+        # val = -3000  
+        val = 0
+
         Final_Board = None
         for board in boards:
             output = func(board)
@@ -657,7 +659,7 @@ class Player:
                 if Stored_Info[output]>val:
                     Final_Board=board 
                     val = Stored_Info[output]
-        # print(val)
+        
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)] 
         
@@ -692,13 +694,13 @@ class Player:
 
             Matrix =  np.zeros(9).astype(int)
             count = self.pip_differential()
-            if count>=30 and count <=60:
+            if count>=60 and count <=120:
                 Matrix[0]=1
-            if count >60:
+            if count >120:
                 Matrix[1]=1
-            if count <=-30 and count >=-60:
+            if count <=-60 and count >=-120:
                 Matrix[2]=1
-            if count <-60:
+            if count <-120:
                 Matrix[3]=1
 
             if self.color =='red':
@@ -721,7 +723,7 @@ class Player:
                         Matrix[4]=1
                         break
                 count+=1
-            L = [3,4,5]       
+            L = [1,2,3,4,5,7]       
             for x in blocks:
                 dist = self.distance_to_piece(x,furthest_Opp)
                 if dist in L:
@@ -795,6 +797,9 @@ class Player:
                 return Matrix
 # File 5 working with func eval_3, but slow in processing data, need to find new way of 
 # representing board states to dramatically speed up play time and testing
+# TODO
+# Alternate evaluation, use lists for given conversion, for winning and losign games, in ML model to have 
+# comp weight specific boards
 
 Red_wins = 0
 Black_wins = 0
@@ -806,7 +811,7 @@ Games = 0
 
 while running:
     
-    if Games ==500:
+    if Games ==1000:
         print(Red_wins/Black_wins)                            
         break
     

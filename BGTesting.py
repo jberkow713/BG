@@ -795,11 +795,15 @@ class Player:
                 return str(Matrix)
             else:
                 return Matrix
-# File 5 working with func eval_3, but slow in processing data, need to find new way of 
-# representing board states to dramatically speed up play time and testing
+
 # TODO
-# Alternate evaluation, use lists for given conversion, for winning and losign games, in ML model to have 
-# comp weight specific boards
+# Alternate evaluation, create list of lists of all moves in order, for win/losses, 
+# feed into pytorch model ****SOMEHOW****, find the connection between the order, using weights, bias, etc,
+# Then, use these connections along with updated weights, and reinforcement learning, to slowly improve win rate,
+# against the random AI...
+# It always needs to play against an opponent, in order to evaluate win/loss rate,
+# Progressively increase the difficulty of the opponent, and update the weight, similar to increasing 
+# AlphaGo opponent, in order to alter the gameplay, to optimize against smarter opponents
 
 Red_wins = 0
 Black_wins = 0

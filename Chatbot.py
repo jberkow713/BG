@@ -1,17 +1,27 @@
 import nltk
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
+import copy
 
-stemmer = PorterStemmer()
-stopwords = set(stopwords.words('english'))
+# TODO
+# Language converter
+# Only want to create the relationships which provide information, as in the relationships 
+# between parts of the sentence that matter, and matter is contextual and interpretable
+class Converter:
+    def __init__(self, sentence):
+        self.sentence = sentence
+        self.original = copy.deepcopy(sentence)
+        self.stemmer = PorterStemmer()
+        self.stopwords = set(stopwords.words('english'))
+        
+    def tokenize(self,sent):
+        return nltk.word_tokenize(sent)
 
-def tokenize(sent):
-    return nltk.word_tokenize(sent)
+    def stem(self,word):
+        return self.stemmer.stem(word.lower()) 
 
-def stem(word):
-    return stemmer.stem(word.lower()) 
+    def stem_sent(self,sent):
+        return [self.stem(token) for token in self.tokenize(sent) if token not in self.stopwords]
 
-def stem_sent(sent):
-    return [stem(token) for token in tokenize(sent) if token not in stopwords]
-
-print(stem_sent('organize the park'))
+c = Converter('organize the park')
+print(c.stem_sent(c.sentence))

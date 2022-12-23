@@ -11,22 +11,33 @@ from scipy import spatial
 model = BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True)
 model.eval()
 
-def bert_vectors(word):
-    
+def bert_vectors(sent):
+    # Creates contextualized vectors for given sentence
+    d = {}
     bert = BertTokenizer.from_pretrained('bert-base-uncased')    
     words = [x for x in bert.vocab.keys()]    
-    tokenized_text = bert.tokenize(word)
+    tokenized_text = bert.tokenize(sent)
     token_ids = bert.convert_tokens_to_ids(tokenized_text)
     tokens_tensor = torch.tensor([token_ids])    
     with torch.no_grad():
-        outputs = model(tokens_tensor)    
-    return np.array(outputs[0][0][0]) 
+        outputs = model(tokens_tensor)
+    
+    w = [words[x] for x in token_ids]
+    count = 0
+    while count < len(w):
+        d[w[count]]=outputs[0][0][count]
+        count+=1
+    
+    return d
+
+A = bert_vectors('pizza is tasty')
+B = bert_vectors('i like pizza')
 
 def compare_words(a,b):
     #compares word vectors using Bert model 
-    return 1 - spatial.distance.cosine(bert_vectors(a), bert_vectors(b))
+    return 1 - spatial.distance.cosine(a,b)
 
-print(compare_words('pizza','cheese'))
+print(compare_words(np.array(A['pizza']), np.array(B['pizza'])))
 
 # TODO
 # Language converter

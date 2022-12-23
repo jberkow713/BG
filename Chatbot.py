@@ -25,7 +25,7 @@ def bert_vectors(sent):
     w = [words[x] for x in token_ids]
     count = 0
     while count < len(w):
-        d[w[count]]=outputs[0][0][count]
+        d[w[count]]=np.array(outputs[0][0][count])
         count+=1
     
     return d
@@ -37,7 +37,7 @@ def compare_words(a,b):
     #compares word vectors using Bert model 
     return 1 - spatial.distance.cosine(a,b)
 
-print(compare_words(np.array(A['pizza']), np.array(B['pizza'])))
+print(compare_words(A['pizza'], B['pizza']))
 
 # TODO
 # Language converter

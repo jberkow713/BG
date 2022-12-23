@@ -4,8 +4,8 @@ from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 import copy
 from bert_embedding import BertEmbedding
-import mxnet as mx
-from bert_embedding import BertEmbedding
+import numpy as np
+from scipy import spatial
 
 # TODO
 # Language converter
@@ -23,7 +23,8 @@ class Converter:
         self.descriptors = []
         self.relatives = []
         self.act_rel_dict = {}
-        self.bert = BertEmbedding()  
+        self.bert = BertEmbedding()
+        self.embeddings = self.get_embeddings()  
         
     def tokenize(self,sent):
         return nltk.word_tokenize(sent)
@@ -37,6 +38,9 @@ class Converter:
     def get_embeddings(self):
         # gets bert embeddings for the tokenized sentence
         return self.bert(self.tokenize(self.sentence))
+    def compare_words(self, a,b):        
+        return 1 - spatial.distance.cosine(a, b)    
 
-c = Converter('hello I am a cat')
-print(c.get_embeddings())
+c = Converter('dog wolf')
+
+print(c.compare_words(c.embeddings[0][1], c.embeddings[1][1]))

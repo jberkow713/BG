@@ -7,15 +7,11 @@ from bert_embedding import BertEmbedding
 import mxnet as mx
 from bert_embedding import BertEmbedding
 
-
-
-
-
-
 # TODO
 # Language converter
 # Only want to create the relationships which provide information, as in the relationships 
 # between parts of the sentence that matter, and matter is contextual and interpretable
+
 class Converter:
     def __init__(self, sentence):
         self.sentence = sentence

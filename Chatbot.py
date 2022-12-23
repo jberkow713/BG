@@ -3,9 +3,30 @@ import nltk
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 import copy
-from bert_embedding import BertEmbedding
+import torch
+from transformers import BertTokenizer, BertModel
 import numpy as np
 from scipy import spatial
+
+model = BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True)
+model.eval()
+
+def bert_vectors(word):
+    
+    bert = BertTokenizer.from_pretrained('bert-base-uncased')    
+    words = [x for x in bert.vocab.keys()]    
+    tokenized_text = bert.tokenize(word)
+    token_ids = bert.convert_tokens_to_ids(tokenized_text)
+    tokens_tensor = torch.tensor([token_ids])    
+    with torch.no_grad():
+        outputs = model(tokens_tensor)    
+    return np.array(outputs[0][0][0]) 
+
+def compare_words(a,b):
+    #compares word vectors using Bert model 
+    return 1 - spatial.distance.cosine(bert_vectors(a), bert_vectors(b))
+
+print(compare_words('pizza','cheese'))
 
 # TODO
 # Language converter
@@ -22,9 +43,7 @@ class Converter:
         self.action = []
         self.descriptors = []
         self.relatives = []
-        self.act_rel_dict = {}
-        self.bert = BertEmbedding()
-        self.embeddings = self.get_embeddings()  
+        self.act_rel_dict = {}         
         
     def tokenize(self,sent):
         return nltk.word_tokenize(sent)
@@ -34,18 +53,9 @@ class Converter:
 
     def stem_sent(self,sent):
         return [self.stem(token) for token in self.tokenize(sent) if token not in self.stopwords]
-    
-    def get_embeddings(self):
-        # gets bert embeddings for the tokenized sentence
-        return self.bert(self.tokenize(self.sentence))
-    def compare_words(self, a,b):        
-        return 1 - spatial.distance.cosine(a, b)    
-
-c = Converter('dog wolf')
+           
 
 # TODO
 # Clean the vocab, store the usable words in json file, as dictionary objects {word:bert_vector}
 # print(c.bert.vocab.__dict__) represents all trained words, needs cleaning and storage
 
-print(c.compare_words(c.embeddings[0][1], c.embeddings[1][1]))
-print(c.bert.vocab.__dict__)

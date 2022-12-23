@@ -2,6 +2,14 @@ import nltk
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 import copy
+from bert_embedding import BertEmbedding
+import mxnet as mx
+from bert_embedding import BertEmbedding
+
+
+
+
+
 
 # TODO
 # Language converter
@@ -13,6 +21,12 @@ class Converter:
         self.original = copy.deepcopy(sentence)
         self.stemmer = PorterStemmer()
         self.stopwords = set(stopwords.words('english'))
+        self.subject = None
+        self.action = []
+        self.descriptors = []
+        self.relatives = []
+        self.act_rel_dict = {}
+        self.bert = BertEmbedding()  
         
     def tokenize(self,sent):
         return nltk.word_tokenize(sent)
@@ -22,6 +36,10 @@ class Converter:
 
     def stem_sent(self,sent):
         return [self.stem(token) for token in self.tokenize(sent) if token not in self.stopwords]
+    
+    def get_embeddings(self):
+        # gets bert embeddings for the tokenized sentence
+        return self.bert(self.tokenize(self.sentence))
 
-c = Converter('organize the park')
-print(c.stem_sent(c.sentence))
+c = Converter('hello I am a cat')
+print(c.get_embeddings())

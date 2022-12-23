@@ -43,4 +43,9 @@ class Converter:
 
 c = Converter('dog wolf')
 
+# TODO
+# Clean the vocab, store the usable words in json file, as dictionary objects {word:bert_vector}
+# print(c.bert.vocab.__dict__) represents all trained words, needs cleaning and storage
+
 print(c.compare_words(c.embeddings[0][1], c.embeddings[1][1]))
+print(c.bert.vocab.__dict__)

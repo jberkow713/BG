@@ -20,7 +20,7 @@ def find_types(word_list, tenses):
     doc = nlp(' '.join(word_list))
     return [x.text for x in doc if x.text.isalpha()==True and len(x.text)>1 and x.pos_ in tenses]    
 
-    # print(find_types(words, ['NOUN', 'VERB', 'ADJ']))
+# print(find_types(words, ['NOUN', 'VERB', 'ADJ']))
 
 def bert_vectors(sent):
     # Creates contextualized vectors for given sentence
@@ -39,8 +39,8 @@ def bert_vectors(sent):
     
     return d
 
-A = bert_vectors('i like to eat pizza')
-B = bert_vectors('eat some cheese it tastes good')
+A = bert_vectors('pigeon')
+B = bert_vectors('sparrow')
 
 # consider clustering based on vector
 
@@ -48,7 +48,7 @@ def compare_words(a,b):
     #compares word vectors using Bert model 
     return 1 - spatial.distance.cosine(a,b)
 
-print(compare_words(A['pizza'], B['cheese']))
+print(compare_words(A['pigeon'], B['sparrow']))
 
 # TODO
 # Language converter
@@ -78,6 +78,17 @@ class Converter:
            
 
 # TODO
-# Clean the vocab, store the usable words in json file, as dictionary objects {word:bert_vector}
-# print(c.bert.vocab.__dict__) represents all trained words, needs cleaning and storage
+# First link words together based on tense, then going to compare each word to all the other usable words,
+# Rank them all, as similar, opposite, [{Word:{Opposites:[], Similar:[]}}, ....,....]
+
+# Basically then create some kind of generalized word list, response list, etc
+# Store that information in json file
+
+# TODO
+# Break down the sentences by relationship, and tense, 
+# Then going to access this list of top related, or opposite words, 
+# randomized a bit, 
+# Then piece the sentence back together
+# Need an entire format to then piece these 'value' words, back together, return a sentence
+
 

@@ -8,7 +8,6 @@ from scipy import spatial
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 model = GPT2LMHeadModel.from_pretrained('gpt2')
 
-
 def remove_punc(sent):
     # Removes punctuation given sentence
     test_str = sent.translate(str.maketrans('', '', string.punctuation))
@@ -31,7 +30,7 @@ class Chatbot:
         self.min_reply = min_reply
     def generate_response(self):
         inputs = tokenizer.encode(self.input, return_tensors='pt')
-        outputs = model.generate(inputs, max_length=50, do_sample=True, temperature=3.0,top_k=50)
+        outputs = model.generate(inputs, max_length=50, do_sample=True, temperature=.5,top_k=50)
         text = tokenizer.decode(outputs[0], skip_special_tokens=True)
         original = list(set(text.split('.')))        
         final = [x for x in original if x!=remove_punc(self.input) and len(x)>0 and '\n' not in x and len(x.split())>self.min_reply]
@@ -41,12 +40,12 @@ class Chatbot:
         rand_response = final[random.randint(0,len(final)-1)]
             
         return rand_response
-a = get_vector('pigeon')
-b = get_vector('sparrow')
-print(compare_words(a,b))
+# a = get_vector('pigeon')
+# b = get_vector('sparrow')
+# print(compare_words(a,b))
 
-sent = "i like pizza"
-C = Chatbot(sent,5)
+sent = "Have a good night"
+C = Chatbot(sent,4)
 print(C.generate_response())
 
 

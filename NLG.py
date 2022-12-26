@@ -31,6 +31,10 @@ def compare_words(a,b):
     #compares word vectors using Bert model 
     return 1 - spatial.distance.cosine(a,b)
 
+def avg_vectors(vec_list):
+    Avg_Vector =  np.average(vec_list, axis=0)
+    return Avg_Vector
+
 class Chatbot:
     # Initial version of chatbot
     def __init__(self, input, min_reply,randomness):
@@ -49,9 +53,13 @@ class Chatbot:
         rand_response = final[random.randint(0,len(final)-1)]            
         return rand_response
 
-# a = get_vector('pigeon')
-# b = get_vector('sparrow')
-# print(compare_words(a,b))
+l = []
+a = get_vector('pigeon')
+b = get_vector('sparrow')
+l.append(a)
+l.append(b)
+
+print(avg_vectors(l))
 
 sent = "I love watching television with my pants off"
 C = Chatbot(sent,4,1.2)

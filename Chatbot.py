@@ -1,5 +1,4 @@
 import nltk
-# nltk.download('punkt')
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 import spacy
@@ -44,9 +43,9 @@ def avg_vectors(vec_list):
     Avg_Vector =  np.average(vec_list, axis=0)
     return Avg_Vector
 
-def create_json(filepath, list):
+def create_json(filepath, item):
     with open(filepath, 'w') as fp:
-        json.dump(list, fp)
+        json.dump(item, fp)
 
 class Converter:
     def __init__(self, sentence):
@@ -73,8 +72,8 @@ class Converter:
 # B = bert_vectors('sparrow')
 # print(compare_words(A['pigeon'], B['sparrow']))
 
-ADJ= find_types(words, ['ADJ'])
-create_json('Bert_Adjs.json',ADJ)
+# ADJ= find_types(words, ['ADJ'])
+# create_json('Bert_Adjs.json',ADJ)
 
 
 # TODO

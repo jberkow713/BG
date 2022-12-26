@@ -8,6 +8,7 @@ import torch
 from transformers import BertTokenizer, BertModel
 import numpy as np
 from scipy import spatial
+import json
 
 nlp = spacy.load("en_core_web_sm")
 model = BertModel.from_pretrained('bert-base-uncased', output_hidden_states=True)
@@ -20,8 +21,6 @@ def find_types(word_list, tenses):
     doc = nlp(' '.join(word_list))
     return [x.text for x in doc if x.text.isalpha()==True and len(x.text)>1 and x.pos_ in tenses]    
 
-# print(find_types(words, ['NOUN', 'VERB', 'ADJ']))
-
 def bert_vectors(sent):
     # Creates contextualized vectors for given sentence
     d = {}      
@@ -29,31 +28,21 @@ def bert_vectors(sent):
     token_ids = bert.convert_tokens_to_ids(tokenized_text)
     tokens_tensor = torch.tensor([token_ids])    
     with torch.no_grad():
-        outputs = model(tokens_tensor)
-    
+        outputs = model(tokens_tensor)    
     w = [words[x] for x in token_ids]
     count = 0
     while count < len(w):
         d[w[count]]=np.array(outputs[0][0][count])
-        count+=1
-    
+        count+=1    
     return d
-
-A = bert_vectors('pigeon')
-B = bert_vectors('sparrow')
-
-# consider clustering based on vector
 
 def compare_words(a,b):
     #compares word vectors using Bert model 
     return 1 - spatial.distance.cosine(a,b)
 
-print(compare_words(A['pigeon'], B['sparrow']))
-
-# TODO
-# Language converter
-# Only want to create the relationships which provide information, as in the relationships 
-# between parts of the sentence that matter, and matter is contextual and interpretable
+def create_json(filepath, list):
+    with open(filepath, 'w') as fp:
+        json.dump(list, fp)
 
 class Converter:
     def __init__(self, sentence):
@@ -75,7 +64,14 @@ class Converter:
 
     def stem_sent(self,sent):
         return [self.stem(token) for token in self.tokenize(sent) if token not in self.stopwords]
-           
+
+# A = bert_vectors('pigeon')
+# B = bert_vectors('sparrow')
+# print(compare_words(A['pigeon'], B['sparrow']))
+
+ADJ= find_types(words, ['ADJ'])
+create_json('Bert_Adjs.json',ADJ)
+
 
 # TODO
 # First link words together based on tense, then going to compare each word to all the other usable words,

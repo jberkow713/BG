@@ -40,6 +40,10 @@ def compare_words(a,b):
     #compares word vectors using Bert model 
     return 1 - spatial.distance.cosine(a,b)
 
+def avg_vectors(vec_list):
+    Avg_Vector =  np.average(vec_list, axis=0)
+    return Avg_Vector
+
 def create_json(filepath, list):
     with open(filepath, 'w') as fp:
         json.dump(list, fp)

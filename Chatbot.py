@@ -68,6 +68,18 @@ class Converter:
     def stem_sent(self,sent):
         return [self.stem(token) for token in self.tokenize(sent) if token not in self.stopwords]
 
+with open("Bert_Nouns.json") as file:
+    Nouns = json.load(file)
+
+Compared = {}
+First = Nouns[0]
+for noun in Nouns[1:10]:
+    Compared[noun]=compare_words(bert_vectors(First)[First], bert_vectors(noun)[noun])
+print(Compared)    
+
+
+
+
 # A = bert_vectors('pigeon')
 # B = bert_vectors('sparrow')
 # print(compare_words(A['pigeon'], B['sparrow']))

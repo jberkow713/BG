@@ -27,6 +27,7 @@ class Game:
         self.screen = p.display.set_mode((self.width, self.height))
         self.color = color
         self.screen.fill(WHITE)
+        self.letter_count = None
         
     def draw_line(self, color, x1,y1,x2,y2):
         p.draw.line(self.screen, color, (x1, y1), (x2, y2))
@@ -60,6 +61,7 @@ class Game:
             curr_y += size 
     
     def draw_grid(self,squares,size):
+        self.letter_count = 4*squares - 4
 
         start_x = (self.width - squares*size)/2
         start_y = (self.height- squares*size)/2
@@ -73,7 +75,7 @@ class Game:
             start_x += (squares-1)*size
 
 G = Game(800,800,BLUE)
-G.draw_grid(8,80)
+G.draw_grid(10,60)
 
 while True:    
     clock.tick(FPS)    

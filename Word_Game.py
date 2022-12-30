@@ -19,7 +19,6 @@ RED = (255,0,0)
 GREEN = (0,255,0)
 BLUE = (0,0,255)
 PURPLE = (255,0,255)
-
 p.init()
 clock = p.time.Clock()
 
@@ -50,8 +49,7 @@ class Game:
             self.draw_line(color,curr_x,curr_y,final_x,final_y)
             curr_x+=size
 
-    def draw_horizontal_squares(self, color, squares, x,y,size):
-                
+    def draw_horizontal_squares(self, color, squares, x,y,size):                
         curr_x = x
         for _ in range(squares):
             self.draw_square(color,curr_x,y, size)
@@ -74,16 +72,12 @@ class Game:
         start_y = (self.height- squares*size)/2
         for _ in range(2):
             self.draw_vertical_squares(self.color,squares,start_x,start_y,size)
-            start_x += (squares-1)*size      
-
-
-
+            start_x += (squares-1)*size
 
 G = Game(800,800,BLUE)
 G.draw_grid(8,80)
 
 while True:    
-    
     clock.tick(FPS)    
     for event in p.event.get():
         if event.type == p.QUIT:

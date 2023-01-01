@@ -797,13 +797,11 @@ class Player:
                 return Matrix
 
 # TODO
-# Alternate evaluation, create list of lists of all moves in order, for win/losses, 
-# feed into pytorch model ****SOMEHOW****, find the connection between the order, using weights, bias, etc,
-# Then, use these connections along with updated weights, and reinforcement learning, to slowly improve win rate,
-# against the random AI...
-# It always needs to play against an opponent, in order to evaluate win/loss rate,
-# Progressively increase the difficulty of the opponent, and update the weight, similar to increasing 
-# AlphaGo opponent, in order to alter the gameplay, to optimize against smarter opponents
+# Create alternate evaluation function that can defeat computer consistently, have it play against
+# matrix_eval_3, see which wins, and keep improving model this way
+# Scores_9.json, matrix_eval_3, only winning model so far
+
+# Create a class that does this automation
 
 Red_wins = 0
 Black_wins = 0
@@ -815,7 +813,7 @@ Games = 0
 
 while running:
     
-    if Games ==1000:
+    if Games ==200:
         print(Red_wins/Black_wins)                            
         break
     
@@ -826,7 +824,7 @@ while running:
     
     P1 = Player('red',board)
     # P1.Random_Move()     
-    P1.Random_Move(reinforced=True,File='Scores_8.json',Func=P1.Matrix_Eval_Board)
+    P1.Random_Move(reinforced=True,File='Scores_9.json',Func=P1.Matrix_3_eval)
     # P1.Random_Move()    
     if P1.win==True:
         print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')
@@ -835,13 +833,13 @@ while running:
         if Games%100==0:
             print(Games)
                
-        P1.record_eval('Scores_8.json',Red_Moves,Black_Moves)                    
+        P1.record_eval('Scores_9.json',Red_Moves,Black_Moves)                    
         Red_Moves.clear()
         Black_Moves.clear()               
         
 
     board = P1.board
-    conversion = P1.Matrix_Eval_Board(board)
+    conversion = P1.Matrix_3_eval(board)
     if conversion!=None:
         Red_Moves.append(conversion)  
 
@@ -852,16 +850,15 @@ while running:
         Games+=1
         Black_wins+=1   
         if Games%100==0:
-            print(Games)
-                
+            print(Games)                
              
-        P2.record_eval('Scores_8.json',Black_Moves, Red_Moves)                     
+        # P2.record_eval('Scores_10.json',Black_Moves, Red_Moves)                     
         Red_Moves.clear()
         Black_Moves.clear()         
         
     
     board = P2.board    
-    conversion = P2.Matrix_Eval_Board(board)
+    conversion = P2.Matrix_3_eval(board)
     if conversion!=None:
         Black_Moves.append(conversion)       
     

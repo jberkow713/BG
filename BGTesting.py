@@ -480,7 +480,7 @@ class Player:
         elif self.take_off==False and self.stored_boards!=[]:
             if reinforced==False:
                 self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)] 
-            else:
+            elif reinforced==True:
                 self.board =  self.reinforced_test(File,Func, self.stored_boards)                   
         self.redraw()                
         return
@@ -634,24 +634,13 @@ class Player:
             Stored_Info = json.load(file)
         Keys = [x for x in Stored_Info]        
         
-        # This default value is the main source of changing the outcome
-        # By altering this default value, you alter the frequency of the random choice
-        # Thus altering the exploration rate, and altering the criteria for when you choose
-        # A stored value, or not
-        # The higher this value is , relative to all values in the list, the higher the exploration rate is
-        # After a good deal of games, you want to lower this value relative to all values in the list,
-        # TO reduce exploration
-        # The higher you set this value, the more value you are attaching to specific moves, and the less 
-        # value you are attaching to all other moves, meaning your selection criteria is basically higher
-        # You can do whatever you like at random...unless you see this specific board, and then you must choose it
-        # vals = sorted([x for x in Stored_Info.values()], reverse=True)
-        # val = vals[5]
-        # This is kind of arbitrary...figure out a better way to represent a portion of moves based on some
-        # mathematical formula
-        # val = -3000  
-        val = 0
+        # Altering this val , is the selection criteria for choosing moves,
+        # Moving it up to 200 from 0, improved the win rate substantially,
+        # More to come
+        val = 200
 
-        Final_Board = None
+        Final_Board = None           
+
         for board in boards:
             output = func(board)
             
@@ -795,14 +784,13 @@ class Player:
                 return str(Matrix)
             else:
                 return Matrix
-
+    
 # TODO
 # Create alternate evaluation function that can defeat computer consistently, have it play against
 # matrix_eval_3, see which wins, and keep improving model this way
 # Scores_9.json, matrix_eval_3, only winning model so far
 
 # Create a class that does this automation
-
 Red_wins = 0
 Black_wins = 0
 Red_Moves = []
@@ -813,7 +801,7 @@ Games = 0
 
 while running:
     
-    if Games ==200:
+    if Games ==500:
         print(Red_wins/Black_wins)                            
         break
     
@@ -852,7 +840,7 @@ while running:
         if Games%100==0:
             print(Games)                
              
-        # P2.record_eval('Scores_10.json',Black_Moves, Red_Moves)                     
+        P2.record_eval('Scores_9.json',Black_Moves, Red_Moves)                     
         Red_Moves.clear()
         Black_Moves.clear()         
         

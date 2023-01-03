@@ -637,7 +637,7 @@ class Player:
         # Altering this val , is the selection criteria for choosing moves,
         # Moving it up to 200 from 0, improved the win rate substantially,
         # More to come
-        val = 200
+        val = 0
 
         Final_Board = None           
 
@@ -789,6 +789,7 @@ class Player:
 # Create alternate evaluation function that can defeat computer consistently, have it play against
 # matrix_eval_3, see which wins, and keep improving model this way
 # Scores_9.json, matrix_eval_3, only winning model so far
+# 545-455 wins over 1000 games, vs random opponent
 
 # Create a class that does this automation
 Red_wins = 0
@@ -801,7 +802,7 @@ Games = 0
 
 while running:
     
-    if Games ==500:
+    if Games ==1000:
         print(Red_wins/Black_wins)                            
         break
     
@@ -815,12 +816,11 @@ while running:
     P1.Random_Move(reinforced=True,File='Scores_9.json',Func=P1.Matrix_3_eval)
     # P1.Random_Move()    
     if P1.win==True:
-        print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')
-        Red_wins+=1       
+        Red_wins+=1 
+        print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')             
         Games+=1
         if Games%100==0:
-            print(Games)
-               
+            print(Games)               
         P1.record_eval('Scores_9.json',Red_Moves,Black_Moves)                    
         Red_Moves.clear()
         Black_Moves.clear()               
@@ -834,16 +834,14 @@ while running:
     P2 = Player('black',board)    
     P2.Random_Move()
     if P2.win==True:
+        Black_wins+=1 
         print(f'Red Wins {Red_wins}, Black Wins:{Black_wins}')
-        Games+=1
-        Black_wins+=1   
+        Games+=1         
         if Games%100==0:
-            print(Games)                
-             
+            print(Games)             
         P2.record_eval('Scores_9.json',Black_Moves, Red_Moves)                     
         Red_Moves.clear()
-        Black_Moves.clear()         
-        
+        Black_Moves.clear()        
     
     board = P2.board    
     conversion = P2.Matrix_3_eval(board)

@@ -3,7 +3,6 @@ import random
 import pygame as p
 from pygame.constants import MOUSEBUTTONDOWN
 import sys
-import itertools
 import copy
 import time
 import json
@@ -785,13 +784,14 @@ class Player:
             else:
                 return Matrix
     
-# TODO
-# Create alternate evaluation function that can defeat computer consistently, have it play against
-# matrix_eval_3, see which wins, and keep improving model this way
+
 # Scores_9.json, matrix_eval_3, only winning model so far
 # 545-455 wins over 1000 games, vs random opponent
+# TODO
+# Consider using random board automation each game to improve mid game play
+# Create new evaluation functions that can defeat computer consistently, have it play against
+# matrix_eval_3, see which wins, and keep improving model this way
 
-# Create a class that does this automation
 Red_wins = 0
 Black_wins = 0
 Red_Moves = []

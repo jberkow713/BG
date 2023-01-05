@@ -628,29 +628,25 @@ class Player:
         return  
             
     def reinforced_test(self, File, func, boards):
-        
+        # reinforced learning using board evaluation function
         with open(File) as file:    
             Stored_Info = json.load(file)
         Keys = [x for x in Stored_Info]        
-        
         # Altering this val , is the selection criteria for choosing moves,
         # Moving it up to 200 from 0, improved the win rate substantially,
         # More to come
         val = 0
-
-        Final_Board = None           
+        Final_Board = None  
 
         for board in boards:
-            output = func(board)
-            
+            output = func(board)            
             if output in Keys:
                 if Stored_Info[output]>val:
                     Final_Board=board 
                     val = Stored_Info[output]
         
         if Final_Board==None:            
-            return boards[random.randint(0,len(boards)-1)] 
-        
+            return boards[random.randint(0,len(boards)-1)]       
         else:            
             return Final_Board
             
@@ -787,6 +783,7 @@ class Player:
 
 # Scores_9.json, matrix_eval_3, only winning model so far
 # 545-455 wins over 1000 games, vs random opponent
+# 535-465 second attempt
 # TODO
 # Consider using random board automation each game to improve mid game play
 # Create new evaluation functions that can defeat computer consistently, have it play against

@@ -117,6 +117,8 @@ class Ball():
             return 
         
         #Check collisions with blocks
+        # TODO
+        # Improve collisions
         if self.y >=100 and self.y <226:
             count = 0
             for x in Rectangle_Positions:
@@ -181,7 +183,6 @@ class Rectangles():
                 Rows+=1        
 
 Rectangle = Rectangles(75,25,4)
-
 Ball1 = Ball(width/2, height/2, BLACK,2,3)
 Ball2 = Ball(width/3, height/3, BLACK,2,3)
 
@@ -194,11 +195,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
-    if event.type == pygame.KEYDOWN:                        
-        MOVER.update()
-    
     Ball1.move()
-    Ball2.move()
-        
+    Ball2.move()        
     pygame.display.flip()
            

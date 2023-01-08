@@ -73,19 +73,16 @@ class Ball():
         self.mover = MOVER
         self.mult = 1.25
         self.increment = 10
-
+        self.paddle = MOVER
         pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)    
     
     def move(self):
-        #This will be the main movement function that takes care of all the physics, collisions, etc with the walls,
-        #The mover, the bricks, etc
-        #Need to be able to check the direction ball is moving right before it hits a surface, to reverse either x or y
         if self.blocks == self.increment:
             self.xspeed = self.xspeed *self.mult
             self.yspeed = self.yspeed *self.mult
             self.blocks = 0
         #paddle collision
-        if self.y >=self.mover.y - Ballsize:
+        if self.y >=self.paddle.y - Ballsize:
             pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
             paddle_x = self.mover.current_pos
             if self.x > paddle_x[0] and self.x < paddle_x[1]:
@@ -96,7 +93,7 @@ class Ball():
                 self.last_wall = 'bottom'
                 return 
             else:
-                if self.y >Mover.y+Ballsize:
+                if self.y >self.paddle.y+Ballsize:
                     self.lives -=1
                     self.x = width/2
                     self.y = height/2        
@@ -108,8 +105,7 @@ class Ball():
             self.xspeed = self.xspeed *-1
             self.x +=self.xspeed
             pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)              
-            return 
-        
+            return        
         #top wall
         if self.y <Buffer:
             pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
@@ -145,54 +141,46 @@ class Ball():
                             self.y +=self.yspeed
                             pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
                             self.last_wall = 'bottom'
-                            return
-                        
+                            return                        
                 count +=1
+
         pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)        
         self.x +=self.xspeed
-        self.y +=self.yspeed
-                
-        pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
-     
+        self.y +=self.yspeed                
+        pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)     
 
 class Rectangles():
-    def __init__(self):
-        
-        self.draw()
+    def __init__(self, width,height,rows):        
+        self.width=width
+        self.height = height
+        self.rows = rows 
+        self.draw()    
     def draw(self):
-        
-        x = 100
-        y = 100
-        length = 75
-        width = 25
+        starting_x = 100 + origin+margin
+        x = 100 + origin+margin
+        y = 100 
         colors = [RED, GREEN, BLUE, PURPLE]
         index = 0
+        Rows = 0
 
-        while y <=201:
+        while Rows <self.rows:
             #tuple of tuples, representing the drawing coordinates, then the xrange, and yrange of rectangles
-            #appended to the positions list, to be referenced for when the ball hits the rectangles
-            a = round(x,2)
-            b = round(y,2)
-            c = a+length
-            d = b+width
-            Rectangle_Positions.append(((a,b),(a,c),(b,d))) 
-            pygame.draw.rect(screen,colors[index],(a,b,length,width))
+            #appended to the positions list, to be referenced for when the ball hits the rectangles                      
+            c = x+self.width
+            d = y+width
+            Rectangle_Positions.append(((x,y),(x,c),(y,d))) 
+            pygame.draw.rect(screen,colors[index],(x,y,self.width,self.height))
 
-            x +=length+.05
+            x +=self.width
             index +=1
-            if index >3:
+            if index >len(colors)-1:
                 index = 0
-            if x >=1050:
-                y+=width+.2
-                x = 100
+            if x >=width-starting_x:
+                y+=self.height
+                x = starting_x
+                Rows+=1        
 
-        
-
-#TODO create ball class, movement of ball, bounce off Mover, hit rectangles, update rectangles, etc
-#can now reference the rectangle positions within the ball class to update rectangles
-#can now reference the mover position to check how and where ball bounces
-
-Rectangle = Rectangles()
+Rectangle = Rectangles(75,25,4)
 
 Ball1 = Ball(width/2, height/2, BLACK,2,3)
 Ball2 = Ball(width/3, height/3, BLACK,2,3)
@@ -200,6 +188,7 @@ Ball2 = Ball(width/3, height/3, BLACK,2,3)
 running = True
 while running:
     draw_screen()
+    MOVER.update()
     clock.tick(FPS)
     
     for event in pygame.event.get():

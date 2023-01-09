@@ -30,6 +30,10 @@ def draw_screen():
     pygame.display.set_caption("Wallsmash")
 
 Rectangle_Positions = []
+Tile_Rows = None
+BUFFER = None
+HEIGHT = None
+Started = False
 
 class Mover:
     def __init__(self):
@@ -60,7 +64,7 @@ class Mover:
 
 MOVER = Mover()
 
-class Ball():
+class Ball:
     def __init__(self,x,y,color, xspeed, yspeed):
         self.x = x
         self.y = y
@@ -74,6 +78,9 @@ class Ball():
         self.mult = 1.25
         self.increment = 10
         self.paddle = MOVER
+        self.x_dir = 'R'
+        self.y_dir = 'D'
+        
         pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)    
     
     def move(self):
@@ -107,7 +114,7 @@ class Ball():
             pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)              
             return        
         #top wall
-        if self.y <Buffer:
+        if self.y-Ballsize/2 <Buffer:
             pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
             self.x +=self.xspeed 
             self.yspeed = self.yspeed *-1
@@ -119,48 +126,75 @@ class Ball():
         #Check collisions with blocks
         # TODO
         # Improve collisions
-        if self.y >=100 and self.y <226:
-            count = 0
-            for x in Rectangle_Positions:
+        if Started==True:            
+            if self.y >=BUFFER and self.y <BUFFER + Tile_Rows*HEIGHT:
+                count = 0
+                for x in Rectangle_Positions:
+                        
+                    if self.x + Ballsize >= x[1][0] and self.x - Ballsize <= x[1][1]:
+                        if self.y+Ballsize >= x[2][0] and self.y-Ballsize <= x[2][1]:
+                            self.blocks +=1
+                            del Rectangle_Positions[count]
+                            pygame.draw.rect(screen,WHITE,(x[0][0],x[0][1],75,25))                       
+                                        
 
-                if self.x+Ballsize >= x[1][0] and self.x-Ballsize <= x[1][1]:
-                    if self.y+Ballsize >= x[2][0] and self.y-Ballsize <= x[2][1]:
-                        self.blocks +=1
-                        del Rectangle_Positions[count]
-                        pygame.draw.rect(screen,WHITE,(x[0][0],x[0][1],75,25))
-                        if self.last_wall == 'bottom':
-                            pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
-                            self.x +=self.xspeed
-                            self.yspeed = self.yspeed * -1
-                            self.y +=self.yspeed
-                            pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
-                            self.last_wall = 'top'
-                            return
-                        elif self.last_wall == 'top':
-                            pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
-                            self.x +=self.xspeed
-                            self.yspeed = self.yspeed * -1
-                            self.y +=self.yspeed
-                            pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
-                            self.last_wall = 'bottom'
-                            return                        
-                count +=1
-
+                            if self.last_wall == 'bottom':
+                                pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
+                                self.x +=self.xspeed
+                                self.yspeed = self.yspeed * -1
+                                self.y +=self.yspeed
+                                pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
+                                self.last_wall = 'top'
+                                
+                                return
+                            elif self.last_wall == 'top':
+                                pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)
+                                self.x +=self.xspeed
+                                self.yspeed = self.yspeed * -1
+                                self.y +=self.yspeed
+                                pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)
+                                self.last_wall = 'bottom'
+                                
+                                return
+                            
+                    count +=1
         pygame.draw.circle(screen,WHITE,(self.x,self.y),Ballsize)        
         self.x +=self.xspeed
         self.y +=self.yspeed                
         pygame.draw.circle(screen,self.color,(self.x,self.y),Ballsize)     
 
-class Rectangles():
-    def __init__(self, width,height,rows):        
+class Rectangle:
+    def __init__(self, color, x,y, width, height):
+        self.color = color
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.draw()
+    def draw(self):
+        pygame.draw.rect(screen,self.color,(self.x,self.y,self.width,self.height))
+        return
+
+class Rectangles:
+    def __init__(self, width,height,rows,buffer):        
         self.width=width
         self.height = height
-        self.rows = rows 
-        self.draw()    
+        self.rows = rows
+        global BUFFER
+        global HEIGHT
+        global Started
+        global Tile_Rows   
+        self.buffer,BUFFER = buffer,buffer
+        HEIGHT = self.height
+        Started =True
+        Tile_Rows= rows
+        self.All_Rectangles = []
+        self.draw()
+
     def draw(self):
-        starting_x = 100 + origin+margin
-        x = 100 + origin+margin
-        y = 100 
+        starting_x = self.buffer + origin+margin
+        x = self.buffer + origin+margin
+        y = self.buffer 
         colors = [RED, GREEN, BLUE, PURPLE]
         index = 0
         Rows = 0
@@ -170,9 +204,9 @@ class Rectangles():
             #appended to the positions list, to be referenced for when the ball hits the rectangles                      
             c = x+self.width
             d = y+width
-            Rectangle_Positions.append(((x,y),(x,c),(y,d))) 
-            pygame.draw.rect(screen,colors[index],(x,y,self.width,self.height))
-
+            Rectangle_Positions.append(((x,y),(x,c),(y,d)))
+            self.All_Rectangles.append(Rectangle(colors[index],x,y,self.width, self.height))
+            
             x +=self.width
             index +=1
             if index >len(colors)-1:
@@ -182,7 +216,7 @@ class Rectangles():
                 x = starting_x
                 Rows+=1        
 
-Rectangle = Rectangles(75,25,4)
+Rectangle = Rectangles(75,25,4,100)
 Ball1 = Ball(width/2, height/2, BLACK,2,3)
 Ball2 = Ball(width/3, height/3, BLACK,2,3)
 

@@ -787,9 +787,9 @@ class Player:
 
 
 # LOAD IN EXISTING WINS/LOSSES Conversion List of Lists
-with open('ML_INFO_WINS') as file:
+with open('ML_INFO_WINS.json') as file:
     WINS = json.load(file)
-with open ('ML_INFO_LOSSES') as file:
+with open ('ML_INFO_LOSSES.json') as file:
     LOSSES = json.load(file)       
 
 Red_wins = 0
@@ -856,13 +856,14 @@ while running:
 
 print(len(WINS))
 # DUMP NEW ADDED INFORMATION BACK TO JSON FILES
-with open('ML_INFO_WINS', 'w') as fp:
+with open('ML_INFO_WINS.json', 'w') as fp:
     json.dump(WINS, fp)
-with open('ML_INFO_LOSSES','w') as fp:
+with open('ML_INFO_LOSSES.json','w') as fp:
     json.dump(LOSSES,fp)
 
 # Script for ultimately turning these files into np arrays to be used with PYTORCH ML
-with open('ML_INFO_WINS') as file:
+'''
+with open('ML_INFO_WINS.json') as file:
     New_Wins = json.load(file)
 
 # Takes the lists wins/losses, st
@@ -872,7 +873,7 @@ for l in New_Wins:
     for x in l:
         L.append(np.array(x))
     Final.append(L)    
-print(Final)
+'''
 
 # TODO
 # Use wins/Losses information in ML SOMEHOW...

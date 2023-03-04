@@ -473,9 +473,13 @@ class Player:
         if self.take_off==True:
             self.board = self.off_board
             if self.win_check()==True:
-                self.board = Board().board                    
+                self.board = Board().board
+                self.redraw()
+                return                    
         elif self.stored_boards == []:            
             self.board = self.replica_board
+            self.redraw()
+            return 
         elif self.take_off==False and self.stored_boards!=[]:
             if reinforced==False:
                 self.board = self.stored_boards[random.randint(0,len(self.stored_boards)-1)] 
@@ -635,7 +639,7 @@ class Player:
         # Altering this val , is the selection criteria for choosing moves,
         # Moving it up to 200 from 0, improved the win rate substantially,
         # More to come
-        val = 0
+        val = 1000
         Final_Board = None  
 
         for board in boards:
@@ -738,7 +742,6 @@ class Player:
 
             self.clear_dict()
             self.populate_Dict(board)
-
             Matrix =  np.zeros(5).astype(int)
             if self.color =='red':
 
@@ -778,17 +781,16 @@ class Player:
             if STR==True:
                 return str(Matrix)
             else:
-                return Matrix
-    
+                return Matrix.tolist()
+        else:
+            return -1
 
-# Scores_9.json, matrix_eval_3, only winning model so far
-# 545-455 wins over 1000 games, vs random opponent
-# 535-465 second attempt
-#scores_8 and matrix eval 534-466 wins first 1000
-# TODO
-# Consider using random board automation each game to improve mid game play
-# Create new evaluation functions that can defeat computer consistently, have it play against
-# matrix_eval_3, see which wins, and keep improving model this way
+
+# LOAD IN EXISTING WINS/LOSSES Conversion List of Lists
+with open('ML_INFO_WINS') as file:
+    WINS = json.load(file)
+with open ('ML_INFO_LOSSES') as file:
+    LOSSES = json.load(file)       
 
 Red_wins = 0
 Black_wins = 0
@@ -798,9 +800,8 @@ board = None
 running = True
 Games = 0
 
-while running:
-    
-    if Games ==1000:
+while running:    
+    if Games ==20:
         print(Red_wins/Black_wins)                            
         break
     
@@ -809,44 +810,73 @@ while running:
         if event.type == p.QUIT:
             sys.exit()
     
-    P1 = Player('red',board)
-    # P1.Random_Move()     
-    P1.Random_Move(reinforced=True,File='Scores_8.json',Func=P1.Matrix_Eval_Board)
-    # P1.Random_Move()    
+    P1 = Player('red',board)     
+    P1.Random_Move()    
     if P1.win==True:
-        Red_wins+=1 
-        print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')             
-        Games+=1
-        if Games%100==0:
-            print(Games)               
-        P1.record_eval('Scores_8.json',Red_Moves,Black_Moves)                    
-        Red_Moves.clear()
-        Black_Moves.clear()               
+        Red_Moves_1 = [x for x in Red_Moves if type(x)!=int]
+        Black_Moves_1 = [x for x in Black_Moves if type(x)!=int]                
+        LOSSES.append(Black_Moves_1)
+        WINS.append(Red_Moves_1)
         
+        Red_wins+=1
+        Games +=1
+        print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
 
+        Red_Moves.clear()
+        Black_Moves.clear()        
+    
     board = P1.board
-    conversion = P1.Matrix_Eval_Board(board)
-    if conversion!=None:
-        Red_Moves.append(conversion)  
-
-    P2 = Player('black',board)    
+    conversion = P1.Matrix_3_eval(board,STR=False)
+    # if conversion!=None:
+    Red_Moves.append(conversion)
+    P2 = Player('black',board)
+      
     P2.Random_Move()
     if P2.win==True:
-        Black_wins+=1 
+        
+        Red_Moves_1 = [x for x in Red_Moves if type(x)!=int]
+        Black_Moves_1 = [x for x in Black_Moves if type(x)!=int]
+        LOSSES.append(Red_Moves_1)
+        WINS.append(Black_Moves_1)
+        Black_wins+=1
+        Games+=1 
         print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
-        Games+=1         
-        if Games%100==0:
-            print(Games)             
-        P2.record_eval('Scores_8.json',Black_Moves, Red_Moves)                     
+                                                   
         Red_Moves.clear()
         Black_Moves.clear()        
     
     board = P2.board    
-    conversion = P2.Matrix_Eval_Board(board)
-    if conversion!=None:
-        Black_Moves.append(conversion)       
+    conversion = P2.Matrix_3_eval(board,STR=False)
+    Black_Moves.append(conversion)       
     
     # Optional Time parameter to view changing board states
 
-    # time.sleep(.05)       
+    # time.sleep(.03)       
     p.display.flip()
+
+print(len(WINS))
+# DUMP NEW ADDED INFORMATION BACK TO JSON FILES
+with open('ML_INFO_WINS', 'w') as fp:
+    json.dump(WINS, fp)
+with open('ML_INFO_LOSSES','w') as fp:
+    json.dump(LOSSES,fp)
+
+# Script for ultimately turning these files into np arrays to be used with PYTORCH ML
+with open('ML_INFO_WINS') as file:
+    New_Wins = json.load(file)
+
+# Takes the lists wins/losses, st
+Final = []
+for l in New_Wins:
+    L = []
+    for x in l:
+        L.append(np.array(x))
+    Final.append(L)    
+print(Final)
+
+# TODO
+# Use wins/Losses information in ML SOMEHOW...
+
+
+
+

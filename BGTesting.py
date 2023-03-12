@@ -595,7 +595,7 @@ class Player:
                     max_consec_red_blocks
     
 
-    def record_eval(self, File,L1, L2,increment=1,decrement=1):
+    def record_eval(self, File,L1, L2,increment=1,decrement=1,lr=.3):
     # Records evaluation for given json file based on list of board representations
     # check if file exists in directory
         if os.path.isfile(File)==False:
@@ -603,39 +603,38 @@ class Player:
                 json.dump({}, f)        
         
         with open(File) as file:    
-            Eval = json.load(file)        
+            Eval = json.load(file)
+                    
         for val in L1:
             if val not in Eval:
                 Eval[val]=increment
             else:
-                Eval[val]+=increment
+                Eval[val]+=lr*increment
         for val2 in L2:
             if val2 not in Eval:
                 Eval[val2]=-1*decrement
             else:
-                Eval[val2]-=decrement
+                Eval[val2]-=lr*decrement
         with open(File, 'w') as fp:
             json.dump(Eval, fp)
         return  
             
     def reinforced_test(self, File, func, boards):
         # reinforced learning using board evaluation function
+        # This function is built into player's random move function as alternative
         with open(File) as file:    
             Stored_Info = json.load(file)
         Keys = [x for x in Stored_Info]        
         # Altering this val , is the selection criteria for choosing moves,
-        # Moving it up to 200 from 0, improved the win rate substantially,
-        # More to come
+        # Setting it at 0 forces choice to be positive, or random
         val = 0
-        Final_Board = None  
-
+        Final_Board = None
         for board in boards:
             output = func(board)            
             if output in Keys:
                 if Stored_Info[output]>val:
                     Final_Board=board 
-                    val = Stored_Info[output]
-        
+                    val = Stored_Info[output]        
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)]       
         else:            

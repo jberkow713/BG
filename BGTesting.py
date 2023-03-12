@@ -626,7 +626,7 @@ class Player:
         # Altering this val , is the selection criteria for choosing moves,
         # Moving it up to 200 from 0, improved the win rate substantially,
         # More to come
-        val = 1000
+        val = 0
         Final_Board = None  
 
         for board in boards:
@@ -813,15 +813,9 @@ class Player:
             Output[0]=self.pip_differential()
             Output[1]=blocks
             Output[2]=rail_count
+            return str(Output)
 
-            return str(Output) 
-
-
-
-
-
-# LOAD IN EXISTING WINS/LOSSES Conversion List of Lists
-
+# 289-211 last series using 0 as threshold
 
 Red_wins = 0
 Black_wins = 0
@@ -832,7 +826,7 @@ running = True
 Games = 0
 
 while running:    
-    if Games ==1000:
+    if Games ==500:
         print(Red_wins/Black_wins)                            
         break
     
@@ -841,8 +835,8 @@ while running:
         if event.type == p.QUIT:
             sys.exit()
     
-    P1 = Player('red',board)     
-    P1.Random_Move()
+    P1 = Player('red',board)
+    P1.Random_Move(reinforced=True,File='Scores_10.json',Func=P1.Matrix_Eval_Board_4)    
     board = P1.board
     conversion = P1.Matrix_Eval_Board_4(board)
     if conversion!=None:

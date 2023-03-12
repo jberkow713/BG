@@ -531,19 +531,6 @@ class Player:
                 R.append(''.join(l))
         return''.join(R)
 
-    def Eval_3_5(self, board):
-        # Different board eval method for testing
-        R = ''
-        for x in board:
-            if len(x)!=0:
-                l= ''
-                for y in x:
-                    l+=(str(y))
-                if len(l)>1:
-                    l+=(str(0))
-                R+=l
-        return R
-
     def Eval_Blocks(self, board):
         Count = 0
         for x in board[1:25]:
@@ -667,8 +654,19 @@ class Player:
             for pos,Count in self.Black_Pieces.items():
                 count +=pos*Count
             for pos,Count in self.Black_Pieces.items():
-                opp_count += (25-pos)*Count    
-        return count-opp_count
+                opp_count += (25-pos)*Count
+        
+        diff = opp_count-count
+        pip_dict = {-100:-3, -60:-2,-30:-1,30:1, 60:2, 100:3}
+        pips = sorted([int(x) for x in pip_dict.keys()])
+        idx = 0
+        for x in pips:
+            if diff >x:                
+                idx +=1
+            else:
+                break
+        return pip_dict[pips[idx-1]]
+        
 
     def Matrix_Eval_Board(self, board,STR=True):
         # Represent the board in very simplistic way in matrix form, 
@@ -730,10 +728,7 @@ class Player:
                 return str(Matrix)
             else:
                 return Matrix
-
-    def Matrix_Eval_Board_2(self,board):
-        # For Tensor use
-        return self.Matrix_Eval_Board(board,STR=False)
+    
     
     def Matrix_3_eval(self, board, STR=True):
         # To store in Json_9
@@ -742,7 +737,7 @@ class Player:
 
             self.clear_dict()
             self.populate_Dict(board)
-            Matrix =  np.zeros(5).astype(int)
+            Matrix =  [0,0,0,0,0]
             if self.color =='red':
 
                 Pieces = self.Red_Pieces            
@@ -781,16 +776,52 @@ class Player:
             if STR==True:
                 return str(Matrix)
             else:
-                return Matrix.tolist()
+                if Matrix==[0,0,0,0,0]:
+                    return -1
+                else:
+                    return Matrix
         else:
             return -1
+    def Matrix_Eval_Board_4(self, board):
+        if self.can_remove == False:
+            self.clear_dict()
+            self.populate_Dict(board)
+            Output =  [0,0,0]
+            if self.color == 'red':
+                pieces = copy.deepcopy(self.Red_Pieces)
+                opp_pieces = copy.deepcopy(self.Black_Pieces)
+                rail_count = len(self.board[25])-len(self.board[0])
+                blocks = 0
+                for v in pieces.values():
+                    if v >1:
+                        blocks +=1
+                for v in opp_pieces.values():
+                    if v>1:
+                        blocks -=1
+
+            elif self.color == 'black':
+                pieces = copy.deepcopy(self.Black_Pieces)
+                opp_pieces = copy.deepcopy(self.Red_Pieces)
+                rail_count = len(self.board[0])-len(self.board[25])
+                blocks = 0
+                for v in pieces.values():
+                    if v >1:
+                        blocks +=1
+                for v in opp_pieces.values():
+                    if v>1:
+                        blocks -=1    
+            Output[0]=self.pip_differential()
+            Output[1]=blocks
+            Output[2]=rail_count
+
+            return str(Output) 
+
+
+
 
 
 # LOAD IN EXISTING WINS/LOSSES Conversion List of Lists
-with open('ML_INFO_WINS.json') as file:
-    WINS = json.load(file)
-with open ('ML_INFO_LOSSES.json') as file:
-    LOSSES = json.load(file)       
+
 
 Red_wins = 0
 Black_wins = 0
@@ -801,7 +832,7 @@ running = True
 Games = 0
 
 while running:    
-    if Games ==20:
+    if Games ==1000:
         print(Red_wins/Black_wins)                            
         break
     
@@ -811,72 +842,45 @@ while running:
             sys.exit()
     
     P1 = Player('red',board)     
-    P1.Random_Move()    
+    P1.Random_Move()
+    board = P1.board
+    conversion = P1.Matrix_Eval_Board_4(board)
+    if conversion!=None:
+        Red_Moves.append(conversion)
+
     if P1.win==True:
-        Red_Moves_1 = [x for x in Red_Moves if type(x)!=int]
-        Black_Moves_1 = [x for x in Black_Moves if type(x)!=int]                
-        LOSSES.append(Black_Moves_1)
-        WINS.append(Red_Moves_1)
-        
+        P1.record_eval('Scores_10.json', Red_Moves, Black_Moves)          
+                        
         Red_wins+=1
         Games +=1
         print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
-
         Red_Moves.clear()
-        Black_Moves.clear()        
-    
-    board = P1.board
-    conversion = P1.Matrix_3_eval(board,STR=False)
-    # if conversion!=None:
-    Red_Moves.append(conversion)
-    P2 = Player('black',board)
-      
+        Black_Moves.clear()
+        board = None
+ 
+    P2 = Player('black',board)      
     P2.Random_Move()
+    board = P2.board
+    conversion = P2.Matrix_Eval_Board_4(board)
+    if conversion!=None:
+        Black_Moves.append(conversion)
+
     if P2.win==True:
-        
-        Red_Moves_1 = [x for x in Red_Moves if type(x)!=int]
-        Black_Moves_1 = [x for x in Black_Moves if type(x)!=int]
-        LOSSES.append(Red_Moves_1)
-        WINS.append(Black_Moves_1)
+        P2.record_eval('Scores_10.json', Black_Moves, Red_Moves)          
+                
         Black_wins+=1
         Games+=1 
         print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
                                                    
         Red_Moves.clear()
-        Black_Moves.clear()        
-    
-    board = P2.board    
-    conversion = P2.Matrix_3_eval(board,STR=False)
-    Black_Moves.append(conversion)       
-    
-    # Optional Time parameter to view changing board states
-
+        Black_Moves.clear()
+        board = None        
+        
+    #  Optional Time parameter to view changing board states
     # time.sleep(.03)       
     p.display.flip()
 
-print(len(WINS))
-# DUMP NEW ADDED INFORMATION BACK TO JSON FILES
-with open('ML_INFO_WINS.json', 'w') as fp:
-    json.dump(WINS, fp)
-with open('ML_INFO_LOSSES.json','w') as fp:
-    json.dump(LOSSES,fp)
 
-# Script for ultimately turning these files into np arrays to be used with PYTORCH ML
-'''
-with open('ML_INFO_WINS.json') as file:
-    New_Wins = json.load(file)
-
-# Takes the lists wins/losses, st
-Final = []
-for l in New_Wins:
-    L = []
-    for x in l:
-        L.append(np.array(x))
-    Final.append(L)    
-'''
-
-# TODO
-# Use wins/Losses information in ML SOMEHOW...
 
 
 

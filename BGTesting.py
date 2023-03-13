@@ -652,7 +652,7 @@ class Player:
         elif self.color=='black':
             for pos,Count in self.Black_Pieces.items():
                 count +=pos*Count
-            for pos,Count in self.Black_Pieces.items():
+            for pos,Count in self.Red_Pieces.items():
                 opp_count += (25-pos)*Count
         
         diff = opp_count-count
@@ -781,34 +781,29 @@ class Player:
                     return Matrix
         else:
             return -1
+    
     def Matrix_Eval_Board_4(self, board):
         if self.can_remove == False:
             self.clear_dict()
             self.populate_Dict(board)
             Output =  [0,0,0]
+            blocks = 0
             if self.color == 'red':
                 pieces = copy.deepcopy(self.Red_Pieces)
                 opp_pieces = copy.deepcopy(self.Black_Pieces)
-                rail_count = len(self.board[25])-len(self.board[0])
-                blocks = 0
-                for v in pieces.values():
-                    if v >1:
-                        blocks +=1
-                for v in opp_pieces.values():
-                    if v>1:
-                        blocks -=1
-
+                rail_count = len(self.board[25])-len(self.board[0])                
             elif self.color == 'black':
                 pieces = copy.deepcopy(self.Black_Pieces)
                 opp_pieces = copy.deepcopy(self.Red_Pieces)
-                rail_count = len(self.board[0])-len(self.board[25])
-                blocks = 0
-                for v in pieces.values():
-                    if v >1:
-                        blocks +=1
-                for v in opp_pieces.values():
-                    if v>1:
-                        blocks -=1    
+                rail_count = len(self.board[0])-len(self.board[25])               
+            
+            for v in pieces.values():
+                if v >1:
+                    blocks +=1
+            for v in opp_pieces.values():
+                if v>1:
+                    blocks -=1
+
             Output[0]=self.pip_differential()
             Output[1]=blocks
             Output[2]=rail_count

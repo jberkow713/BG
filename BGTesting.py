@@ -595,7 +595,7 @@ class Player:
                     max_consec_red_blocks
     
 
-    def record_eval(self, File,L1, L2,increment=1,decrement=1,lr=.3):
+    def record_eval(self, File,L1, L2,increment=1,decrement=1,lr=.2):
     # Records evaluation for given json file based on list of board representations
     # check if file exists in directory
         if os.path.isfile(File)==False:
@@ -627,7 +627,7 @@ class Player:
         Keys = [x for x in Stored_Info]        
         # Altering this val , is the selection criteria for choosing moves,
         # Setting it at 0 forces choice to be positive, or random
-        val = 0
+        val = 100
         Final_Board = None
         for board in boards:
             output = func(board)            

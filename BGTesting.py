@@ -627,7 +627,7 @@ class Player:
         Keys = [x for x in Stored_Info]        
         # Altering this val , is the selection criteria for choosing moves,
         # Setting it at 0 forces choice to be positive, or random
-        val = 100
+        val = 0
         Final_Board = None
         for board in boards:
             output = func(board)            
@@ -664,8 +664,7 @@ class Player:
                 idx +=1
             else:
                 break
-        return pip_dict[pips[idx-1]]
-        
+        return pip_dict[pips[idx-1]]        
 
     def Matrix_Eval_Board(self, board,STR=True):
         # Represent the board in very simplistic way in matrix form, 
@@ -844,7 +843,7 @@ while running:
         print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
         Red_Moves.clear()
         Black_Moves.clear()
-        board = None
+        board = P1.generate_random_board()
  
     P2 = Player('black',board)      
     P2.Random_Move()
@@ -862,7 +861,7 @@ while running:
                                                    
         Red_Moves.clear()
         Black_Moves.clear()
-        board = None        
+        board = P2.generate_random_board()       
         
     #  Optional Time parameter to view changing board states
     # time.sleep(.03)       

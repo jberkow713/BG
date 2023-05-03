@@ -82,16 +82,17 @@ class Player:
 
     def generate_random_board(self):
         # Random board generator for reinforcement learning testing
-        board = [[] for x in range(26)]
+        board = [[] for _ in range(26)]
         for _ in range(15):
             can_insert = False
             while can_insert==False:
                 red = random.randint(1,24)
                 black = random.randint(1,24)
-                if 2 not in board[red] and 1 not in board[black]!=1:
-                    board[red].append(1)
-                    board[black].append(2)
-                    can_insert=True 
+                if red !=black:
+                    if 2 not in board[red] and 1 not in board[black]:
+                        board[red].append(1)
+                        board[black].append(2)
+                        can_insert=True 
         return board 
 
     def Can_remove(self):
@@ -861,7 +862,7 @@ while running:
                                                    
         Red_Moves.clear()
         Black_Moves.clear()
-        board = P2.generate_random_board()       
+        board = P2.generate_random_board()     
         
     #  Optional Time parameter to view changing board states
     # time.sleep(.03)       

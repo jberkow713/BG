@@ -25,7 +25,6 @@ font = p.font.SysFont(None, 36)
 clock = p.time.Clock()
 screen = p.display.set_mode((width, height))
 p.display.set_caption("Backgammon")
-
 screen.fill(TAN)
 
 class Board:
@@ -43,7 +42,6 @@ class Player:
             self.board = Board().board
         else:
             self.board = board
-
         self.color = color
         self.Red_Pieces = {}
         self.Black_Pieces = {}
@@ -200,7 +198,6 @@ class Player:
                         screen.blit(img, (x_coord-c_size/2,y_coord))    
                         overlap = font.render(None, 0, TAN)
                         screen.blit(overlap, (x_coord-c_size/2,y_coord))
-
                     inner_count+=1
             count-=1
 
@@ -519,8 +516,7 @@ class Player:
     
     def Eval_3(self, board):
         # Transforms list of list board state into string representation
-        # Sample output: "1222222220000020000022010122211111211111110"
-        
+        # Sample output: "1222222220000020000022010122211111211111110"        
         R = []        
         for x in board:
             if len(x)==0:
@@ -569,13 +565,11 @@ class Player:
                             max_consec_red_blocks = red_consec_counter 
                     else:
                         starting_red_block_index = red_consec_counter = 1
-                        max_consec_red_blocks = copy_max_red
-                        
+                        max_consec_red_blocks = copy_max_red                        
                 if 2 in x and len(x)>1:
                     starting_red_block_index=0
                     black_blocks+=1
                     if black_consec_counter == starting_black_block_index:
-
                         black_consec_counter+=1
                         starting_black_block_index+=1
                         if black_consec_counter>max_consec_black_blocks:
@@ -587,25 +581,21 @@ class Player:
                 starting_red_block_index=0
                 starting_black_block_index=0
         if self.can_remove==False:
-
             if self.color=='red':
                 return max_consec_red_blocks**2 - max_consec_black_blocks**2 + max_consec_red_blocks-\
                     max_consec_black_blocks
             else:
                 return max_consec_black_blocks**2 - max_consec_red_blocks**2 + max_consec_black_blocks-\
-                    max_consec_red_blocks
-    
+                    max_consec_red_blocks    
 
     def record_eval(self, File,L1, L2,increment=1,decrement=1,lr=.2):
     # Records evaluation for given json file based on list of board representations
     # check if file exists in directory
         if os.path.isfile(File)==False:
             with open(File, "w") as f:
-                json.dump({}, f)        
-        
+                json.dump({}, f)       
         with open(File) as file:    
-            Eval = json.load(file)
-                    
+            Eval = json.load(file)                    
         for val in L1:
             if val not in Eval:
                 Eval[val]=increment
@@ -648,14 +638,12 @@ class Player:
             for pos,Count in self.Red_Pieces.items():
                 count += (25-pos)*Count
             for pos,Count in self.Black_Pieces.items():
-                opp_count += pos*Count   
-
+                opp_count += pos*Count
         elif self.color=='black':
             for pos,Count in self.Black_Pieces.items():
                 count +=pos*Count
             for pos,Count in self.Red_Pieces.items():
-                opp_count += (25-pos)*Count
-        
+                opp_count += (25-pos)*Count        
         diff = opp_count-count
         pip_dict = {-100:-3, -60:-2,-30:-1,30:1, 60:2, 100:3}
         pips = sorted([int(x) for x in pip_dict.keys()])
@@ -673,7 +661,6 @@ class Player:
         # Example output
         # [0,0,0,1,0,0,1,0]
         if self.can_remove == False:
-
             self.clear_dict()
             self.populate_Dict(board)
 
@@ -716,8 +703,7 @@ class Player:
                 if dist==6:
                     Matrix[6]=1    
                 if dist>6:
-                    break        
-            
+                    break            
             if new_rail==1:
                 Matrix[7]=1
             if new_rail>1:

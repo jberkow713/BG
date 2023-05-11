@@ -224,8 +224,8 @@ class Player:
         die_1 = random.randint(1,6)
         die_2 = random.randint(1,6)
         if die_1 == die_2:
-            for _ in range(2):
-                self.doubles = True
+            self.doubles = True
+            for _ in range(2):                
                 self.dice.append([die_1,die_2])
         else:
             self.doubles = False
@@ -252,12 +252,11 @@ class Player:
         # checks if a spot is blocked for a given color
         if self.color == 'red':
             if spot in self.Black_Pieces and self.Black_Pieces[spot]>1:                
-                return True
-            return False      
+                return True                
         if self.color =='black':
             if spot in self.Red_Pieces and self.Red_Pieces[spot]>1:
                 return True
-            return False     
+        return False     
     
     def spot_open(self, spot):
         # Checks if a spot is open        
@@ -795,8 +794,6 @@ class Player:
             Output[2]=rail_count
             return str(Output)
 
-# 289-211 last series using 0 as threshold
-
 Red_wins = 0
 Black_wins = 0
 Red_Moves = []
@@ -823,13 +820,13 @@ while running:
         Red_Moves.append(conversion)
 
     if P1.win==True:
-        P1.record_eval('Scores_10.json', Red_Moves, Black_Moves)          
-                        
+        P1.record_eval('Scores_10.json', Red_Moves, Black_Moves)                       
         Red_wins+=1
         Games +=1
         print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
         Red_Moves.clear()
         Black_Moves.clear()
+        # Generates randomized board on the restart
         board = P1.generate_random_board()
  
     P2 = Player('black',board)      
@@ -840,12 +837,10 @@ while running:
         Black_Moves.append(conversion)
 
     if P2.win==True:
-        P2.record_eval('Scores_10.json', Black_Moves, Red_Moves)          
-                
+        P2.record_eval('Scores_10.json', Black_Moves, Red_Moves)               
         Black_wins+=1
         Games+=1 
-        print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')
-                                                   
+        print(f'Red Wins : {Red_wins}, Black Wins:{Black_wins}')                                                   
         Red_Moves.clear()
         Black_Moves.clear()
         board = P2.generate_random_board()     
@@ -853,9 +848,3 @@ while running:
     #  Optional Time parameter to view changing board states
     # time.sleep(.03)       
     p.display.flip()
-
-
-
-
-
-

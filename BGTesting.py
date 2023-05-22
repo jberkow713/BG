@@ -229,8 +229,7 @@ class Player:
                 self.dice.append([die_1,die_2])
         else:
             self.doubles = False
-            self.dice.append([die_1,die_2])
-            self.dice.append([die_2,die_1])
+            self.dice = [[die_1,die_2],[die_2,die_1]]            
         return
 
     def clear_dict(self):
@@ -251,12 +250,12 @@ class Player:
     def blocked(self,spot):
         # checks if a spot is blocked for a given color
         if self.color == 'red':
-            if spot in self.Black_Pieces and self.Black_Pieces[spot]>1:                
-                return True                
-        if self.color =='black':
-            if spot in self.Red_Pieces and self.Red_Pieces[spot]>1:
-                return True
-        return False     
+            opp_pieces = self.Black_Pieces
+        else:
+            opp_pieces = self.Red_Pieces
+        if spot in opp_pieces and opp_pieces[spot]>1:
+            return True
+        return False          
     
     def spot_open(self, spot):
         # Checks if a spot is open        
@@ -609,7 +608,7 @@ class Player:
             json.dump(Eval, fp)
         return  
             
-    def reinforced_test(self, File, func, boards):
+    def reinforced_test(self, File, func, boards,thresh=0):
         # reinforced learning using board evaluation function
         # This function is built into player's random move function as alternative
         with open(File) as file:    
@@ -617,14 +616,14 @@ class Player:
         Keys = [x for x in Stored_Info]        
         # Altering this val , is the selection criteria for choosing moves,
         # Setting it at 0 forces choice to be positive, or random
-        val = 0
+        
         Final_Board = None
         for board in boards:
             output = func(board)            
             if output in Keys:
-                if Stored_Info[output]>val:
+                if Stored_Info[output]>thresh:
                     Final_Board=board 
-                    val = Stored_Info[output]        
+                    thresh = Stored_Info[output]        
         if Final_Board==None:            
             return boards[random.randint(0,len(boards)-1)]       
         else:            
@@ -711,8 +710,7 @@ class Player:
             if STR==True:
                 return str(Matrix)
             else:
-                return Matrix
-    
+                return Matrix    
     
     def Matrix_3_eval(self, board, STR=True):
         # To store in Json_9

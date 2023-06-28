@@ -766,6 +766,10 @@ class Player:
             return -1
     
     def Matrix_Eval_Board_4(self, board):
+        # Using pip differential function, block differential, and rail count differential
+        # To populate an array of [0,0,0] into for example [1,2,1], etc...to evaluate a given
+        # board state, in order to feed various boards and save various board states, 
+        # to be incremented and decremented at the end game and stored for reinforcement learning
         if self.can_remove == False:
             self.clear_dict()
             self.populate_Dict(board)
